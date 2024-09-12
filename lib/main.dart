@@ -13,9 +13,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = Theme.of(context).textTheme.apply(bodyColor: Colors.white70);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Language parser Demo',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -32,11 +32,12 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87, brightness: Brightness.dark),
         useMaterial3: true,
         textTheme: GoogleFonts.ubuntuMonoTextTheme(textTheme),
+        brightness: Brightness.dark,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Language Parser Demo'),
     );
   }
 }
@@ -91,30 +92,11 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      body: const Center(
+
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const TableExample(),
-            TextButton(
-                onPressed: () {}, child: const SelectableText('Enabled')),
-          ],
-        ),
+        child: Padding(padding: EdgeInsets.all(16.0),child: TableExample(),),
       ),
     );
   }

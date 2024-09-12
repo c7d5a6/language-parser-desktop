@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/util/word_generator.dart';
 
 class HDash extends StatelessWidget {
   const HDash({super.key});
@@ -9,50 +10,154 @@ class HDash extends StatelessWidget {
         builder: (BuildContext context, BoxConstraints constraints) {
       return Text(
         '-' * (constraints.maxWidth / 7).round(),
-        softWrap: false,
         overflow: TextOverflow.fade,
+        style: const TextStyle(fontSize: 14, height: 0.0),
+        maxLines: 1,
       );
     });
   }
 }
 
-var words = ['word 1', 'word 2', 'asdada asd', 'master plan', 'word 2'];
-
-class TableExample extends StatelessWidget {
+class TableExample extends StatefulWidget {
   const TableExample({super.key});
 
   @override
+  State<TableExample> createState() => _TableExample();
+}
+
+class _TableExample extends State<TableExample> {
+  List<wrd> _words = [];
+
+  _TableExample():_words=generateWords(25);
+
+  void _regenerateWords() {
+    setState(() {
+      _words = generateWords(25);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Table(
-      border: TableBorder.all(style: BorderStyle.none),
-      columnWidths: const <int, TableColumnWidth>{
-        0: FixedColumnWidth(8),
-        // 1: IntrinsicColumnWidth(),
-        1: IntrinsicColumnWidth(),
-        2: FixedColumnWidth(8),
-        3: IntrinsicColumnWidth(),
-        4: FixedColumnWidth(8),
-        5: IntrinsicColumnWidth(),
-        6: FixedColumnWidth(8),
-        7: FlexColumnWidth(),
-        8: FixedColumnWidth(8),
-      },
-      defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
-      children: words
-          .map(
-            (w) => TableRow(children: <Widget>[
-              const Text('|', style: const TextStyle(fontSize: 14, height: 0.0), maxLines: 1,),
-              Text(' $w ', style: const TextStyle(fontSize: 14, height: 0.0),),
-              const Text('|', style: const TextStyle(fontSize: 14, height: 0.0),),
-              Text(' / $w / ', style: const TextStyle(fontSize: 14, height: 0.0),),
-              const Text('|', style: const TextStyle(fontSize: 14, height: 0.0),),
-              const Text(' n. ', style: const TextStyle(fontSize: 14, height: 0.0),),
-              Container(color: Colors.red,height: 14,),
-              const Text(' Comment of the word ', style: const TextStyle(fontSize: 14, height: 0.0),),
-              const Text('|', style: const TextStyle(fontSize: 14, height: 0.0),),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Table(
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: const <int, TableColumnWidth>{
+            0: FixedColumnWidth(8),
+            1: FlexColumnWidth(),
+            2: FixedColumnWidth(8),
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.baseline,
+          textBaseline: TextBaseline.ideographic,
+          children: const [
+            TableRow(children: [
+              Text(
+                "+",
+                style: TextStyle(fontSize: 14, height: 0.0),
+                maxLines: 1,
+              ),
+              HDash(),
+              Text(
+                "+",
+                style: TextStyle(fontSize: 14, height: 0.0),
+                maxLines: 1,
+              ),
             ]),
-          )
-          .toList(growable: false),
+          ],
+        ),
+        Table(
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: const <int, TableColumnWidth>{
+            0: FixedColumnWidth(8),
+            // 1: IntrinsicColumnWidth(),
+            1: IntrinsicColumnWidth(),
+            2: FixedColumnWidth(8),
+            3: IntrinsicColumnWidth(),
+            4: FixedColumnWidth(8),
+            5: IntrinsicColumnWidth(),
+            6: FixedColumnWidth(8),
+            7: FlexColumnWidth(),
+            8: FixedColumnWidth(8),
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+          children: _words
+              .map(
+                (w) => TableRow(children: <Widget>[
+                  const Text(
+                    '|',
+                    style: TextStyle(fontSize: 14, height: 0.0),
+                    maxLines: 1,
+                  ),
+                  SelectableText(
+                    ' ${w.written} ',
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  const Text(
+                    '|',
+                    style: TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  SizedBox(height: 16,child: SelectableText(
+                    ' / ${w.word} / ',
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 14, height: 0.0),
+                  ),),
+                  const Text(
+                    '|',
+                    style: TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  Text(
+                    ' ${w.pos} ',
+                    maxLines: 1,
+                    softWrap: false,
+                    style: const TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  const Text(
+                    '|',
+                    style: TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  Text(
+                    ' ${w.comment} ',
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                  const Text(
+                    '|',
+                    style: TextStyle(fontSize: 14, height: 0.0),
+                  ),
+                ]),
+              )
+              .toList(growable: false),
+        ),
+        Table(
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: const <int, TableColumnWidth>{
+            0: FixedColumnWidth(8),
+            1: FlexColumnWidth(),
+            2: FixedColumnWidth(8),
+          },
+          defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
+          children: const [
+            TableRow(children: [
+              Text(
+                "+",
+                style: TextStyle(fontSize: 14, height: 0.0),
+                maxLines: 1,
+              ),
+              HDash(),
+              Text(
+                "+",
+                style: TextStyle(fontSize: 14, height: 0.0),
+                maxLines: 1,
+              ),
+            ]),
+          ],
+        ),
+        TextButton(
+            onPressed: () =>  _regenerateWords(),
+            child: const Text('Generate')),
+      ],
     );
   }
 }
