@@ -85,3 +85,6 @@ String writtenWord(String word) {
 }
 // θuntɔːɣi
 //
+void generateSQL(){
+
+}

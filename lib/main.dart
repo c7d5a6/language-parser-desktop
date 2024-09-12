@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'features/word/words_list.dart';
 
 void main() {
+
   runApp(const MyApp());
 }
 
@@ -96,7 +97,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Padding(padding: EdgeInsets.all(16.0),child: TableExample(),),
+        child: Padding(padding: EdgeInsets.all(16.0),
+          child: SelectionArea(child: TableExample(),)),
       ),
     );
   }

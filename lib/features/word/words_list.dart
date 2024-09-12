@@ -8,13 +8,46 @@ class HDash extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-      return Text(
+      return SelectionContainer.disabled(
+          child: Text(
         '-' * (constraints.maxWidth / 7).round(),
         overflow: TextOverflow.fade,
         style: const TextStyle(fontSize: 14, height: 0.0),
         maxLines: 1,
-      );
+      ));
     });
+  }
+}
+
+class VDash extends StatelessWidget {
+  const VDash({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SelectionContainer.disabled(
+        child: Text(
+      '|',
+      style: TextStyle(fontSize: 14, height: 0.0),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.fade,
+    ));
+  }
+}
+
+class XDash extends StatelessWidget {
+  const XDash({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SelectionContainer.disabled(
+        child: Text(
+      '+',
+      style: TextStyle(fontSize: 14, height: 0.0),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.fade,
+    ));
   }
 }
 
@@ -28,7 +61,7 @@ class TableExample extends StatefulWidget {
 class _TableExample extends State<TableExample> {
   List<wrd> _words = [];
 
-  _TableExample():_words=generateWords(25);
+  _TableExample() : _words = generateWords(25);
 
   void _regenerateWords() {
     setState(() {
@@ -52,17 +85,9 @@ class _TableExample extends State<TableExample> {
           textBaseline: TextBaseline.ideographic,
           children: const [
             TableRow(children: [
-              Text(
-                "+",
-                style: TextStyle(fontSize: 14, height: 0.0),
-                maxLines: 1,
-              ),
+              XDash(),
               HDash(),
-              Text(
-                "+",
-                style: TextStyle(fontSize: 14, height: 0.0),
-                maxLines: 1,
-              ),
+              XDash(),
             ]),
           ],
         ),
@@ -70,7 +95,6 @@ class _TableExample extends State<TableExample> {
           border: TableBorder.all(style: BorderStyle.none),
           columnWidths: const <int, TableColumnWidth>{
             0: FixedColumnWidth(8),
-            // 1: IntrinsicColumnWidth(),
             1: IntrinsicColumnWidth(),
             2: FixedColumnWidth(8),
             3: IntrinsicColumnWidth(),
@@ -84,48 +108,41 @@ class _TableExample extends State<TableExample> {
           children: _words
               .map(
                 (w) => TableRow(children: <Widget>[
-                  const Text(
-                    '|',
-                    style: TextStyle(fontSize: 14, height: 0.0),
-                    maxLines: 1,
+                  const VDash(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      w.written,
+                      maxLines: 1,
+                      style: const TextStyle(fontSize: 14, height: 0.0),
+                    ),
                   ),
-                  SelectableText(
-                    ' ${w.written} ',
-                    maxLines: 1,
-                    style: const TextStyle(fontSize: 14, height: 0.0),
+                  const VDash(),
+                  SizedBox(
+                    height: 16,
+                    child: TextButton(
+                      onPressed: () => {},
+                      child: Text(
+                        ' / ${w.word} / ',
+                        maxLines: 1,
+                        style: const TextStyle(fontSize: 14, height: 0.0),
+                      ),
+                    ),
                   ),
-                  const Text(
-                    '|',
-                    style: TextStyle(fontSize: 14, height: 0.0),
-                  ),
-                  SizedBox(height: 16,child: SelectableText(
-                    ' / ${w.word} / ',
-                    maxLines: 1,
-                    style: const TextStyle(fontSize: 14, height: 0.0),
-                  ),),
-                  const Text(
-                    '|',
-                    style: TextStyle(fontSize: 14, height: 0.0),
-                  ),
+                  const VDash(),
                   Text(
                     ' ${w.pos} ',
                     maxLines: 1,
                     softWrap: false,
                     style: const TextStyle(fontSize: 14, height: 0.0),
                   ),
-                  const Text(
-                    '|',
-                    style: TextStyle(fontSize: 14, height: 0.0),
-                  ),
+                  const VDash(),
                   Text(
                     ' ${w.comment} ',
                     maxLines: 1,
                     style: const TextStyle(fontSize: 14, height: 0.0),
                   ),
-                  const Text(
-                    '|',
-                    style: TextStyle(fontSize: 14, height: 0.0),
-                  ),
+                  const VDash(),
                 ]),
               )
               .toList(growable: false),
@@ -140,23 +157,14 @@ class _TableExample extends State<TableExample> {
           defaultVerticalAlignment: TableCellVerticalAlignment.bottom,
           children: const [
             TableRow(children: [
-              Text(
-                "+",
-                style: TextStyle(fontSize: 14, height: 0.0),
-                maxLines: 1,
-              ),
+              XDash(),
               HDash(),
-              Text(
-                "+",
-                style: TextStyle(fontSize: 14, height: 0.0),
-                maxLines: 1,
-              ),
+              XDash(),
             ]),
           ],
         ),
         TextButton(
-            onPressed: () =>  _regenerateWords(),
-            child: const Text('Generate')),
+            onPressed: () => _regenerateWords(), child: const Text('Generate')),
       ],
     );
   }
