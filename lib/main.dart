@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:language_parser_desktop/util/word_generator.dart';
 
 import 'features/word/words_list.dart';
 
-void main() {
-
+void main() async {
+  // generateSQL();
   runApp(const MyApp());
 }
 
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme.apply(bodyColor: Colors.white70);
+    final textTheme =
+        Theme.of(context).textTheme.apply(bodyColor: Colors.white70);
     return MaterialApp(
       title: 'Language parser Demo',
       theme: ThemeData(
@@ -33,7 +35,8 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.black87, brightness: Brightness.dark),
         useMaterial3: true,
         textTheme: GoogleFonts.ubuntuMonoTextTheme(textTheme),
         brightness: Brightness.dark,
@@ -94,13 +97,14 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: const Center(
-
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Padding(padding: EdgeInsets.all(16.0),
-          child: SelectionArea(child: TableExample(),)),
+        child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: SelectionArea(
+              child: TableExample(),
+            )),
       ),
     );
   }
 }
-

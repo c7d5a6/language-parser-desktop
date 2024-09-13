@@ -65,7 +65,7 @@ class _TableExample extends State<TableExample> {
 
   void _regenerateWords() {
     setState(() {
-      _words = generateWords(25);
+      _words = getWords(25,'ni');
     });
   }
 
