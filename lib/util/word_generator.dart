@@ -27,7 +27,7 @@ var languages = [
 List<wrd> getWords(int size, String string){
   var db = sqlite3.open('./temp.sqlt3');
   final ResultSet resultSet =
-  db.select('SELECT * FROM word_tbl WHERE word LIKE ? OR written_word LIKE ? LIMIT ?', ['%$string%','%$string%', size]);
+  db.select('SELECT * FROM word_tbl WHERE word LIKE ? OR written_word LIKE ? ORDER BY word ASC LIMIT ? ', ['%$string%','%$string%', size]);
   var res = resultSet.rows.map((row) => wrd(
     '${row[1]}',
       '${row[2]}',
