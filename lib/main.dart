@@ -6,6 +6,7 @@ import 'features/word/words_list.dart';
 
 void main() async {
   // generateSQL();
+  initDB();
   runApp(const MyApp());
 }
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/util/word_generator.dart';
 
@@ -63,9 +65,10 @@ class _TableExample extends State<TableExample> {
 
   _TableExample() : _words = generateWords(25);
 
-  void _regenerateWords() {
+  Future<void> _regenerateWords(String? search) async {
+    var wrds = await getWords(25,search ?? '');
     setState(() {
-      _words = getWords(25,'ni');
+      _words = wrds;
     });
   }
 
@@ -74,6 +77,8 @@ class _TableExample extends State<TableExample> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        TextFormField(textAlign: TextAlign.center,onChanged: (word)=>_regenerateWords(word),),
+        const VerticalDivider(),
         Table(
           border: TableBorder.all(style: BorderStyle.none),
           columnWidths: const <int, TableColumnWidth>{
@@ -163,8 +168,6 @@ class _TableExample extends State<TableExample> {
             ]),
           ],
         ),
-        TextButton(
-            onPressed: () => _regenerateWords(), child: const Text('Generate')),
       ],
     );
   }
