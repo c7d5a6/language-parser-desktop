@@ -3,11 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:language_parser_desktop/util/word_generator.dart';
 
 import 'features/word/words_list.dart';
+import 'util/sqlite.dart' as sl;
 
 void main() async {
   // generateSQL();
   initDB();
   runApp(const MyApp());
+  sl.main();
 }
 
 class MyApp extends StatelessWidget {
