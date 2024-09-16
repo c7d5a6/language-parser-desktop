@@ -7,7 +7,7 @@ import 'util/sqlite.dart' as sl;
 
 void main() async {
   // generateSQL();
-  initDB();
+  // initDB();
   runApp(const MyApp());
   sl.main();
 }
