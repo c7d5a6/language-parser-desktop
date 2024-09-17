@@ -1,8 +1,35 @@
+import 'dart:developer';
+
 import 'package:flutter/services.dart' show AssetManifest, rootBundle;
+import 'package:language_parser_desktop/util/word_generator.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 const assetsPath = 'assets/db/';
 const migrationsPath = '${assetsPath}migrations/';
+
+Database? database;
+
+void newDb(String path) {
+  log('New db in path: $path');
+  var tmp = sqlite3.openInMemory();
+  database = sqlite3.open(path);
+  tmp.backup(database!, nPage: -1);
+  tmp.dispose();
+  migrate(database!);
+  generateSQL(database!);
+}
+
+void setDb(String path) {
+  log('Set db in path: $path');
+  database = sqlite3.open(path);
+  migrate(database!);
+}
+
+void generateWords() {
+  if (database != null) {
+    generateSQL(database!);
+  }
+}
 
 void main() async {
   print('Using sqlite3 ${sqlite3.version}');
@@ -31,7 +58,7 @@ Future<void> migrate(Database db) async {
           migrationsPath.length, m.indexOf('_', migrationsPath.length))))
       .toList(growable: false)
     ..sort();
-  var uversion  = db.select("PRAGMA user_version;").single['user_version'];
+  var uversion = db.select("PRAGMA user_version;").single['user_version'];
   for (int version in versions) {
     if (version <= uversion) continue;
     var migrationPath = migrations

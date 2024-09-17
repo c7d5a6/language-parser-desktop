@@ -2,7 +2,8 @@ import 'dart:developer';
 import 'dart:math' show Random;
 
 import 'package:sqlite3/sqlite3.dart';
-import 'package:sqlite_async/sqlite_async.dart';
+
+import './sqlite.dart' as sl;
 
 class wrd {
   String word;
@@ -27,29 +28,25 @@ var languages = [
   'Runic'
 ];
 
-Database? data;
-SqliteDatabase? aDB;
-void initDB() {
-  aDB = SqliteDatabase(path: './temp.sqlt3');
-  var db = sqlite3.open('./temp.sqlt3', mode: OpenMode.readOnly);
-  // data = sqlite3.open('./temp.sqlt3');
-  data = sqlite3.copyIntoMemory(db);
-}
-
 Future<List<wrd>> getWords(int size, String string) async {
+  final data = sl.database;
   var time = DateTime.now().millisecondsSinceEpoch;
   if (data == null) return [];
   // if(aDB==null) return [];
   // var resultSet = (aDB!.getAll(
   //     'SELECT * FROM word_tbl WHERE word LIKE ? OR written_word LIKE ? ORDER BY word ASC LIMIT ? ',
   //     ['%$string%', '%$string%', size]));
-  final ResultSet resultSet = string.length<3?
-  data!.select(
-      'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT ? ',
-      ['*$string*', '*$string*', size]):
-  data!.select(
-      'SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ',
-      [string, size]);
+  final ResultSet resultSet = string.length < 3
+      ? data!.select(
+          'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT ? ',
+          [
+              '*$string*',
+              '*$string*',
+              size
+            ])
+      : data!.select(
+          'SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ',
+          [string, size]);
   log('Result time: ${DateTime.now().millisecondsSinceEpoch - time}');
   var res = (resultSet)
       .rows
@@ -208,11 +205,10 @@ String writtenWord(String word) {
 
 // θuntɔːɣi
 //
-Future<void> generateSQL() async {
+Future<void> generateSQL(Database database) async {
   log('Using sqlite3 ${sqlite3.version}');
-  final database = sqlite3.open('./temp.sqlt3');
 
-  final db = sqlite3.openInMemory();
+  final db = sqlite3.copyIntoMemory(database);
   db.execute('''
     DROP TABLE IF EXISTS word_tbl;
     CREATE TABLE word_tbl (
@@ -231,8 +227,8 @@ Future<void> generateSQL() async {
   // Prepare a statement to run it multiple times:
   final stmt =
       db.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
-  for (int i = 0; i < 10000000; i++) {
-    if (i % 1000 == 0) log("Generated $i");
+  for (int i = 0; i < 1000; i++) {
+    if (i % 100 == 0) log("Generated $i");
     var word = generateWord();
     stmt.execute([word, writtenWord(word)]);
   }
@@ -245,5 +241,4 @@ Future<void> generateSQL() async {
   // var backUp = sqlite3.open('temp.sqlt3');
   await db.backup(database, nPage: -1).drain();
   db.dispose();
-  database.dispose();
 }

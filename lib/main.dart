@@ -1,6 +1,6 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:language_parser_desktop/util/word_generator.dart';
 
 import 'features/word/words_list.dart';
 import 'util/sqlite.dart' as sl;
@@ -70,6 +70,24 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  void _nwFile() async {
+    var file = await FilePicker.platform.saveFile();
+    if (file != null) {
+      print("File $file");
+      sl.newDb(file);
+    }
+    _incrementCounter();
+  }
+
+  void _opnFile() async {
+    var file = await FilePicker.platform.pickFiles();
+    if (file != null) {
+      print("File $file");
+      sl.setDb(file.files[0].path!);
+    }
+    _incrementCounter();
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -99,15 +117,26 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: const Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: SelectionArea(
-              child: TableExample(),
-            )),
-      ),
+      body: Center(
+          // Center is a layout widget. It takes a single child and positions it
+          // in the middle of the parent.
+          child: Column(
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(onPressed: _nwFile, child: const Text('[ NEW ]')),
+              TextButton(onPressed: _opnFile, child: const Text('[ LOAD ]')),
+            ],
+          ),
+          Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SelectionArea(
+                child:
+                    _counter > 0 ? const TableExample() : const Text('NO DATA'),
+              )),
+        ],
+      )),
     );
   }
 }
