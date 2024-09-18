@@ -37,14 +37,13 @@ Future<List<wrd>> getWords(int size, String string) async {
   //     'SELECT * FROM word_tbl WHERE word LIKE ? OR written_word LIKE ? ORDER BY word ASC LIMIT ? ',
   //     ['%$string%', '%$string%', size]));
   final ResultSet resultSet = string.length < 3
-      ? data!.select(
-          'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT ? ',
+      ? data.select(
+          'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT $size ',
           [
               '*$string*',
               '*$string*',
-              size
             ])
-      : data!.select(
+      : data.select(
           'SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ',
           [string, size]);
   log('Result time: ${DateTime.now().millisecondsSinceEpoch - time}');

@@ -133,7 +133,13 @@ class _TableExample extends State<TableExample> {
                       child: Text(
                         ' / ${w.word} / ',
                         maxLines: 1,
-                        style: const TextStyle(fontSize: 16, height: 0.0),
+                        style: const TextStyle(
+                            fontSize: 16,
+                            height: 0.0,
+                            fontFamily: 'Cousine',
+                            fontFeatures: [
+                              FontFeature.tabularFigures(),
+                            ]),
                       ),
                     ),
                   ),
