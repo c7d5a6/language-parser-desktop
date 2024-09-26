@@ -2,8 +2,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/app.dart';
-import 'package:language_parser_desktop/open_file_screen.dart';
+import 'package:language_parser_desktop/features/open_file/open_file_screen.dart';
 import 'package:language_parser_desktop/persistence/repository_manager.dart';
+import 'package:language_parser_desktop/service_provider.dart';
+import 'package:language_parser_desktop/services/service_manager.dart';
 
 import 'util/sqlite.dart' as sl;
 
@@ -68,6 +70,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String? _filePath;
   late RepositoryManager _repositoryManager;
+  ServiceManager? _serviceManager;
 
   bool get isFileOpened => _filePath != null;
 
@@ -81,8 +84,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var filePath = await FilePicker.platform.saveFile();
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
+      _serviceManager = ServiceManager(_repositoryManager);
     } else {
       _repositoryManager.dispose();
+      _serviceManager = null;
     }
     setState(() {
       _filePath = filePath;
@@ -97,8 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
     var filePath = file?.files[0].path;
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
+      _serviceManager = ServiceManager(_repositoryManager);
     } else {
       _repositoryManager.dispose();
+      _serviceManager = null;
     }
     setState(() {
       _filePath = filePath;
@@ -109,7 +116,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Container(
       child: isFileOpened
-          ? const App()
+          ? ServiceProvider(_serviceManager!,
+              child: App(
+                onOpenFile: openFile,
+                onNewFile: newFile,
+              ))
           : OpenFileScreen(
               onOpenFile: openFile,
               onNewFile: newFile,

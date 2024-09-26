@@ -3,15 +3,13 @@ import 'dart:math' show Random;
 
 import 'package:sqlite3/sqlite3.dart';
 
-import './sqlite.dart' as sl;
-
-class wrd {
+class wrd_u {
   String word;
   String written;
   String pos;
   String comment;
 
-  wrd(this.word, this.written, this.pos, this.comment);
+  wrd_u(this.word, this.written, this.pos, this.comment);
 }
 
 var poses = ['n.', 'v.', 'adj.', 'pn.'];
@@ -28,47 +26,15 @@ var languages = [
   'Runic'
 ];
 
-Future<List<wrd>> getWords(int size, String string) async {
-  final data = sl.database;
-  var time = DateTime.now().millisecondsSinceEpoch;
-  if (data == null) return [];
-  // if(aDB==null) return [];
-  // var resultSet = (aDB!.getAll(
-  //     'SELECT * FROM word_tbl WHERE word LIKE ? OR written_word LIKE ? ORDER BY word ASC LIMIT ? ',
-  //     ['%$string%', '%$string%', size]));
-  final ResultSet resultSet = string.length < 3
-      ? data.select(
-          'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT $size ',
-          [
-              '*$string*',
-              '*$string*',
-            ])
-      : data.select(
-          'SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ',
-          [string, size]);
-  log('Result time: ${DateTime.now().millisecondsSinceEpoch - time}');
-  var res = (resultSet)
-      .rows
-      .map((row) => wrd(
-            '${row[1]}',
-            '${row[2]}',
-            poses[Random().nextInt(poses.length)],
-            languages[Random().nextInt(languages.length)],
-          ))
-      .toList(growable: false);
-  log('Responce time: ${DateTime.now().millisecondsSinceEpoch - time}');
-  return res;
-}
-
-List<wrd> generateWords(int size) {
-  List<wrd> result = [];
+List<wrd_u> generateWords(int size) {
+  List<wrd_u> result = [];
   for (int i = 0; i < size; i++) {
     var pos = poses[Random().nextInt(poses.length)];
     var ln = languages[Random().nextInt(languages.length)];
     var comment = 'from $ln';
     var word = generateWord();
     var written = writtenWord(word);
-    result.add(wrd(word, '${written[0].toUpperCase()}${written.substring(1)}',
+    result.add(wrd_u(word, '${written[0].toUpperCase()}${written.substring(1)}',
         pos, comment));
   }
   return result;

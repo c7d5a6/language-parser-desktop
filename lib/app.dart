@@ -3,24 +3,27 @@ import 'package:flutter/material.dart';
 import 'features/word/words_list.dart';
 
 class App extends StatelessWidget {
-  const App({super.key});
+  final Function() onOpenFile;
+  final Function() onNewFile;
+
+  const App({super.key, required this.onOpenFile, required this.onNewFile});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(10, 20),
+        preferredSize: const Size(10, 20),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(' [ TBD ] '),
-            // TextButton(onPressed: newFile, child: const Text('[ NEW ]')),
-            // TextButton(onPressed: openFile, child: const Text('[ LOAD ]')),
+            const Text(' [ TBD ] '),
+            TextButton(onPressed: onNewFile, child: const Text('[ NEW ]')),
+            TextButton(onPressed: onOpenFile, child: const Text('[ LOAD ]')),
           ],
         ),
       ),
-      bottomNavigationBar: Text(' f o o t e r '),
-      body: SingleChildScrollView(
+      bottomNavigationBar: const Text(' f o o t e r '),
+      body: const SingleChildScrollView(
           child: Center(
               child: Column(
         children: [

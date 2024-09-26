@@ -1,5 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:language_parser_desktop/util/word_generator.dart';
+import 'package:language_parser_desktop/services/service_manager.dart';
+import 'package:language_parser_desktop/services/word_service.dart';
+
+import '../../persistence/word_repository.dart';
+import '../../service_provider.dart';
 
 class HDash extends StatelessWidget {
   const HDash({super.key});
@@ -60,13 +66,24 @@ class TableExample extends StatefulWidget {
 
 class _TableExample extends State<TableExample> {
   List<wrd> _words = [];
+  ServiceManager? serviceManager;
+  late WordService _wordService;
 
-  _TableExample() : _words = [] {
-    getWords(25, '').then((ws) => _words = ws);
-  }
+  @override
+  Future<void> didChangeDependencies() async {
+    log("didChangeDependencies");
+    super.didChangeDependencies();
+    final sm = ServiceProvider.of(context)?.serviceManager;
+    if(serviceManager != sm) {
+      serviceManager = sm;
+      _wordService = serviceManager!.wordService;
+      await _regenerateWords(null);
+    }
+  } // @override
 
   Future<void> _regenerateWords(String? search) async {
-    var wrds = await getWords(25, search ?? '');
+    log("regenerate words");
+    var wrds = await _wordService.getWords(25, search ?? '');
     setState(() {
       _words = wrds;
     });
