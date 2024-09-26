@@ -1,5 +1,5 @@
-import 'package:language_parser_desktop/persistence/language_repository.dart';
-import 'package:language_parser_desktop/persistence/word_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 import 'package:language_parser_desktop/util/sqlite.dart';
 import 'package:sqlite3/sqlite3.dart';
 

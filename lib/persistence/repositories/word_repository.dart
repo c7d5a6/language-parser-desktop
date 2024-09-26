@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:language_parser_desktop/persistence/repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/repository.dart';
 import 'package:sqlite3/common.dart';
 
 class wrd {

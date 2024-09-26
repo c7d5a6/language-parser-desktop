@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/services/word_service.dart';
 
-import '../../persistence/word_repository.dart';
+import '../../persistence/repositories/word_repository.dart';
 import '../../service_provider.dart';
 
 class HDash extends StatelessWidget {

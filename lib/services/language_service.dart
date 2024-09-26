@@ -1,4 +1,4 @@
-import 'package:language_parser_desktop/persistence/language_repository.dart';
+import '../persistence/repositories/language_repository.dart';
 
 class LanguageService {
   final LanguageRepository _languageRepository;

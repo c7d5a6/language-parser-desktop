@@ -1,4 +1,4 @@
-import 'package:language_parser_desktop/persistence/word_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 
 class WordService {
   final WordRepository _wordRepository;
