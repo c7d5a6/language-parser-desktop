@@ -22,8 +22,13 @@ class RepositoryManager {
     _database = null;
   }
 
-  //TODO add assert
-  LanguageRepository get languageRepository => _languageRepository;
+  LanguageRepository get languageRepository {
+    assert(_database != null);
+    return _languageRepository;
+  }
 
-  WordRepository get wordRepository => _wordRepository;
+  WordRepository get wordRepository {
+    assert(_database != null);
+    return _wordRepository;
+  }
 }
