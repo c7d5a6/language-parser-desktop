@@ -4,8 +4,7 @@ class OpenFileScreen extends StatelessWidget {
   final Function() onOpenFile;
   final Function() onNewFile;
 
-  const OpenFileScreen(
-      {super.key, required this.onOpenFile, required this.onNewFile});
+  const OpenFileScreen({super.key, required this.onOpenFile, required this.onNewFile});
 
   @override
   Widget build(BuildContext context) {

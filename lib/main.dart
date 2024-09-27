@@ -25,31 +25,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Language parser Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.black87, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87, brightness: Brightness.dark),
         useMaterial3: true,
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(
-              fontSize: 16,
-              height: 0.0,
-              fontFamily: 'Cousine',
-              fontFeatures: [
-                FontFeature.tabularFigures(),
-              ]),
-          labelMedium: TextStyle(
-              fontSize: 16,
-              height: 0.0,
-              fontFamily: 'Cousine',
-              fontFeatures: [
-                FontFeature.tabularFigures(),
-              ]),
-          displayMedium: TextStyle(
-              fontSize: 16,
-              height: 0.0,
-              fontFamily: 'Cousine',
-              fontFeatures: [
-                FontFeature.tabularFigures(),
-              ]),
+          bodyMedium: TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+            FontFeature.tabularFigures(),
+          ]),
+          labelMedium: TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+            FontFeature.tabularFigures(),
+          ]),
+          displayMedium: TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+            FontFeature.tabularFigures(),
+          ]),
         ),
         brightness: Brightness.dark,
       ),

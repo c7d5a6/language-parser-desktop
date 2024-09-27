@@ -34,34 +34,13 @@ List<wrd_u> generateWords(int size) {
     var comment = 'from $ln';
     var word = generateWord();
     var written = writtenWord(word);
-    result.add(wrd_u(word, '${written[0].toUpperCase()}${written.substring(1)}',
-        pos, comment));
+    result.add(wrd_u(word, '${written[0].toUpperCase()}${written.substring(1)}', pos, comment));
   }
   return result;
 }
 
 String generateWord() {
-  var starting = [
-    'dr',
-    'sn',
-    'ɡr',
-    'd',
-    'h',
-    'j',
-    'l',
-    'm',
-    'n',
-    'p',
-    's',
-    't',
-    'w',
-    'ʍ',
-    'β',
-    'θ',
-    'iː',
-    'a',
-    ''
-  ];
+  var starting = ['dr', 'sn', 'ɡr', 'd', 'h', 'j', 'l', 'm', 'n', 'p', 's', 't', 'w', 'ʍ', 'β', 'θ', 'iː', 'a', ''];
   var clust = [
     'jsk',
     'dr',
@@ -108,22 +87,7 @@ String generateWord() {
     'ɡʷ',
     'χ'
   ];
-  var cluv = [
-    'aː',
-    'ia',
-    'iu',
-    'iː',
-    'oː',
-    'ɛː',
-    'a',
-    'i',
-    'u',
-    'ɔ',
-    'ɛ',
-    'eː',
-    'uː',
-    'ɔː'
-  ];
+  var cluv = ['aː', 'ia', 'iu', 'iː', 'oː', 'ɛː', 'a', 'i', 'u', 'ɔ', 'ɛ', 'eː', 'uː', 'ɔː'];
   var endingC = ['r', 's', 'z', 'ð'];
   var endingV = ['i'];
   var word = starting[Random().nextInt(starting.length)];
@@ -190,8 +154,7 @@ Future<void> generateSQL(Database database) async {
   log('created db');
 
   // Prepare a statement to run it multiple times:
-  final stmt =
-      db.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
+  final stmt = db.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
   for (int i = 0; i < 1000; i++) {
     if (i % 100 == 0) log("Generated $i");
     var word = generateWord();

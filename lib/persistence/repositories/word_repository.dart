@@ -18,15 +18,11 @@ class WordRepository extends Repository {
   Future<List<wrd>> getWords(int size, String string) async {
     var time = DateTime.now().millisecondsSinceEpoch;
     final ResultSet resultSet = string.length < 3
-        ? db.select(
-            'SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT $size ',
-            [
-                '*$string*',
-                '*$string*',
-              ])
-        : db.select(
-            'SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ',
-            [string, size]);
+        ? db.select('SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT $size ', [
+            '*$string*',
+            '*$string*',
+          ])
+        : db.select('SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ', [string, size]);
     log('Result time: ${DateTime.now().millisecondsSinceEpoch - time}');
     var res = (resultSet)
         .rows

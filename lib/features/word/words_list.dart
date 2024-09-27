@@ -12,8 +12,7 @@ class HDash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return SelectionContainer.disabled(
           child: Text(
         '-' * (constraints.maxWidth / 7).round(),
@@ -74,7 +73,7 @@ class _TableExample extends State<TableExample> {
     log("didChangeDependencies");
     super.didChangeDependencies();
     final sm = ServiceProvider.of(context)?.serviceManager;
-    if(serviceManager != sm) {
+    if (serviceManager != sm) {
       serviceManager = sm;
       _wordService = serviceManager!.wordService;
       await _regenerateWords(null);
@@ -150,13 +149,9 @@ class _TableExample extends State<TableExample> {
                       child: Text(
                         ' / ${w.word} / ',
                         maxLines: 1,
-                        style: const TextStyle(
-                            fontSize: 16,
-                            height: 0.0,
-                            fontFamily: 'Cousine',
-                            fontFeatures: [
-                              FontFeature.tabularFigures(),
-                            ]),
+                        style: const TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+                          FontFeature.tabularFigures(),
+                        ]),
                       ),
                     ),
                   ),

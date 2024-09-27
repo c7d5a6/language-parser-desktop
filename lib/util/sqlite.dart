@@ -51,18 +51,15 @@ Future<void> checkAssets() async {
 
 Future<void> migrate(Database db) async {
   final assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
-  final migrations =
-      assetManifest.listAssets().where((p) => p.startsWith(migrationsPath));
+  final migrations = assetManifest.listAssets().where((p) => p.startsWith(migrationsPath));
   final versions = migrations
-      .map((m) => int.parse(m.substring(
-          migrationsPath.length, m.indexOf('_', migrationsPath.length))))
+      .map((m) => int.parse(m.substring(migrationsPath.length, m.indexOf('_', migrationsPath.length))))
       .toList(growable: false)
     ..sort();
   var uversion = db.select("PRAGMA user_version;").single['user_version'];
   for (int version in versions) {
     if (version <= uversion) continue;
-    var migrationPath = migrations
-        .firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
+    var migrationPath = migrations.firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
     var migration = await rootBundle.loadString(migrationPath);
     db.execute(migration);
     db.execute('''
@@ -87,8 +84,7 @@ void checkData() {
       written_word TEXT NOT NULL
     );
   ''');
-  final stmt =
-      dm.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
+  final stmt = dm.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
   stmt.execute(['abc2', 'abc']);
   stmt.execute(['abc3', 'abc']);
   stmt.dispose();

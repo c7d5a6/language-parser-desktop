@@ -4,8 +4,7 @@ import 'package:language_parser_desktop/services/service_manager.dart';
 class ServiceProvider extends InheritedWidget {
   final ServiceManager _serviceManager;
 
-  const ServiceProvider(this._serviceManager,
-      {super.key, required super.child});
+  const ServiceProvider(this._serviceManager, {super.key, required super.child});
 
   static ServiceProvider? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<ServiceProvider>();

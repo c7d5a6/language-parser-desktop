@@ -7,10 +7,10 @@ class ServiceManager {
   late final WordService _wordService;
 
   ServiceManager(RepositoryManager repositoryManager)
-      : _languageService =
-            LanguageService(repositoryManager.languageRepository),
+      : _languageService = LanguageService(repositoryManager.languageRepository),
         _wordService = WordService(repositoryManager.wordRepository);
 
   LanguageService get languageService => _languageService;
+
   WordService get wordService => _wordService;
 }
