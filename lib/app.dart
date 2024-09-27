@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'features/word/words_list.dart';
+import 'features/language/languages.dart';
 
 class App extends StatelessWidget {
   final Function() onOpenFile;
@@ -30,7 +30,7 @@ class App extends StatelessWidget {
           Padding(
               padding: EdgeInsets.all(16.0),
               child: SelectionArea(
-                child: TableExample(),
+                child: Languages(),
               )),
         ],
       ))),

@@ -23,7 +23,7 @@ void main() {
     ('Display name 3', null, null);
     ''');
 
-    var languages = languageRepository.findAll();
+    var languages = languageRepository.getAll();
 
     expect(3, languages.length);
     var lang1 = languages[0];

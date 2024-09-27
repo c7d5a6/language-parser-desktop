@@ -4,7 +4,7 @@ import 'package:language_parser_desktop/persistence/repositories/repository.dart
 class LanguageRepository extends Repository {
   LanguageRepository(super.db);
 
-  List<Language> findAll() {
+  List<Language> getAll() {
     final resultSet = db.select('SELECT * FROM ${Language.table_name} ORDER BY id', []);
     return (resultSet).map(convertFullEntity).toList(growable: false);
   }
