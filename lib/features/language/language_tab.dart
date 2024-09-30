@@ -1,12 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/components/dashes/hdash.dart';
 import 'package:language_parser_desktop/features/word/words_list.dart';
 
 import '../../persistence/entities/language_entity.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
 import '../../services/service_manager.dart';
+import '../../util/layout.dart';
 
 class LanguageTabs extends StatefulWidget {
   final Function(Language?) onSelect;
@@ -65,19 +67,31 @@ class _LanguageTabs extends State<LanguageTabs> {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: 220),
-      child: Column(
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-              children: _languages
-                  .map((lang) =>
-                      LanguageTab(lang.displayName, _selectedLanguage?.id == lang.id, selectLanguage, lang.id))
-                  .toList(growable: false)),
-        ],
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      double maxLanguageWidth = measureTextWidth('-' * 7, context) +
+          _languages.map((language) => measureTextWidth(language.displayName, context)).reduce((a, b) => a > b ? a : b);
+      List<Widget> tabs = [];
+      for (final (index, lang) in _languages.indexed) {
+        tabs.add(LanguageTab(
+            lang.displayName,
+            _selectedLanguage?.id == lang.id,
+            index < _languages.length - 1 && _languages[index + 1].id == _selectedLanguage?.id,
+            selectLanguage,
+            lang.id));
+      }
+      return Container(
+        width: maxLanguageWidth,
+        child: Column(
+          children: [
+            HDash(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: tabs,
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -97,28 +111,48 @@ class LanguageTab extends StatelessWidget {
   final String _langName;
   final int _id;
   final bool _selected;
+  final bool _prevSelected;
   final Function(int?) _onSelect;
 
-  LanguageTab(this._langName, this._selected, this._onSelect, this._id);
+  LanguageTab(this._langName, this._selected, this._prevSelected, this._onSelect, this._id);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [Text(_selected ? "  +" : "    ")],
-        ),
-        Row(
-          children: [
+        GestureDetector(
+          onTap: () => _onSelect(_id),
+          child: Row(children: [
             Text(_selected ? "  " : "   "),
             VDash(),
-            TextButton(
-              onPressed: () => _onSelect(_id),
-              child: Text('$_langName ${_selected ? "yes" : "not"}'),
+            SizedBox(
+              height: 16 * 1.2,
+              child: Text(
+                ' $_langName ',
+                style: const TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+                  FontFeature.tabularFigures(),
+                ]),
+                maxLines: 1,
+              ),
             ),
-          ],
+          ]),
         ),
+        LayoutBuilder(builder: (context, constraints) {
+          final maxWidth = constraints.maxWidth;
+          log('Max width $maxWidth');
+          var prefix = _selected || _prevSelected ? "  +" : "    ";
+          final width = maxWidth - measureTextWidth(prefix, context);
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(prefix),
+              Container(
+                width: width - 1,
+                child: HDash(),
+              ),
+            ],
+          );
+        }),
       ],
     );
   }

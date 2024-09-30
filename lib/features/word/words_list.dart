@@ -4,25 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/services/word_service.dart';
 
+import '../../components/dashes/hdash.dart';
 import '../../persistence/repositories/word_repository.dart';
 import '../../service_provider.dart';
 
-class HDash extends StatelessWidget {
-  const HDash({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      return SelectionContainer.disabled(
-          child: Text(
-        '-' * (constraints.maxWidth / 7).round(),
-        overflow: TextOverflow.fade,
-        style: const TextStyle(fontSize: 16, height: 0.0),
-        maxLines: 1,
-      ));
-    });
-  }
-}
 
 class VDash extends StatelessWidget {
   const VDash({super.key});

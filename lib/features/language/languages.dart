@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/features/language/language_tab.dart';
 import 'package:language_parser_desktop/features/language_description/language_description.dart';
+import 'package:language_parser_desktop/features/word/words_list.dart';
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 
 class Languages extends StatefulWidget {
@@ -27,6 +28,7 @@ class _Languages extends State<Languages> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LanguageTabs(onSelect: selectLanguage),
+        VDash(),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 1200, maxHeight: 800),
           child: DefaultTabController(
