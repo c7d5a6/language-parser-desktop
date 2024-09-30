@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/features/word/words_list.dart';
 
 import '../../persistence/entities/language_entity.dart';
 import '../../service_provider.dart';
@@ -64,12 +65,33 @@ class _LanguageTabs extends State<LanguageTabs> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-        children: _languages
-            .map((lang) => LanguageTab(lang.displayName, _selectedLanguage?.id == lang.id, selectLanguage, lang.id))
-            .toList(growable: false));
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 220),
+      child: Column(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+              children: _languages
+                  .map((lang) =>
+                      LanguageTab(lang.displayName, _selectedLanguage?.id == lang.id, selectLanguage, lang.id))
+                  .toList(growable: false)),
+        ],
+      ),
+    );
   }
 }
+
+// +-----------
+// 1| search
+// 1+----------
+// 12|  Lang 1
+// 12+---------
+// 123| Lang 2
+// 1234--------
+// 123| Lang 3
+// 12+---------
+// 12|  Lang 4
+// 12+---------
 
 class LanguageTab extends StatelessWidget {
   final String _langName;
@@ -81,9 +103,23 @@ class LanguageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () => _onSelect(_id),
-      child: Text('$_langName ${_selected ? "yes" : "not"}'),
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [Text(_selected ? "  +" : "    ")],
+        ),
+        Row(
+          children: [
+            Text(_selected ? "  " : "   "),
+            VDash(),
+            TextButton(
+              onPressed: () => _onSelect(_id),
+              child: Text('$_langName ${_selected ? "yes" : "not"}'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

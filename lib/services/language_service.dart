@@ -10,4 +10,8 @@ class LanguageService {
   List<Language> getAllLanguages(){
     return _languageRepository.getAll();
   }
+
+  Language getLanguage(int id){
+    return _languageRepository.getById(id);
+  }
 }
