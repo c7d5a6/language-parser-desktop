@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
+import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../components/border/border.dart';
 import '../../components/border/hdash.dart';
@@ -122,21 +123,28 @@ class _LanguageTabs extends State<LanguageTabs> {
                 Text(' '),
                 Container(
                   width: 100,
-                  height: 21,
+                  height: measureTextHeight('|', context),
                   child: TextField(
                     onChanged: (s) => {
                       setState(() {
                         search = s;
                       })
                     },
-                    decoration: InputDecoration.collapsed(hintText: 'Search', border: InputBorder.none),
+                    style: LPFont.defaultTextStyle,
+                    decoration: InputDecoration.collapsed(
+                        hintText: 'Search',
+                        border: InputBorder.none,
+                        hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.borderColor))),
                   ),
                 ),
                 Text(' '),
                 VDash(maxDashes: 1),
               ],
             ),
-            HDashWithPrefix(prefix: ' +', postfix: '+',),
+            HDashWithPrefix(
+              prefix: ' +',
+              postfix: '+',
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: tabs,
@@ -163,9 +171,13 @@ class LanguageTab extends StatelessWidget {
       children: [
         Row(children: [
           Text(_selected ? "  " : "   "),
-          VDash(maxDashes: 1,),
+          VDash(
+            maxDashes: 1,
+          ),
           TButton(' $_langName ', () => _onSelect(_id)),
-          VDash(maxDashes: 1,),
+          VDash(
+            maxDashes: 1,
+          ),
         ]),
         HDashWithPrefix(prefix: _selected || _prevSelected ? "  +" : "    "),
       ],
