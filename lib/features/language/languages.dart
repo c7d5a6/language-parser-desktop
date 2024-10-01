@@ -4,6 +4,8 @@ import 'package:language_parser_desktop/features/language_description/language_d
 import 'package:language_parser_desktop/features/word/words_list.dart';
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 
+import '../../components/border/vdash.dart';
+
 class Languages extends StatefulWidget {
   const Languages({super.key});
 
@@ -13,11 +15,13 @@ class Languages extends StatefulWidget {
 
 class _Languages extends State<Languages> {
   Language? selectedLanguage;
+  bool createLanguage = false;
 
   void selectLanguage(Language? language) {
     if (selectedLanguage?.id != language?.id) {
       setState(() {
         selectedLanguage = language;
+        createLanguage = false;
       });
     }
   }
@@ -28,9 +32,9 @@ class _Languages extends State<Languages> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LanguageTabs(onSelect: selectLanguage),
-        VDash(),
+        VDash(maxDashes: 100),
         ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 1200, maxHeight: 800),
+          constraints: BoxConstraints(maxWidth: 1000, maxHeight: 800),
           child: DefaultTabController(
             length: 3,
             child: Scaffold(

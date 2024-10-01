@@ -20,12 +20,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // final textTheme =
-    //     Theme.of(context).textTheme.apply(bodyColor: Colors.white70);
     return MaterialApp(
       title: 'Language parser Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.black87, brightness: Brightness.dark),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffaf7fa8), brightness: Brightness.dark, ),
         useMaterial3: true,
         textTheme: const TextTheme(
           bodyMedium: TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [

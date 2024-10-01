@@ -20,6 +20,7 @@ class TButton extends StatelessWidget {
         ),
         onPressed: () => {},
         style: TextButton.styleFrom(
+          foregroundColor: Color(0xffaf7fa8),
           minimumSize: Size.zero,
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,

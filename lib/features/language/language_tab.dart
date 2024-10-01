@@ -3,9 +3,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
-import 'package:language_parser_desktop/components/dashes/hdash.dart';
-import 'package:language_parser_desktop/features/word/words_list.dart';
 
+import '../../components/border/border.dart';
+import '../../components/border/hdash.dart';
+import '../../components/border/vdash.dart';
 import '../../persistence/entities/language_entity.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
@@ -71,9 +72,9 @@ class _LanguageTabs extends State<LanguageTabs> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      //#25 what is this -5 px???
+      //TODO: #25 what is this -5 px???
       double maxLanguageWidth = -5 +
-          measureTextWidth('-' * 7, context) +
+          measureTextWidth('-' * 8, context) +
           _languages.map((language) => measureTextWidth(language.displayName, context)).reduce((a, b) => a > b ? a : b);
       maxLanguageWidth = math.max(maxLanguageWidth, 150);
       List<Widget> tabs = [];
@@ -92,25 +93,32 @@ class _LanguageTabs extends State<LanguageTabs> {
         width: maxLanguageWidth,
         child: Column(
           children: [
-            VDashWithPrefix(prefix: '+'),
+            HDashWithPrefix(
+              prefix: '+',
+              postfix: '+',
+            ),
             Row(
               children: [
-                VDash(),
+                VDash(maxDashes: 1),
                 LayoutBuilder(builder: (context, constraints) {
                   log('$constraints');
                   return Container(
-                      width: maxLanguageWidth - measureTextWidth('|', context) - 1,
+                      width: maxLanguageWidth - 2 * measureTextWidth('|', context) - 1,
                       child: Center(
                         child: TButton('[ + ]', () => {}),
                       ));
                 }),
+                VDash(maxDashes: 1),
               ],
             ),
-            VDashWithPrefix(prefix: '+'),
+            HDashWithPrefix(
+              prefix: '+',
+              postfix: '+',
+            ),
             Row(
               children: [
                 Text(' '),
-                VDash(),
+                VDash(maxDashes: 1),
                 Text(' '),
                 Container(
                   width: 100,
@@ -123,10 +131,12 @@ class _LanguageTabs extends State<LanguageTabs> {
                     },
                     decoration: InputDecoration.collapsed(hintText: 'Search', border: InputBorder.none),
                   ),
-                )
+                ),
+                Text(' '),
+                VDash(maxDashes: 1),
               ],
             ),
-            VDashWithPrefix(prefix: ' +'),
+            HDashWithPrefix(prefix: ' +', postfix: '+',),
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: tabs,
@@ -151,34 +161,52 @@ class LanguageTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(children: [Text(_selected ? "  " : "   "), VDash(), TButton(' $_langName ', () => _onSelect(_id))]),
-        VDashWithPrefix(prefix: _selected || _prevSelected ? "  +" : "    "),
+        Row(children: [
+          Text(_selected ? "  " : "   "),
+          VDash(maxDashes: 1,),
+          TButton(' $_langName ', () => _onSelect(_id)),
+          VDash(maxDashes: 1,),
+        ]),
+        HDashWithPrefix(prefix: _selected || _prevSelected ? "  +" : "    "),
       ],
     );
   }
 }
 
-class VDashWithPrefix extends StatelessWidget {
-  const VDashWithPrefix({
-    super.key,
-    required String prefix,
-  }) : _prefix = prefix;
+class HDashWithPrefix extends StatelessWidget {
+  const HDashWithPrefix({super.key, String? prefix, String? postfix})
+      : _prefix = prefix,
+        _postfix = postfix;
 
-  final String _prefix;
+  final String? _prefix;
+  final String? _postfix;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final maxWidth = constraints.maxWidth;
-      final width = maxWidth - measureTextWidth(_prefix, context);
+      final width = maxWidth -
+          ((_prefix != null) ? measureTextWidth(_prefix, context) : 0) -
+          ((_postfix != null) ? measureTextWidth(_postfix, context) : 0);
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(_prefix),
+          (_prefix != null
+              ? DBorder(
+                  data: _prefix,
+                  maxLines: 1,
+                )
+              : Container()),
           Container(
             width: width - 1,
             child: HDash(),
           ),
+          (_postfix != null
+              ? DBorder(
+                  data: _postfix,
+                  maxLines: 1,
+                )
+              : Container()),
         ],
       );
     });
