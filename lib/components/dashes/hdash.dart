@@ -18,15 +18,15 @@ class HDash extends StatelessWidget {
 
   Widget calculateDashes(BoxConstraints constraints, BuildContext context) {
     double dashWidth = measureTextWidth('-', context);
-    log('Calculate dashes $dashWidth');
     final width = constraints.maxWidth;
-    log('Calculate dashes $width');
     int numberOfDashes = (width / dashWidth).ceil();
     final dashes = '-' * numberOfDashes;
     return Text(
       dashes,
       overflow: TextOverflow.fade,
-      style: const TextStyle(fontSize: 16, height: 0.0),
+      style: const TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
+        FontFeature.tabularFigures(),
+      ]),
       maxLines: 1,
     );
   }
