@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/components/dashes/hdash.dart';
 import 'package:language_parser_desktop/features/word/words_list.dart';
 
@@ -68,7 +69,8 @@ class _LanguageTabs extends State<LanguageTabs> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      double maxLanguageWidth = measureTextWidth('-' * 7, context) +
+      //TODO: what is this -5 px???
+      double maxLanguageWidth = -5 + measureTextWidth('-' * 7, context) +
           _languages.map((language) => measureTextWidth(language.displayName, context)).reduce((a, b) => a > b ? a : b);
       List<Widget> tabs = [];
       for (final (index, lang) in _languages.indexed) {
@@ -120,23 +122,7 @@ class LanguageTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(
-          onTap: () => _onSelect(_id),
-          child: Row(children: [
-            Text(_selected ? "  " : "   "),
-            VDash(),
-            SizedBox(
-              height: 16 * 1.2,
-              child: Text(
-                ' $_langName ',
-                style: const TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
-                  FontFeature.tabularFigures(),
-                ]),
-                maxLines: 1,
-              ),
-            ),
-          ]),
-        ),
+        Row(children: [Text(_selected ? "  " : "   "), VDash(), TButton(' $_langName ', () => _onSelect(_id))]),
         LayoutBuilder(builder: (context, constraints) {
           final maxWidth = constraints.maxWidth;
           log('Max width $maxWidth');
