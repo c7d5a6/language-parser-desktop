@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
 class LPColor {
-  static final Color primaryColor = Color(0xffaf7fa8);
-  static final Color borderColor = Color(0xff3d3d3d);
+  static const Color primaryColor = Color(0xffaf7fa8);
+  static const Color greyBrightColor = Color(0xffBDBDBD);
+  static const Color greyColor = Color(0xff616161);
+  static const Color greenBrightColor = Color(0xff8fd637);
+  static const Color greenColor = Color(0xff568a21);
+  static const Color borderColor = Color(0xff424242);
+
+
+  static const Color backgroundColor = Color(0xff212121);
 }
 
 class LPFont {
-  static final String fontFamily = 'Cousine';
-  static final double fontSize = 16.0;
+  static const String fontFamily = 'Cousine';
+  static const double fontSize = 16.0;
 
-  static final TextStyle defaultTextStyle =
+  static const TextStyle defaultTextStyle =
       TextStyle(fontSize: fontSize, height: 0.0, fontFamily: fontFamily, fontFeatures: [
     FontFeature.tabularFigures(),
   ]);

@@ -17,9 +17,7 @@ import '../../util/layout.dart';
 class LanguageTabs extends StatefulWidget {
   final Function(Language?) onSelect;
 
-  LanguageTabs({super.key, required this.onSelect}) {
-    log('Rebuild');
-  }
+  LanguageTabs({super.key, required this.onSelect}) {}
 
   @override
   State<StatefulWidget> createState() => _LanguageTabs();
@@ -32,14 +30,11 @@ class _LanguageTabs extends State<LanguageTabs> {
   late LanguageService _languageService;
   String search = '';
 
-  _LanguageTabs() {
-    log('State');
-  }
+  _LanguageTabs() {}
 
   @override
   void initState() {
     super.initState();
-    log("Init state");
   }
 
   @override
@@ -72,6 +67,10 @@ class _LanguageTabs extends State<LanguageTabs> {
 
   @override
   Widget build(BuildContext context) {
+    log('size "--": ${measureTextWidth('--', context)}');
+    log('size " Sl " ${measureTextWidth(' Sl ', context)}');
+    log('size "+-": ${measureTextWidth('+-', context)}');
+    log('size " |": ${measureTextWidth(' |', context)}');
     return LayoutBuilder(builder: (context, constraints) {
       //TODO: #25 what is this -5 px???
       double maxLanguageWidth = -5 +
@@ -102,11 +101,14 @@ class _LanguageTabs extends State<LanguageTabs> {
               children: [
                 VDash(maxDashes: 1),
                 LayoutBuilder(builder: (context, constraints) {
-                  log('$constraints');
                   return Container(
                       width: maxLanguageWidth - 2 * measureTextWidth('|', context) - 1,
                       child: Center(
-                        child: TButton('[ + ]', () => {}),
+                        child: TButton(
+                          text: ' [ + ] ',
+                          color: LPColor.greenColor,
+                          hover: LPColor.greenBrightColor,
+                        ),
                       ));
                 }),
                 VDash(maxDashes: 1),
@@ -122,7 +124,7 @@ class _LanguageTabs extends State<LanguageTabs> {
                 VDash(maxDashes: 1),
                 Text(' '),
                 Container(
-                  width: 100,
+                  width: maxLanguageWidth - 5 * measureTextWidth('|', context) - 1,
                   height: measureTextHeight('|', context),
                   child: TextField(
                     onChanged: (s) => {
@@ -130,11 +132,11 @@ class _LanguageTabs extends State<LanguageTabs> {
                         search = s;
                       })
                     },
-                    style: LPFont.defaultTextStyle,
+                    style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
                     decoration: InputDecoration.collapsed(
                         hintText: 'Search',
                         border: InputBorder.none,
-                        hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.borderColor))),
+                        hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
                   ),
                 ),
                 Text(' '),
@@ -143,7 +145,7 @@ class _LanguageTabs extends State<LanguageTabs> {
             ),
             HDashWithPrefix(
               prefix: ' +',
-              postfix: '+',
+              postfix: '|',
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -167,21 +169,38 @@ class LanguageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(children: [
-          Text(_selected ? "  " : "   "),
-          VDash(
-            maxDashes: 1,
+    return LayoutBuilder(builder: (context, constraints) {
+      final tabLength = measureTextWidth('-' * ((_selected ? 0 : 1) + 6 + _langName.length), context);
+      return Column(
+        children: [
+          Row(children: [
+            Text(_selected ? "  " : "   "),
+            VDash(
+              maxDashes: 1,
+            ),
+            TButton(
+              text: ' $_langName ',
+              onPressed: () => _onSelect(_id),
+              color: _selected ? LPColor.primaryColor : LPColor.greyColor,
+              hover: LPColor.greyBrightColor,
+            ),
+            //TODO: why - 2?
+            Container(
+              width: constraints.maxWidth - tabLength - 2,
+            ),
+            (_selected
+                ? Container()
+                : VDash(
+                    maxDashes: 1,
+                  )),
+          ]),
+          HDashWithPrefix(
+            prefix: _selected || _prevSelected ? "  +" : "    ",
+            postfix: _selected || _prevSelected ? "+" : "|",
           ),
-          TButton(' $_langName ', () => _onSelect(_id)),
-          VDash(
-            maxDashes: 1,
-          ),
-        ]),
-        HDashWithPrefix(prefix: _selected || _prevSelected ? "  +" : "    "),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
 
@@ -210,7 +229,7 @@ class HDashWithPrefix extends StatelessWidget {
                 )
               : Container()),
           Container(
-            width: width - 1,
+            width: width - 1.25,
             child: HDash(),
           ),
           (_postfix != null

@@ -32,7 +32,6 @@ class _Languages extends State<Languages> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         LanguageTabs(onSelect: selectLanguage),
-        VDash(maxDashes: 100),
         ConstrainedBox(
           constraints: BoxConstraints(maxWidth: 1000, maxHeight: 800),
           child: DefaultTabController(

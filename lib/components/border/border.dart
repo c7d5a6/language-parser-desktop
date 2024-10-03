@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
@@ -11,7 +9,6 @@ class DBorder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log("color ${LPFont.borderFontStyle}");
     return SelectionContainer.disabled(
       child: Text(
         data,

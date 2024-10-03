@@ -6,6 +6,7 @@ import 'package:language_parser_desktop/features/open_file/open_file_screen.dart
 import 'package:language_parser_desktop/persistence/repository_manager.dart';
 import 'package:language_parser_desktop/service_provider.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
+import 'package:language_parser_desktop/util/constants.dart';
 
 import 'util/sqlite.dart' as sl;
 
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Language parser Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xffaf7fa8), brightness: Brightness.dark, ),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Color(0xffaf7fa8), brightness: Brightness.dark, surface: LPColor.backgroundColor),
         useMaterial3: true,
         textTheme: const TextTheme(
           bodyMedium: TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
