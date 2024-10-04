@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:language_parser_desktop/features/language/language_creating.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
 import 'package:language_parser_desktop/util/sqlite.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -53,5 +54,16 @@ void main() {
 
   test('Get languages by id throws if no language', () {
     expect(() => languageRepository.getById(0), throwsA(isA<StateError>()));
+  });
+
+  test('Save Language', () {
+    var model = LanguageCreatingModel()..displayName = 'Display';
+
+    var lang = languageRepository.save(model);
+
+    expect(lang.id, 1);
+    expect(lang.displayName, 'Display');
+    expect(lang.nativeName, null);
+    expect(lang.comment, null);
   });
 }

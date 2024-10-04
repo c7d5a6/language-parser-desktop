@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
+import 'package:language_parser_desktop/features/language/language_creating.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../components/border/border.dart';
@@ -16,8 +17,9 @@ import '../../util/layout.dart';
 
 class LanguageTabs extends StatefulWidget {
   final Function(Language?) onSelect;
+  final Function() onCreate;
 
-  LanguageTabs({super.key, required this.onSelect}) {}
+  LanguageTabs({super.key, required this.onSelect, required this.onCreate}) {}
 
   @override
   State<StatefulWidget> createState() => _LanguageTabs();
@@ -28,6 +30,7 @@ class _LanguageTabs extends State<LanguageTabs> {
   Language? _selectedLanguage;
   ServiceManager? _serviceManager;
   late LanguageService _languageService;
+  bool creating = false;
   String search = '';
 
   _LanguageTabs() {}
@@ -49,20 +52,40 @@ class _LanguageTabs extends State<LanguageTabs> {
   }
 
   void selectLanguage(int? id) {
+    final s = _languages.firstWhere((lang) => lang.id == id, orElse: null);
     if (id != _selectedLanguage?.id) {
-      final s = _languages.firstWhere((lang) => lang.id == id, orElse: null);
       setState(() {
         _selectedLanguage = s;
+        creating = false;
+      });
+      widget.onSelect(s);
+    } else {
+      setState(() {
+        creating = false;
       });
       widget.onSelect(s);
     }
   }
 
   void _getLanguages() {
-    final langs = _languageService.getAllLanguages();
+    final langs = _languageService.getAllLanguages()..sort((a, b) => a.displayName.compareTo(b.displayName));
     setState(() {
       _languages = langs;
     });
+  }
+
+  void _createLanguage() {
+    setState(() {
+      creating = true;
+      _selectedLanguage = null;
+      widget.onCreate();
+    });
+  }
+
+  void _saveLanguage(LanguageCreatingModel model) {
+    final toSelect = _languageService.save(model);
+    _getLanguages();
+    selectLanguage(toSelect.id);
   }
 
   @override
@@ -89,71 +112,75 @@ class _LanguageTabs extends State<LanguageTabs> {
             selectLanguage,
             lang.id));
       }
-      return Container(
-        width: maxLanguageWidth,
-        child: Column(
-          children: [
-            HDashWithPrefix(
-              prefix: '+',
-              postfix: '+',
-            ),
-            Row(
-              children: [
-                VDash(maxDashes: 1),
-                LayoutBuilder(builder: (context, constraints) {
-                  return Container(
-                      width: maxLanguageWidth - 2 * measureTextWidth('|', context) - 1,
-                      child: Center(
-                        child: TButton(
-                          text: ' [ + ] ',
-                          color: LPColor.greenColor,
-                          hover: LPColor.greenBrightColor,
-                        ),
-                      ));
-                }),
-                VDash(maxDashes: 1),
-              ],
-            ),
-            HDashWithPrefix(
-              prefix: '+',
-              postfix: '+',
-            ),
-            Row(
-              children: [
-                Text(' '),
-                VDash(maxDashes: 1),
-                Text(' '),
-                Container(
-                  width: maxLanguageWidth - 5 * measureTextWidth('|', context) - 1,
-                  height: measureTextHeight('|', context),
-                  child: TextField(
-                    onChanged: (s) => {
-                      setState(() {
-                        search = s;
-                      })
-                    },
-                    style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
-                    decoration: InputDecoration.collapsed(
-                        hintText: 'Search',
-                        border: InputBorder.none,
-                        hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
+      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: maxLanguageWidth,
+          child: Column(
+            children: [
+              HDashWithPrefix(
+                prefix: '+',
+                postfix: '+',
+              ),
+              Row(
+                children: [
+                  VDash(maxDashes: 1),
+                  LayoutBuilder(builder: (context, constraints) {
+                    return Container(
+                        width: maxLanguageWidth - 2 * measureTextWidth('|', context) - 1,
+                        child: Center(
+                          child: TButton(
+                            text: ' [ + ] ',
+                            color: LPColor.greenColor,
+                            hover: LPColor.greenBrightColor,
+                            onPressed: () => _createLanguage(),
+                          ),
+                        ));
+                  }),
+                  VDash(maxDashes: 1),
+                ],
+              ),
+              HDashWithPrefix(
+                prefix: '+',
+                postfix: '+',
+              ),
+              Row(
+                children: [
+                  Text(' '),
+                  VDash(maxDashes: 1),
+                  Text(' '),
+                  Container(
+                    width: maxLanguageWidth - 5 * measureTextWidth('|', context) - 1,
+                    height: measureTextHeight('|', context),
+                    child: TextField(
+                      onChanged: (s) => {
+                        setState(() {
+                          search = s;
+                        })
+                      },
+                      style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
+                      decoration: InputDecoration.collapsed(
+                          hintText: 'Search',
+                          border: InputBorder.none,
+                          hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
+                    ),
                   ),
-                ),
-                Text(' '),
-                VDash(maxDashes: 1),
-              ],
-            ),
-            HDashWithPrefix(
-              prefix: ' +',
-              postfix: '|',
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: tabs,
-            ),
-          ],
+                  Text(' '),
+                  VDash(maxDashes: 1),
+                ],
+              ),
+              HDashWithPrefix(
+                prefix: ' +',
+                postfix: '|',
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: tabs,
+              ),
+            ],
+          ),
         ),
-      );
+        if (creating) LanguageCreating(createLanguage: _saveLanguage),
+      ]);
     });
   }
 }

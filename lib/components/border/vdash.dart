@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
@@ -13,6 +14,7 @@ class VDash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      log('vdash constraints ${constraints.maxWidth}:${constraints.maxHeight} __ $maxDashes');
       return Container(
         width: measureTextWidth('|', context),
         child: DBorder(
@@ -24,7 +26,8 @@ class VDash extends StatelessWidget {
 
   String calculateDashes(BoxConstraints constraints, BuildContext context) {
     double dashHeight = measureTextHeight('|', context);
-    var height = math.min(3000, constraints.maxHeight);
+    var height =
+        constraints.maxHeight == double.infinity ? 1 : constraints.maxHeight; //math.min(3000, constraints.maxHeight);
     int numberOfDashes = (height / dashHeight).ceil();
     if (maxDashes != null) {
       numberOfDashes = math.min(maxDashes!, numberOfDashes);
