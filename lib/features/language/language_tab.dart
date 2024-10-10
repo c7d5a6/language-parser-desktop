@@ -90,14 +90,11 @@ class _LanguageTabs extends State<LanguageTabs> {
 
   @override
   Widget build(BuildContext context) {
-    log('size "--": ${measureTextWidth('--', context)}');
-    log('size " Sl " ${measureTextWidth(' Sl ', context)}');
-    log('size "+-": ${measureTextWidth('+-', context)}');
-    log('size " |": ${measureTextWidth(' |', context)}');
     return LayoutBuilder(builder: (context, constraints) {
+      final cWSize = measureTextWidth('-', context);
+      log('CWSIZE $cWSize');
       //TODO: #25 what is this -5 px???
-      double maxLanguageWidth = -5 +
-          measureTextWidth('-' * 8, context) +
+      double maxLanguageWidth = cWSize * 8 +
           _languages.map((language) => measureTextWidth(language.displayName, context)).reduce((a, b) => a > b ? a : b);
       maxLanguageWidth = math.max(maxLanguageWidth, 150);
       List<Widget> tabs = [];
@@ -117,60 +114,17 @@ class _LanguageTabs extends State<LanguageTabs> {
           width: maxLanguageWidth,
           child: Column(
             children: [
-              HDashWithPrefix(
-                prefix: '+',
-                postfix: '+',
+              LanguageNewButton(
+                cWSize: cWSize,
+                onPressed: _createLanguage,
               ),
-              Row(
-                children: [
-                  VDash(maxDashes: 1),
-                  LayoutBuilder(builder: (context, constraints) {
-                    return Container(
-                        width: maxLanguageWidth - 2 * measureTextWidth('|', context) - 1,
-                        child: Center(
-                          child: TButton(
-                            text: ' [ + ] ',
-                            color: LPColor.greenColor,
-                            hover: LPColor.greenBrightColor,
-                            onPressed: () => _createLanguage(),
-                          ),
-                        ));
-                  }),
-                  VDash(maxDashes: 1),
-                ],
-              ),
-              HDashWithPrefix(
-                prefix: '+',
-                postfix: '+',
-              ),
-              Row(
-                children: [
-                  Text(' '),
-                  VDash(maxDashes: 1),
-                  Text(' '),
-                  Container(
-                    width: maxLanguageWidth - 5 * measureTextWidth('|', context) - 1,
-                    height: measureTextHeight('|', context),
-                    child: TextField(
-                      onChanged: (s) => {
-                        setState(() {
-                          search = s;
-                        })
-                      },
-                      style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
-                      decoration: InputDecoration.collapsed(
-                          hintText: 'Search',
-                          border: InputBorder.none,
-                          hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
-                    ),
-                  ),
-                  Text(' '),
-                  VDash(maxDashes: 1),
-                ],
-              ),
-              HDashWithPrefix(
-                prefix: ' +',
-                postfix: '|',
+              LanguageSearchWidget(
+                cWSize: cWSize,
+                onChanged: (s) => {
+                  setState(() {
+                    search = s;
+                  })
+                },
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -182,6 +136,108 @@ class _LanguageTabs extends State<LanguageTabs> {
         if (creating) LanguageCreating(createLanguage: _saveLanguage),
       ]);
     });
+  }
+}
+
+class LanguageSearchWidget extends StatelessWidget {
+  const LanguageSearchWidget({
+    super.key,
+    required this.cWSize,
+    required this.onChanged,
+  });
+
+  final double cWSize;
+  final void Function(String) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        border: TableBorder.all(style: BorderStyle.none),
+        columnWidths: <int, TableColumnWidth>{
+          0: FixedColumnWidth(cWSize),
+          1: FixedColumnWidth(cWSize),
+          2: FlexColumnWidth(1),
+          3: FixedColumnWidth(cWSize),
+        },
+        children: [
+          TableRow(children: [
+            DBorder(data: ' '),
+            DBorder(data: '|'),
+            TextField(
+              onChanged: onChanged,
+              style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
+              decoration: InputDecoration.collapsed(
+                  hintText: 'Search',
+                  border: InputBorder.none,
+                  hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
+            ),
+            DBorder(data: '|')
+          ]),
+          TableRow(children: [DBorder(data: ' '), DBorder(data: '+'), HDash(), DBorder(data: '|')]),
+        ]);
+    // return Row(
+    //   children: [
+    //     Text(' '),
+    //     VDash(maxDashes: 1),
+    //     Text(' '),
+    //     Container(
+    //       width: maxLanguageWidth - 5 * measureTextWidth('|', context) - 1,
+    //       height: measureTextHeight('|', context),
+    //       child: TextField(
+    //         // onChanged: (s) => {
+    //         //   setState(() {
+    //         //     search = s;
+    //         //   })
+    //         // },
+    //         style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
+    //         decoration: InputDecoration.collapsed(
+    //             hintText: 'Search',
+    //             border: InputBorder.none,
+    //             hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
+    //       ),
+    //     ),
+    //     Text(' '),
+    //     VDash(maxDashes: 1),
+    //   ],
+    // );
+  }
+}
+
+class LanguageNewButton extends StatelessWidget {
+  const LanguageNewButton({
+    super.key,
+    required this.cWSize,
+    required this.onPressed,
+  });
+
+  final double cWSize;
+  final void Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        border: TableBorder.all(style: BorderStyle.none),
+        columnWidths: <int, TableColumnWidth>{
+          0: FixedColumnWidth(cWSize),
+          1: FlexColumnWidth(1),
+          2: FixedColumnWidth(cWSize),
+        },
+        children: [
+          TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+          TableRow(children: [
+            DBorder(data: '|'),
+            TButton(
+              text: '[ + ]',
+              color: LPColor.greenColor,
+              hover: LPColor.greenBrightColor,
+              onPressed: onPressed,
+            ),
+            DBorder(data: '|')
+          ]),
+          TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+        ]);
   }
 }
 
