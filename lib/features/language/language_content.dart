@@ -90,6 +90,7 @@ class _LanguageContentState extends State<LanguageContent> {
     tabsColumns1.add(Container());
     tabsColumns2.add(Container());
     tabsColumns3.add(HDash());
+    var list = tabsInfo.map((e) => e.content).toList();
     return Column(
       children: [
         Table(
@@ -105,11 +106,7 @@ class _LanguageContentState extends State<LanguageContent> {
         Expanded(
           child: IndexedStack(
             index: _activeTabIndex,
-            children: [
-              Center(child: Text('General Settings')),
-              Center(child: Text('Localization Settings')),
-              Center(child: Text('Advanced Settings')),
-            ],
+            children: list,
           ),
         ),
       ],
