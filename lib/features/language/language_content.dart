@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
-import 'package:language_parser_desktop/components/border/hdash.dart';
-import 'package:language_parser_desktop/components/buttons/t_button.dart';
+import 'package:language_parser_desktop/components/border/ldash.dart';
 import 'package:language_parser_desktop/util/layout.dart';
+
+import '../../components/border/hdash.dart';
+import '../../components/buttons/t_button.dart';
+import '../../util/constants.dart';
+
+class TabsContent {
+  final String tabName;
+  final String shortTabName;
+  final Widget content;
+
+  TabsContent(
+      {required this.tabName,
+      required this.shortTabName,
+      required this.content});
+}
 
 class LanguageContent extends StatefulWidget {
   @override
@@ -12,7 +26,20 @@ class LanguageContent extends StatefulWidget {
 class _LanguageContentState extends State<LanguageContent> {
   int _activeTabIndex = 0; // Tracks the selected tab
 
-  final List<String> tabs = ['General', 'Localization', 'Advanced'];
+  final List<TabsContent> tabsInfo = [
+    TabsContent(
+        tabName: 'Description',
+        shortTabName: 'Description',
+        content: Text('Description')),
+    TabsContent(
+        tabName: 'Phonetics',
+        shortTabName: 'Phonetics',
+        content: Text('Phonetics')),
+    TabsContent(
+        tabName: 'Orthography',
+        shortTabName: 'Orthography',
+        content: Text('Orthography')),
+  ];
 
   // Method to change the active tab index
   void _onTabSelected(int index) {
@@ -26,123 +53,66 @@ class _LanguageContentState extends State<LanguageContent> {
   @override
   Widget build(BuildContext context) {
     final cWSize = measureTextWidth('-', context);
-    return Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      border: TableBorder.all(style: BorderStyle.none),
-      columnWidths: <int, TableColumnWidth>{
-        0: FixedColumnWidth(cWSize),
-        1: FixedColumnWidth(cWSize),
-        2: FlexColumnWidth(1),
-        3: FixedColumnWidth(cWSize),
-        4: FlexColumnWidth(1),
-        5: FixedColumnWidth(cWSize),
-      },
+    Map<int, TableColumnWidth> colmnWidth = {0: FixedColumnWidth(cWSize)};
+    List<Widget> tabsColumns1 = [DBorder(data: ' ')];
+    List<Widget> tabsColumns2 = [DBorder(data: ' ')];
+    List<Widget> tabsColumns3 = [DBorder(data: '-')];
+    for (var i = 0; i < tabsInfo.length; i++) {
+      colmnWidth.addAll({
+        1 + i * 2: FixedColumnWidth(cWSize),
+        2 + i * 2: FixedColumnWidth(cWSize * (2 + tabsInfo[i].tabName.length))
+      });
+      tabsColumns1.add(_activeTabIndex == i || _activeTabIndex == i - 1
+          ? DBorder(data: '+')
+          : Container());
+      tabsColumns1.add(_activeTabIndex == i ? HDash() : LDash());
+      tabsColumns2.add(DBorder(data: '|'));
+      tabsColumns2.add(TButton(
+        onPressed: () => _onTabSelected(i),
+        text: tabsInfo[i].tabName,
+        color: _activeTabIndex == i ? LPColor.primaryColor : LPColor.greyColor,
+        hover: LPColor.greyBrightColor,
+      ));
+      tabsColumns3.add(_activeTabIndex == i || _activeTabIndex == i - 1
+          ? DBorder(data: '+')
+          : DBorder(data: '-'));
+      tabsColumns3.add(_activeTabIndex == i ? Container() : HDash());
+    }
+    colmnWidth.addAll({tabsInfo.length * 2 + 1: FixedColumnWidth(cWSize)});
+    colmnWidth.addAll({tabsInfo.length * 2 + 2: FlexColumnWidth(1)});
+    tabsColumns1.add(_activeTabIndex == tabsInfo.length - 1
+        ? DBorder(data: '+')
+        : Container());
+    tabsColumns2.add(DBorder(data: '|'));
+    tabsColumns3.add(_activeTabIndex == tabsInfo.length - 1
+        ? DBorder(data: '+')
+        : DBorder(data: '-'));
+    tabsColumns1.add(Container());
+    tabsColumns2.add(Container());
+    tabsColumns3.add(HDash());
+    return Column(
       children: [
-        TableRow(children: [
-          DBorder(data: ' '),
-          Container(),
-          Container(),
-          Container(),
-          Container(),
-          Container(),
-        ]),
-        TableRow(
+        Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: colmnWidth,
           children: [
-            DBorder(data: ' '),
-            DBorder(data: '+'),
-            HDash(),
-            DBorder(data: '+'),
-            HDash(),
-            DBorder(data: '+'),
+            TableRow(children: tabsColumns1),
+            TableRow(children: tabsColumns2),
+            TableRow(children: tabsColumns3),
           ],
         ),
-        TableRow(
-          children: [
-            DBorder(data: '_'),
-            DBorder(data: '|'),
-            TButton(
-              onPressed: () => _onTabSelected(0),
-              text: 'Fisrt Tab',
-            ),
-            DBorder(data: '|'),
-            TButton(
-              onPressed: () => _onTabSelected(1),
-              text: 'Second Tab',
-            ),
-            DBorder(data: '|'),
-          ],
+        Expanded(
+          child: IndexedStack(
+            index: _activeTabIndex,
+            children: [
+              Center(child: Text('General Settings')),
+              Center(child: Text('Localization Settings')),
+              Center(child: Text('Advanced Settings')),
+            ],
+          ),
         ),
       ],
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-//
-// class LanguageSettingsTabs extends StatefulWidget {
-//   @override
-//   _LanguageSettingsTabsState createState() => _LanguageSettingsTabsState();
-// }
-//
-// class _LanguageSettingsTabsState extends State<LanguageSettingsTabs> {
-//   int _activeTabIndex = 0; // Tracks the selected tab
-//
-//   final List<String> tabs = ['General', 'Localization', 'Advanced'];
-//
-//   // Method to change the active tab index
-//   void _onTabSelected(int index) {
-//     setState(() {
-//       _activeTabIndex = index;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: Text('Language Settings')),
-//       body: Column(
-//         children: [
-//           // Custom tab headers
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: List.generate(tabs.length, (index) {
-//               return GestureDetector(
-//                 onTap: () => _onTabSelected(index),
-//                 child: Container(
-//                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-//                   decoration: BoxDecoration(
-//                     border: Border.all(color: Colors.black),
-//                     color: _activeTabIndex == index ? Colors.grey : Colors.white,
-//                   ),
-//                   child: Text(
-//                     _asciiTabLabel(tabs[index]),
-//                     style: TextStyle(fontFamily: 'Courier'),
-//                   ),
-//                 ),
-//               );
-//             }),
-//           ),
-//
-//           // Content of the selected tab
-//           Expanded(
-//             child: IndexedStack(
-//               index: _activeTabIndex,
-//               children: [
-//                 Center(child: Text('General Settings')),
-//                 Center(child: Text('Localization Settings')),
-//                 Center(child: Text('Advanced Settings')),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   // Simulate ASCII graphics for tab labels
-//   String _asciiTabLabel(String tabName) {
-//     return '[$tabName]';
-//   }
-// }
-//
-// void main() => runApp(MaterialApp(home: LanguageSettingsTabs()));
