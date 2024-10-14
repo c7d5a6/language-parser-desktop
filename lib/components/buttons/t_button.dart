@@ -22,29 +22,29 @@ class _TButton extends State<TButton> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => hover = true),
-      onExit: (_) => setState(() => hover = false),
-      child: GestureDetector(
-        onPanDown: (_) => widget._onPressed!(),
-        child: TextButton(
-          child: Text(
-            widget._text,
-            style: const TextStyle(fontSize: 16, height: 0.0, fontFamily: 'Cousine', fontFeatures: [
-              FontFeature.tabularFigures(),
-            ]),
-            maxLines: 1,
-          ),
-          onPressed: () => {},
-          style: TextButton.styleFrom(
-            foregroundColor: hover ? widget._hover : widget._color,
-            minimumSize: Size.zero,
-            padding: EdgeInsets.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            enableFeedback: false,
+    return LayoutBuilder(builder: (context, constraints) {
+      return MouseRegion(
+        onEnter: (_) => setState(() => hover = true),
+        onExit: (_) => setState(() => hover = false),
+        child: GestureDetector(
+          onPanDown: (_) => widget._onPressed!(),
+          child: TextButton(
+            child: Text(
+              widget._text,
+              style: LPFont.defaultTextStyle,
+              maxLines: 1,
+            ),
+            onPressed: () => {},
+            style: TextButton.styleFrom(
+              foregroundColor: hover ? widget._hover : widget._color,
+              minimumSize: Size.zero,
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              enableFeedback: false,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

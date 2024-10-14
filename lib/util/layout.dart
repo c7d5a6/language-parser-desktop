@@ -6,10 +6,11 @@ import 'constants.dart';
 
 double measureTextWidth(String text, BuildContext context) {
   assert(text.length > 0, 'Text "${text}" length should be not empty');
+  final style = DefaultTextStyle.of(context).style.merge(LPFont.defaultTextStyle);
   final TextPainter textPainter = TextPainter(
     text: TextSpan(
       text: text,
-      style: LPFont.defaultTextStyle,
+      style: style,
     ),
     textDirection: ui.TextDirection.ltr,
   )..layout();

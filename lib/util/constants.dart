@@ -8,7 +8,6 @@ class LPColor {
   static const Color greenColor = Color(0xff568a21);
   static const Color borderColor = Color(0xff424242);
 
-
   static const Color backgroundColor = Color(0xff212121);
 }
 
@@ -16,10 +15,17 @@ class LPFont {
   static const String fontFamily = 'Cousine';
   static const double fontSize = 16.0;
 
-  static const TextStyle defaultTextStyle =
-      TextStyle(fontSize: fontSize, height: 0.0, fontFamily: fontFamily, fontFeatures: [
-    FontFeature.tabularFigures(),
-  ]);
+  static const TextStyle defaultTextStyle = TextStyle(
+      fontSize: fontSize,
+      textBaseline: TextBaseline.alphabetic,
+      height: 0.0,
+      wordSpacing: 0,
+      fontFamily: fontFamily,
+      fontWeight: FontWeight.normal,
+      // inherit: false,
+      fontFeatures: [
+        FontFeature.tabularFigures(),
+      ]);
 
   static final TextStyle borderFontStyle =
       defaultTextStyle.merge(TextStyle(color: LPColor.borderColor, fontWeight: FontWeight.w900));

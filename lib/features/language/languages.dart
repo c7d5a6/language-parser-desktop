@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:language_parser_desktop/features/language/language_content.dart';
+import 'package:language_parser_desktop/features/language/language_content_tabs.dart';
 import 'package:language_parser_desktop/features/language/language_tabs.dart';
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 
