@@ -6,6 +6,8 @@ class LPColor {
   static const Color greyColor = Color(0xff616161);
   static const Color greenBrightColor = Color(0xff8fd637);
   static const Color greenColor = Color(0xff568a21);
+  static const Color redColor = Color(0xffbf2020);
+  static const Color redBrightColor = Color(0xffee2d2d);
   static const Color borderColor = Color(0xff424242);
 
   static const Color backgroundColor = Color(0xff212121);

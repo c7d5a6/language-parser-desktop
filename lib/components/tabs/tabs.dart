@@ -60,14 +60,19 @@ class _TabsState extends State<Tabs> {
     }
     columnWidth.addAll({widget.tabsInfo.length * 2 + 1: FixedColumnWidth(cWSize)});
     columnWidth.addAll({widget.tabsInfo.length * 2 + 2: FlexColumnWidth(1)});
+    columnWidth.addAll({widget.tabsInfo.length * 2 + 3: FixedColumnWidth(cWSize)});
     tabsColumns1.add(_activeTabIndex == widget.tabsInfo.length - 1 ? DBorder(data: '+') : Container());
     tabsColumns2.add(DBorder(data: '|'));
     tabsColumns3.add(_activeTabIndex == widget.tabsInfo.length - 1 ? DBorder(data: '+') : DBorder(data: '-'));
     tabsColumns1.add(Container());
     tabsColumns2.add(Container());
     tabsColumns3.add(HDash());
+    tabsColumns1.add(Container());
+    tabsColumns2.add(Container());
+    tabsColumns3.add(DBorder(data: '+'));
     var list = widget.tabsInfo.map((e) => e.content).toList();
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Table(
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,

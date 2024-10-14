@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/features/language/language_content_tabs.dart';
 import 'package:language_parser_desktop/features/language/language_tabs.dart';
@@ -36,20 +38,37 @@ class _Languages extends State<Languages> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LanguageTabs(
-          onSelect: selectLanguage,
-          onCreate: onCreate,
+    final Size size = MediaQuery.sizeOf(context);
+    return LayoutBuilder(builder: (context, constraints) {
+      log('Language $constraints');
+      var languageTabs = LanguageTabs(
+        onSelect: selectLanguage,
+        onCreate: onCreate,
+      );
+      return Container(
+        child: Center(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              languageTabs,
+              if (!createLanguage)
+                Flexible(
+                  child: Container(
+                    constraints: BoxConstraints(
+                      minWidth: 1,
+                      maxWidth: 3000,
+                    ),
+                    child: LanguageContentTabs(
+                      languageId: selectedLanguage?.id,
+                    ),
+                    height: size.height,
+                  ),
+                ),
+            ],
+          ),
         ),
-        if (!createLanguage)
-          Container(
-            width: 800,
-            height: 800,
-            child: LanguageContent(),
-          )
-      ],
-    );
+        width: constraints.maxWidth,
+      );
+    });
   }
 }

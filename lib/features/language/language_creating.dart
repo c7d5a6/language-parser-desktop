@@ -7,16 +7,9 @@ import 'package:language_parser_desktop/components/border/vdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
+import '../../persistence/repositories/language_repository.dart';
 import '../../util/constants.dart';
 
-class LanguageCreatingModel {
-  String displayName = '';
-
-  @override
-  String toString() {
-    return 'Model{$displayName}';
-  }
-}
 
 class LanguageCreating extends StatefulWidget {
   final void Function(LanguageCreatingModel model) createLanguage;

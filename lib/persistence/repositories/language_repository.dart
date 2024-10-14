@@ -1,6 +1,21 @@
-import 'package:language_parser_desktop/features/language/language_creating.dart';
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
+
+class LanguageCreatingModel {
+  String displayName = '';
+
+  @override
+  String toString() {
+    return 'Model{$displayName}';
+  }
+}
+
+class LanguageUpdatingModel {
+  final int id;
+  final String displayName;
+
+  LanguageUpdatingModel({required this.id, required this.displayName});
+}
 
 class LanguageRepository extends Repository {
   LanguageRepository(super.db);
@@ -24,8 +39,13 @@ class LanguageRepository extends Repository {
     return convertFullEntity(resultSet.single);
   }
 
-// save
-// delete
+  void update(LanguageUpdatingModel model) {
+    db.execute('UPDATE ${Language.table_name} SET display_name = ? WHERE id = ${model.id};', [model.displayName]);
+  }
+
+  void delete(int id) {
+    db.execute('DELETE FROM ${Language.table_name} WHERE id = ${id};', []);
+  }
 
   Language convertFullEntity(row) {
     return Language(

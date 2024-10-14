@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:language_parser_desktop/features/language/language_creating.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
 import 'package:language_parser_desktop/util/sqlite.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -65,5 +64,35 @@ void main() {
     expect(lang.displayName, 'Display');
     expect(lang.nativeName, null);
     expect(lang.comment, null);
+  });
+
+  test('Update Language', () {
+    db.execute('''
+    INSERT INTO language_tbl (id, display_name, native_name, comment) VALUES 
+    (1, 'Display name 1', 'Native name 1', 'Comment 1'),
+    (2, 'Display name 2', 'Native name 2', 'Comment 2');
+    ''');
+
+    languageRepository.update(LanguageUpdatingModel(id: 1, displayName: 'Updated'));
+    final lang = languageRepository.getById(1);
+
+    expect(lang.id, 1);
+    expect(lang.displayName, 'Updated');
+    expect(lang.nativeName, 'Native name 1');
+    expect(lang.comment, 'Comment 1');
+  });
+
+  test('Delete Language', () {
+    db.execute('''
+    INSERT INTO language_tbl (id, display_name, native_name, comment) VALUES 
+    (1, 'Display name 1', 'Native name 1', 'Comment 1'),
+    (2, 'Display name 2', 'Native name 2', 'Comment 2');
+    ''');
+
+    languageRepository.delete(2);
+    final langs = languageRepository.getAll();
+
+    expect(langs.length, 1);
+    expect(langs[0].id, 1);
   });
 }

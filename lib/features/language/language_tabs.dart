@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:language_parser_desktop/features/language/language_creating.dart
 import '../../components/border/border.dart';
 import '../../components/border/hdash.dart';
 import '../../persistence/entities/language_entity.dart';
+import '../../persistence/repositories/language_repository.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
 import '../../services/service_manager.dart';
@@ -46,12 +48,13 @@ class _LanguageTabs extends State<LanguageTabs> {
     if (_serviceManager != sm) {
       _serviceManager = sm;
       _languageService = _serviceManager!.languageService;
+      _languageService.langsUpdated = () => _getLanguages();
       _getLanguages();
     }
   }
 
   void selectLanguage(int? id) {
-    final s = _languages.firstWhere((lang) => lang.id == id, orElse: null);
+    final s = id == null ? null : _languages.firstWhere((lang) => lang.id == id, orElse: null);
     if (id != _selectedLanguage?.id) {
       setState(() {
         _selectedLanguage = s;
@@ -67,10 +70,16 @@ class _LanguageTabs extends State<LanguageTabs> {
   }
 
   void _getLanguages() {
+    log('Get languages');
     final langs = _languageService.getAllLanguages()..sort((a, b) => a.displayName.compareTo(b.displayName));
     setState(() {
       _languages = langs;
     });
+    if (_selectedLanguage != null) {
+      if (!langs.any((lang) => lang.id == _selectedLanguage?.id)) {
+        selectLanguage(null);
+      }
+    }
   }
 
   void _createLanguage() {
@@ -90,9 +99,10 @@ class _LanguageTabs extends State<LanguageTabs> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
+      log('L Tabs $constraints');
       final cWSize = measureTextWidth('-', context);
       double maxLanguageWidth = cWSize * 8 +
-          _languages.map((language) => measureTextWidth(language.displayName, context)).reduce((a, b) => a > b ? a : b);
+          cWSize * _languages.map((language) => language.displayName.length).fold(0, (a, b) => a > b ? a : b);
       maxLanguageWidth = math.max(maxLanguageWidth, cWSize * 9);
       List<Widget> tabs = [];
       for (final (index, lang) in _languages.indexed) {
