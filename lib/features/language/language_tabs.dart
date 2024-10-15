@@ -106,7 +106,7 @@ class _LanguageTabs extends State<LanguageTabs> {
       maxLanguageWidth = math.max(maxLanguageWidth, cWSize * 9);
       List<Widget> tabs = [];
       for (final (index, lang) in _languages.indexed) {
-        if (lang.id != _selectedLanguage?.id && !lang.displayName.contains(search)) {
+        if (lang.id != _selectedLanguage?.id && !lang.displayName.toLowerCase().contains(search.toLowerCase())) {
           continue;
         }
         tabs.add(LanguageTab(
