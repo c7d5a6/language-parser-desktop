@@ -46,9 +46,14 @@ class LanguageRepository extends Repository {
   void delete(int id) {
     db.execute('DELETE FROM ${Language.table_name} WHERE id = ${id};', []);
   }
+}
 
-  Language convertFullEntity(row) {
-    return Language(
-        row['id'] as int, row['display_name'] as String, row['native_name'] as String?, row['comment'] as String?);
-  }
+Language convertFullEntity(row) {
+  return Language(
+      row['id'] as int, row['display_name'] as String, row['native_name'] as String?, row['comment'] as String?);
+}
+
+Language convertNamedEntity(row) {
+  return Language(row['language_id'] as int, row['language_display_name'] as String,
+      row['language_native_name'] as String?, row['language_comment'] as String?);
 }
