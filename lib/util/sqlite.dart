@@ -61,10 +61,18 @@ Future<void> migrate(Database db) async {
     if (version <= uversion) continue;
     var migrationPath = migrations.firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
     var migration = await rootBundle.loadString(migrationPath);
-    db.execute(migration);
-    db.execute('''
-    PRAGMA user_version = $version;
-    ''');
+    db.execute('BEGIN TRANSACTION;');
+    try {
+      db.execute(migration);
+      db.execute('''
+      PRAGMA user_version = $version;
+      ''');
+      db.execute('COMMIT;');
+      print('Migration $version successful');
+    } catch (e) {
+      db.execute('ROLLBACK;');
+      print('Migration $version failed: $e');
+    }
   }
 }
 
