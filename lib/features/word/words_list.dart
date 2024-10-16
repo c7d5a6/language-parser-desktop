@@ -9,7 +9,6 @@ import '../../components/border/vdash.dart';
 import '../../persistence/repositories/word_repository.dart';
 import '../../service_provider.dart';
 
-
 class XDash extends StatelessWidget {
   const XDash({super.key});
 
@@ -52,9 +51,9 @@ class _TableExample extends State<TableExample> {
 
   Future<void> _regenerateWords(String? search) async {
     log("regenerate words");
-    var wrds = await _wordService.getWords(25, search ?? '');
+    // var wrds = await _wordService.getWords(25, search ?? '');
     setState(() {
-      _words = wrds;
+      _words = [];
     });
   }
 

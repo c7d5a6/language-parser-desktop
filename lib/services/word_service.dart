@@ -5,7 +5,8 @@ class WordService {
 
   WordService(this._wordRepository);
 
-  Future<List<wrd>> getWords(int size, String string) async {
-    return _wordRepository.getWords(size, string);
-  }
+// Future<List<wrd>> getWords(int size, String string) async {
+// return _wordRepository.getWords(size, string);
+// return
+// }
 }

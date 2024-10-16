@@ -25,6 +25,10 @@ class LanguageRepository extends Repository {
     return (resultSet).map(convertFullEntity).toList(growable: false);
   }
 
+  bool exists(int id) {
+    return existsInTable(id, Language.table_name);
+  }
+
   Language getById(int id) {
     final resultSet = db.select('SELECT * FROM ${Language.table_name} WHERE id = $id', []);
     return convertFullEntity(resultSet.single);

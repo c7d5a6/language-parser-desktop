@@ -9,7 +9,7 @@ class ServiceManager {
   late final IpaService _ipaService;
 
   ServiceManager(RepositoryManager repositoryManager)
-      : _languageService = LanguageService(repositoryManager.languageRepository),
+      : _languageService = LanguageService(repositoryManager.languageRepository, repositoryManager.wordRepository),
         _wordService = WordService(repositoryManager.wordRepository),
         _ipaService = IpaService();
 
