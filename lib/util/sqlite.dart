@@ -16,7 +16,6 @@ void newDb(String path) {
   tmp.backup(database!, nPage: -1);
   tmp.dispose();
   migrate(database!);
-  generateSQL(database!);
 }
 
 void setDb(String path) {
@@ -70,8 +69,22 @@ Future<void> migrate(Database db) async {
       db.execute('COMMIT;');
       print('Migration $version successful');
     } catch (e) {
-      db.execute('ROLLBACK;');
-      print('Migration $version failed: $e');
+      if (e.runtimeType == SqliteException) {
+        final se = e as SqliteException;
+        if (se.message == 'error in tokenizer constructor') {
+          db.execute('''
+          PRAGMA user_version = $version;
+          ''');
+          db.execute('COMMIT;');
+          print('Migration $version successful, with warning about tokenizer');
+        } else {
+          db.execute('ROLLBACK;');
+          print('Migration $version failed with sqlite exception: ${se.message}\n$e');
+        }
+      } else {
+        db.execute('ROLLBACK;');
+        print('Migration $version failed: $e');
+      }
     }
   }
 }

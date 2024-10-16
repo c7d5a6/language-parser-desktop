@@ -23,6 +23,10 @@ class LanguageDescription extends StatefulWidget {
 }
 
 class _LanguageDescription extends State<LanguageDescription> {
+  static const save = 'Save';
+  static const delete = 'Delete';
+  static const displayName = ' Display name';
+
   late TextEditingController _displayNameController = TextEditingController();
   ServiceManager? _serviceManager;
   late LanguageService _languageService;
@@ -76,7 +80,7 @@ class _LanguageDescription extends State<LanguageDescription> {
     return Column(children: [
       Table(
         columnWidths: {
-          0: FixedColumnWidth(cWidth * ' Display name'.length),
+          0: FixedColumnWidth(cWidth * displayName.length),
           1: FixedColumnWidth(3 * cWidth),
           2: FlexColumnWidth(1),
           3: FixedColumnWidth(cWidth),
@@ -84,7 +88,7 @@ class _LanguageDescription extends State<LanguageDescription> {
         children: [
           emptyRow,
           TableRow(children: [
-            DBorder(data: ' Display name'),
+            DBorder(data: displayName),
             DBorder(data: ' | '),
             TextFormField(
               onChanged: (word) {
@@ -108,9 +112,9 @@ class _LanguageDescription extends State<LanguageDescription> {
         columnWidths: {
           0: FlexColumnWidth(1),
           1: FixedColumnWidth(cWidth * 2),
-          2: FixedColumnWidth(cWidth * 'Save'.length),
+          2: FixedColumnWidth(cWidth * save.length),
           3: FixedColumnWidth(cWidth * 5),
-          4: FixedColumnWidth(cWidth * 'Delete'.length),
+          4: FixedColumnWidth(cWidth * delete.length),
           5: FixedColumnWidth(cWidth * 4),
         },
         children: [
@@ -119,34 +123,25 @@ class _LanguageDescription extends State<LanguageDescription> {
             DBorder(data: '[ '),
             modified
                 ? TButton(
-                    text: 'Save',
+                    text: save,
                     onPressed: () => saveLanguage(),
                     color: LPColor.greenColor,
                     hover: LPColor.greenBrightColor,
                   )
-                : DBorder(data: 'Save'),
+                : DBorder(data: save),
             DBorder(data: ' ]-[ '),
             canDelete
                 ? TButton(
-                    text: 'Delete',
+                    text: delete,
                     onPressed: () => _languageService.delete(language.id),
                     color: LPColor.redColor,
                     hover: LPColor.redBrightColor,
                   )
-                : DBorder(data: 'Delete'),
+                : DBorder(data: delete),
             DBorder(data: ' ]-+'),
           ])
         ],
       )
     ]);
-
-    // return ConstrainedBox(
-    //   constraints: BoxConstraints(maxHeight: 800, maxWidth: 800),
-    //   child: Column(
-    //     children: [
-    //       Text(language.displayName),
-    //     ],
-    //   ),
-    // );
   }
 }

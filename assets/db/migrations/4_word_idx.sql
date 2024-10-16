@@ -1,11 +1,12 @@
 CREATE INDEX word_idx ON word_tbl (word);
 
-CREATE VIRTUAL TABLE fts5_word USING fts5
+CREATE VIRTUAL TABLE fts5_word
+    USING fts5
 (
     word,
     content='word_tbl',
     content_rowid='id',
-    tokenize='trigram case_sensitive 0 remove_diacritics 1'
+    tokenize='trigram remove_diacritics 1'
 );
 
 CREATE TRIGGER word_tr_ai
