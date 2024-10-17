@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/tabs/tabs.dart';
 import 'package:language_parser_desktop/features/language_description/language_description.dart';
+import 'package:language_parser_desktop/features/language_phonetics/language_phonetics.dart';
 
 class LanguageContentTabs extends StatelessWidget {
   final int? languageId;
@@ -11,11 +12,11 @@ class LanguageContentTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<TabContent> tabsInfo = languageId == null
         ? [
-            TabContent(tabName: 'Phonetics', shortTabName: '[pʰ]', content: Text('Phonetics')),
+            TabContent(tabName: 'Phonetics', shortTabName: '[pʰ]', content: LanguagePhonetics(languageId)),
           ]
         : [
             TabContent(tabName: 'Description', shortTabName: 'Descr.', content: LanguageDescription(languageId!)),
-            TabContent(tabName: 'Phonetics', shortTabName: '[pʰ]', content: Text('Phonetics')),
+            TabContent(tabName: 'Phonetics', shortTabName: '[pʰ]', content: LanguagePhonetics(languageId)),
             TabContent(tabName: 'Orthography', shortTabName: 'Ort', content: Text('Orthography')),
             TabContent(tabName: 'Grammatical Categories', shortTabName: 'm/n/f', content: Text('GC')),
             TabContent(tabName: 'Declensions', shortTabName: '-us/ūs', content: Text('Decl')),

@@ -1,4 +1,4 @@
-class IpaService {
+class IpaUtils {
   //Pulmonic consonants
   //Manner
   static const List<String> plumonicConsonantsNasal = [

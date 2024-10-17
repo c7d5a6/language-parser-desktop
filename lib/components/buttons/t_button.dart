@@ -6,8 +6,9 @@ class TButton extends StatefulWidget {
   final void Function()? _onPressed;
   final Color? _color;
   final Color? _hover;
+  final bool disabled;
 
-  const TButton({super.key, required text, onPressed, color = LPColor.primaryColor, hover})
+  const TButton({super.key, required text, onPressed, color = LPColor.primaryColor, hover, this.disabled = false})
       : _text = text,
         _onPressed = onPressed,
         _color = color,
@@ -34,7 +35,7 @@ class _TButton extends State<TButton> {
               style: LPFont.defaultTextStyle,
               maxLines: 1,
             ),
-            onPressed: () => {},
+            onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(
               foregroundColor: hover ? widget._hover : widget._color,
               minimumSize: Size.zero,

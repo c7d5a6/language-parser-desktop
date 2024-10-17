@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
-import 'package:language_parser_desktop/services/ipa_service.dart';
+import 'package:language_parser_desktop/util/ipa_utils.dart';
 
 import '../persistence/repositories/language_repository.dart';
 
@@ -49,9 +49,9 @@ class LanguageService {
     assert(_languageRepository.exists(languageId), 'Language must exist');
     List<String> usedMainPhonemes = [];
     List<String> restUsedPhonemes = [];
-    String languagePhonemes = IpaService.cleanIPA(_getLanguagePhonemes(languageId));
+    String languagePhonemes = IpaUtils.cleanIPA(_getLanguagePhonemes(languageId));
     //   List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
-    List<String> allSoundsWithVariants = IpaService.allSoundsWithVariants;
+    List<String> allSoundsWithVariants = IpaUtils.allSoundsWithVariants;
     List<String> allSoundsWithVariantsAndLanguagePhonemes =
         []; // elp.stream().map(ELanguagePhoneme::getPhoneme).collect(Collectors.toList());
     allSoundsWithVariantsAndLanguagePhonemes.addAll(allSoundsWithVariants);
@@ -83,7 +83,7 @@ class LanguageService {
 }
 
 class ListOfLanguagePhonemes {
-  final int langId;
+  final int? langId;
   final List<String> usedMainPhonemes;
   final List<String> restUsedPhonemes;
 

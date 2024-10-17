@@ -5,7 +5,7 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
-import 'package:language_parser_desktop/services/ipa_service.dart';
+import 'package:language_parser_desktop/util/ipa_utils.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../persistence/entities/language_entity.dart';

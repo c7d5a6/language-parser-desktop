@@ -33,4 +33,6 @@ class LPFont {
 
   static final TextStyle borderFontStyle =
       defaultTextStyle.merge(TextStyle(color: LPColor.borderColor, fontWeight: FontWeight.w900));
+  static final TextStyle headerFontStyle =
+      defaultTextStyle.merge(TextStyle(color: LPColor.borderColor, fontWeight: FontWeight.w500));
 }
