@@ -14,7 +14,6 @@ class LPhHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      log('LPhHeader constraints $constraints');
       final wide = measureTextWidth(header, context) <= constraints.maxWidth;
       return Container(
         child: wide
