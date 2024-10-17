@@ -63,14 +63,8 @@ class LanguageService {
         languagePhonemes = languagePhonemes.replaceAll(sound, "");
       }
     });
-    // List<String> restSounds = Arrays
-    //     .stream(languagePhonemes.split(""))
-    //     .filter(s -> !s.isEmpty() && !s.trim().isEmpty())
-    //     .sorted((o1, o2) -> o2.length() - o1.length())
-    //     .distinct()
-    //     .collect(Collectors.toList());
-    // resultList.setRestUsedPhonemes(restSounds);
-    //
+    restUsedPhonemes = languagePhonemes.split('').where((s) => s.trim().length > 0).toSet().toList()
+      ..sort((o1, o2) => o2.length - o1.length);
     //   List<LanguagePhoneme> lpused = elp
     //       .stream()
     //       .filter((lp) -> Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals))

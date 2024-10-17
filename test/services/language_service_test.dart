@@ -30,13 +30,14 @@ void main() {
     ''');
     db.execute('''
     INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES 
-    ('asd', 1, 1001, 'NEW', 'Comment word 1'),
-    ('qsd', 1, 1001, 'NEW', 'Comment word 2');
+    ('asd1', 1, 1001, 'NEW', 'Comment word 1'),
+    ('qsd2', 1, 1001, 'NEW', 'Comment word 2');
     ''');
 
     final phonetics = await languageService.getLanguagePhonemes(1);
 
     expect(deepEqualUnorderedStringLists(phonetics.usedMainPhonemes, ['a', 's', 'd', 'q']), true);
+    expect(deepEqualUnorderedStringLists(phonetics.restUsedPhonemes, ['1', '2']), true);
   });
 }
 
