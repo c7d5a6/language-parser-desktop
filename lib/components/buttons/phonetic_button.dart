@@ -13,6 +13,7 @@ class PhoneticButton extends StatefulWidget {
   final bool vowel;
   final bool consonant;
   final bool disabled;
+  final Function(String) onPressed;
   final ListOfLanguagePhonemes languagePhonemes;
 
   const PhoneticButton({
@@ -22,6 +23,7 @@ class PhoneticButton extends StatefulWidget {
     this.vowel = false,
     this.consonant = false,
     required this.disabled,
+    required this.onPressed,
   });
 
   @override
@@ -46,10 +48,12 @@ class _PhonecticButton extends State<PhoneticButton> {
   Color getColor(bool bright, String s) {
     return (widget.languagePhonemes.usedMainPhonemes.contains(s) ||
             widget.languagePhonemes.restUsedPhonemes.contains(s))
-        ? (false
+        ? ((widget.languagePhonemes.selectedMainPhonemes.any((p) => p.phoneme == s) ||
+                widget.languagePhonemes.selectedRestPhonemes.any((p) => p.phoneme == s))
             ? (bright ? LPColor.greenBrightColor : LPColor.greenColor)
             : (bright ? LPColor.redBrightColor : LPColor.redColor))
-        : (false
+        : ((widget.languagePhonemes.selectedMainPhonemes.any((p) => p.phoneme == s) ||
+                widget.languagePhonemes.selectedRestPhonemes.any((p) => p.phoneme == s))
             ? (bright ? LPColor.yellowBrightColor : LPColor.yellowColor)
             : (bright ? LPColor.greyBrightColor : LPColor.greyColor));
   }
@@ -64,6 +68,7 @@ class _PhonecticButton extends State<PhoneticButton> {
           color: getColor(false, widget.phonetic),
           hover: getColor(true, widget.phonetic),
           disabled: widget.disabled,
+          onPressed: widget.disabled ? null : () => widget.onPressed(widget.phonetic),
         ),
         if (widget.consonant)
           Row(
@@ -78,6 +83,7 @@ class _PhonecticButton extends State<PhoneticButton> {
               color: getColor(false, widget.phonetic + cv),
               hover: getColor(true, widget.phonetic + cv),
               disabled: widget.disabled,
+              onPressed: widget.disabled ? null : () => widget.onPressed(widget.phonetic + cv),
             );
           }).toList(growable: false)),
         if (widget.vowel)
@@ -89,6 +95,7 @@ class _PhonecticButton extends State<PhoneticButton> {
                 color: getColor(false, widget.phonetic + 'ː'),
                 hover: getColor(true, widget.phonetic + 'ː'),
                 disabled: widget.disabled,
+                onPressed: widget.disabled ? null : () => widget.onPressed(widget.phonetic + 'ː'),
               ),
               DBorder(data: ')'),
             ],
@@ -101,12 +108,20 @@ class _PhonecticButton extends State<PhoneticButton> {
 class CPhoneticButton extends StatelessWidget {
   final String phonetic;
   final bool disabled;
-  final ListOfLanguagePhonemes languagePhonemes;
+  final Function(String) onPressed;
+  final ListOfLanguagePhonemes phonemes;
 
-  const CPhoneticButton({super.key, required this.phonetic, required this.disabled, required this.languagePhonemes});
+  const CPhoneticButton(
+      {super.key, required this.phonetic, required this.disabled, required this.phonemes, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return PhoneticButton(phonetic: phonetic, languagePhonemes: languagePhonemes, disabled: disabled, consonant: true);
+    return PhoneticButton(
+      phonetic: phonetic,
+      languagePhonemes: phonemes,
+      disabled: disabled,
+      consonant: true,
+      onPressed: onPressed,
+    );
   }
 }

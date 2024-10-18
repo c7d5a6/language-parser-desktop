@@ -1,6 +1,9 @@
 import 'dart:core';
+import 'dart:developer';
 
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
+import 'package:language_parser_desktop/persistence/entities/language_phoneme_entity.dart';
+import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 import 'package:language_parser_desktop/util/ipa_utils.dart';
 
@@ -8,10 +11,11 @@ import '../persistence/repositories/language_repository.dart';
 
 class LanguageService {
   final LanguageRepository _languageRepository;
+  final LanguagePhonemeRepository _languagePhonemeRepository;
   final WordRepository _wordRepository;
   Function()? langsUpdated;
 
-  LanguageService(this._languageRepository, this._wordRepository);
+  LanguageService(this._languageRepository, this._languagePhonemeRepository, this._wordRepository);
 
   List<Language> getAllLanguages() {
     return _languageRepository.getAll();
@@ -41,6 +45,14 @@ class LanguageService {
     if (langsUpdated != null) langsUpdated!();
   }
 
+  LanguagePhoneme addPhoneme(int langId, String phoneme) {
+    return _languagePhonemeRepository.save(langId, phoneme);
+  }
+
+  void deletePhoneme(int id) {
+    return _languagePhonemeRepository.delete(id);
+  }
+
   String _getLanguagePhonemes(int langId) {
     return _wordRepository.getAllWordByLang(langId).map((w) => w.word).fold('', (a, b) => '$a $b').trim();
   }
@@ -50,10 +62,11 @@ class LanguageService {
     List<String> usedMainPhonemes = [];
     List<String> restUsedPhonemes = [];
     String languagePhonemes = IpaUtils.cleanIPA(_getLanguagePhonemes(languageId));
-    //   List<ELanguagePhoneme> elp = this.languagePhonemeRepository.findByLanguage_Id(languageId);
+    List<LanguagePhoneme> lps = _languagePhonemeRepository.getAllByLang(languageId);
     List<String> allSoundsWithVariants = IpaUtils.allSoundsWithVariants;
-    List<String> allSoundsWithVariantsAndLanguagePhonemes =
-        []; // elp.stream().map(ELanguagePhoneme::getPhoneme).collect(Collectors.toList());
+    List<String> allSoundsWithVariantsAndLanguagePhonemes = List.empty(growable: true)
+      ..addAll(allSoundsWithVariants)
+      ..addAll(lps.map((lp) => lp.phoneme));
     allSoundsWithVariantsAndLanguagePhonemes.addAll(allSoundsWithVariants);
 
     List<String> sounds = allSoundsWithVariantsAndLanguagePhonemes..sort((o1, o2) => o2.length - o1.length);
@@ -63,22 +76,18 @@ class LanguageService {
         languagePhonemes = languagePhonemes.replaceAll(sound, "");
       }
     });
-    restUsedPhonemes = languagePhonemes.split('').where((s) => s.trim().length > 0).toSet().toList()
+    restUsedPhonemes = languagePhonemes
+        .split('')
+        .where((s) {
+          return s.trim().length > 0;
+        })
+        .toSet()
+        .toList()
       ..sort((o1, o2) => o2.length - o1.length);
-    //   List<LanguagePhoneme> lpused = elp
-    //       .stream()
-    //       .filter((lp) -> Arrays.stream(allSoundsWithVariants).anyMatch(lp.getPhoneme()::equals))
-    //       .map(this::convertToRestModel)
-    //       .collect(Collectors.toList());
-    //   resultList.setSelectedMainPhonemes(lpused);
-    //   List<LanguagePhoneme> lprest = elp
-    //       .stream()
-    //       .filter((lp) -> Arrays.stream(allSoundsWithVariants).noneMatch(lp.getPhoneme()::equals))
-    //       .map(this::convertToRestModel)
-    //       .collect(Collectors.toList());
-    //   resultList.setSelectedRestPhonemes(lprest);
-    //
-    return ListOfLanguagePhonemes(languageId, usedMainPhonemes, restUsedPhonemes);
+    List<LanguagePhoneme> lpused = lps.where((lp) => allSoundsWithVariants.any((s) => s == lp.phoneme)).toList();
+    List<LanguagePhoneme> lprest = lps.where((lp) => !lpused.any((lu) => lu.id == lp.id)).toList();
+
+    return ListOfLanguagePhonemes(languageId, usedMainPhonemes, restUsedPhonemes, lpused, lprest);
   }
 }
 
@@ -86,9 +95,9 @@ class ListOfLanguagePhonemes {
   final int? langId;
   final List<String> usedMainPhonemes;
   final List<String> restUsedPhonemes;
+  final List<LanguagePhoneme> selectedMainPhonemes;
+  final List<LanguagePhoneme> selectedRestPhonemes;
 
-  // final List<LanguagePhoneme> selectedMainPhonemes;
-  // final List<LanguagePhoneme> selectedRestPhonemes;
-
-  ListOfLanguagePhonemes(this.langId, this.usedMainPhonemes, this.restUsedPhonemes);
+  ListOfLanguagePhonemes(
+      this.langId, this.usedMainPhonemes, this.restUsedPhonemes, this.selectedMainPhonemes, this.selectedRestPhonemes);
 }

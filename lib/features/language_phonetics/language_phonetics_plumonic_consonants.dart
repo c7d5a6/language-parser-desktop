@@ -11,7 +11,8 @@ import '../../services/language_service.dart';
 
 class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   final bool disabled;
-  final ListOfLanguagePhonemes listOfLanguagePhonemes;
+  final ListOfLanguagePhonemes phonemes;
+  final Function(String) onPress;
   static const List<String> rowHeaders = [
     "Nasal",
     "Plosive",
@@ -29,28 +30,23 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   ];
 
   const LanguagePhoneticsPlumonicConsonants(
-      {super.key,
-      required this.disabled,
-      required this.listOfLanguagePhonemes});
+      {super.key, required this.disabled, required this.phonemes, required this.onPress});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-
       final cWidth = measureTextWidth('-', context);
       final rowHeaderCharacters = rowHeaders.fold(0, (p, s) => math.max(p, s.length));
       var delta = (constraints.maxWidth % (cWidth * 12));
-      final rowHeaderLength = math.max(0, rowHeaderCharacters - (delta / cWidth).floorToDouble()) * cWidth + delta % cWidth;
+      final rowHeaderLength =
+          math.max(0, rowHeaderCharacters - (delta / cWidth).floorToDouble()) * cWidth + delta % cWidth;
 
       return Column(
         children: [
           Table(
             columnWidths: {0: FlexColumnWidth(), 1: FixedColumnWidth(cWidth)},
             children: [
-              TableRow(children: [
-                Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---')),
-                DBorder(data: '|')
-              ])
+              TableRow(children: [Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---')), DBorder(data: '|')])
             ],
           ),
           Table(
@@ -61,12 +57,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
               3: FixedColumnWidth(cWidth)
             },
             children: [
-              TableRow(children: [
-                HDash(),
-                DBorder(data: '+'),
-                HDash(),
-                DBorder(data: '+')
-              ])
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')])
             ],
           ),
           Table(
@@ -92,9 +83,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             },
             children: [
               TableRow(children: [
-                Container(
-                    alignment: Alignment.centerRight,
-                    child: LPhHeader(header: 'Place >')),
+                Container(alignment: Alignment.centerRight, child: LPhHeader(header: 'Place >')),
                 DBorder(data: '|'),
                 Center(child: LPhHeader(header: 'Labial')),
                 Container(),
@@ -269,69 +258,30 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
               TableRow(children: [
                 Center(child: CLPhHeader(header: rowHeaders[0])),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'm̥',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
-                CPhoneticButton(
-                    phonetic: 'm',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'm̥', phonemes: phonemes, disabled: disabled, onPressed: onPress),
+                CPhoneticButton(phonetic: 'm', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'ɱ',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'ɱ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'n̼',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'n̼', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
                 Container(),
-                CPhoneticButton(
-                    phonetic: 'n̥',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'n̥', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 Container(),
                 Container(),
-                CPhoneticButton(
-                    phonetic: 'n',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'n', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 Container(),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'ɳ̊',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
-                CPhoneticButton(
-                    phonetic: 'ɳ',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'ɳ̊', phonemes: phonemes, disabled: disabled, onPressed: onPress),
+                CPhoneticButton(phonetic: 'ɳ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'ɲ̊',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
-                CPhoneticButton(
-                    phonetic: 'ɲ',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'ɲ̊', phonemes: phonemes, disabled: disabled, onPressed: onPress),
+                CPhoneticButton(phonetic: 'ɲ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'ŋ̊',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
-                CPhoneticButton(
-                    phonetic: 'ŋ',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'ŋ̊', phonemes: phonemes, disabled: disabled, onPressed: onPress),
+                CPhoneticButton(phonetic: 'ŋ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
-                CPhoneticButton(
-                    phonetic: 'ɴ',
-                    languagePhonemes: listOfLanguagePhonemes,
-                    disabled: disabled),
+                CPhoneticButton(phonetic: 'ɴ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
                 Container(),
                 Container(),

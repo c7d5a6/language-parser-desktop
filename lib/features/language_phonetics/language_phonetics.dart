@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_header.dart';
 import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_plumonic_consonants.dart';
+import 'package:language_parser_desktop/persistence/entities/language_phoneme_entity.dart';
 
-import '../../components/buttons/phonetic_button.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
 import '../../services/service_manager.dart';
@@ -56,16 +55,30 @@ class _LanguagePhonetics extends State<LanguagePhonetics> {
   void _reloadPhonetics() {
     final l = widget.languageId != null
         ? _languageService.getLanguagePhonemes(widget.languageId!)
-        : ListOfLanguagePhonemes(0, [], []);
+        : ListOfLanguagePhonemes(0, [], [], [], []);
     setState(() {
       listOfLanguagePhonemes = l;
     });
   }
 
+  void updatePhoneme(String phoneme) {
+    if (widget.languageId == null) return;
+    final List<LanguagePhoneme> phonemes = List.empty(growable: true)
+      ..addAll(listOfLanguagePhonemes.selectedMainPhonemes)
+      ..addAll(listOfLanguagePhonemes.selectedRestPhonemes);
+    final idx = phonemes.indexWhere((ph) => ph.phoneme == phoneme);
+    if (idx != -1) {
+      _languageService.deletePhoneme(phonemes[idx].id);
+    } else {
+      _languageService.addPhoneme(widget.languageId!, phoneme);
+    }
+    _reloadPhonetics();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      LanguagePhoneticsPlumonicConsonants(listOfLanguagePhonemes: listOfLanguagePhonemes, disabled: disabled),
+      LanguagePhoneticsPlumonicConsonants(phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
       // PhoneticButton(phonetic: 'a', languagePhonemes: listOfLanguagePhonemes, vowel: true, disabled: widget.languageId == null),
       // PhoneticButton(phonetic: 'i', languagePhonemes: listOfLanguagePhonemes, vowel: true, disabled: widget.languageId == null),
       // PhoneticButton(phonetic: 's', languagePhonemes: listOfLanguagePhonemes, consonant: true, disabled: widget.languageId == null),

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 import 'package:language_parser_desktop/services/language_service.dart';
@@ -16,7 +17,8 @@ void main() {
     await migrate(db);
     final wordRepository = WordRepository(db);
     final languageRepository = LanguageRepository(db);
-    languageService = LanguageService(languageRepository, wordRepository);
+    final languagePhonemeRepository = LanguagePhonemeRepository(db);
+    languageService = LanguageService(languageRepository, languagePhonemeRepository, wordRepository);
   });
 
   test('Get all words', () async {
