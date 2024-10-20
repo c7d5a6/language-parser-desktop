@@ -27,11 +27,13 @@ class PhoneticButton extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _PhonecticButton();
+  State<StatefulWidget> createState() => _PhoneticButton();
 }
 
-class _PhonecticButton extends State<PhoneticButton> {
+class _PhoneticButton extends State<PhoneticButton> {
   ServiceManager? _serviceManager;
+  Color color = LPColor.greyColor;
+  Color hoverColor = LPColor.greyBrightColor;
 
   // @Input() languageSounds?: ListOfLanguagePhonemes;
   // @Output() onClick = new EventEmitter<string>();
@@ -43,6 +45,25 @@ class _PhonecticButton extends State<PhoneticButton> {
     if (_serviceManager != sm) {
       _serviceManager = sm;
     }
+  }
+
+  @override
+  void initState() {
+    updateColor();
+  }
+
+  @override
+  void didUpdateWidget(PhoneticButton oldWidget) {
+    if (widget.languagePhonemes != oldWidget.languagePhonemes) {
+      updateColor();
+    }
+  }
+
+  void updateColor() {
+    setState(() {
+      color = getColor(false, widget.phonetic);
+      hoverColor = getColor(true, widget.phonetic);
+    });
   }
 
   Color getColor(bool bright, String s) {
@@ -65,8 +86,8 @@ class _PhonecticButton extends State<PhoneticButton> {
       children: [
         TButton(
           text: widget.phonetic,
-          color: getColor(false, widget.phonetic),
-          hover: getColor(true, widget.phonetic),
+          color: color,
+          hover: hoverColor,
           disabled: widget.disabled,
           onPressed: widget.disabled ? null : () => widget.onPressed(widget.phonetic),
         ),
