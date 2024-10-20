@@ -17,8 +17,9 @@ class TabContent {
 
 class Tabs extends StatefulWidget {
   final List<TabContent> tabsInfo;
+  final bool noFirstPlus;
 
-  const Tabs({super.key, required this.tabsInfo});
+  const Tabs({super.key, required this.tabsInfo, this.noFirstPlus = false});
 
   @override
   _TabsState createState() => _TabsState();
@@ -36,14 +37,25 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     final cWSize = measureTextWidth('-', context);
-    Map<int, TableColumnWidth> columnWidth = {0: FixedColumnWidth(cWSize)};
-    List<Widget> tabsColumns1 = [DBorder(data: ' ')];
-    List<Widget> tabsColumns2 = [DBorder(data: ' ')];
-    List<Widget> tabsColumns3 = [DBorder(data: '-')];
+    final prefix = widget.noFirstPlus ? 0 : 1;
+    Map<int, TableColumnWidth> columnWidth = {};
+    List<Widget> tabsColumns1 = [];
+    List<Widget> tabsColumns2 = [];
+    List<Widget> tabsColumns3 = [];
+    if (!widget.noFirstPlus) {
+      columnWidth.addAll({0: FixedColumnWidth(cWSize)});
+      tabsColumns1.addAll([DBorder(data: ' ')]);
+      tabsColumns2.addAll([DBorder(data: ' ')]);
+      tabsColumns3.addAll([DBorder(data: '+')]);
+    }
+    columnWidth.addAll({prefix + 0: FixedColumnWidth(cWSize)});
+    tabsColumns1.addAll([DBorder(data: ' ')]);
+    tabsColumns2.addAll([DBorder(data: ' ')]);
+    tabsColumns3.addAll([DBorder(data: '-')]);
     for (var i = 0; i < widget.tabsInfo.length; i++) {
       columnWidth.addAll({
-        1 + i * 2: FixedColumnWidth(cWSize),
-        2 + i * 2: FixedColumnWidth(cWSize *
+        prefix + 1 + i * 2: FixedColumnWidth(cWSize),
+        prefix + 2 + i * 2: FixedColumnWidth(cWSize *
             (2 + (_activeTabIndex == i ? widget.tabsInfo[i].tabName.length : widget.tabsInfo[i].shortTabName.length)))
       });
       tabsColumns1.add(_activeTabIndex == i || _activeTabIndex == i - 1 ? DBorder(data: '+') : Container());
@@ -58,9 +70,9 @@ class _TabsState extends State<Tabs> {
       tabsColumns3.add(_activeTabIndex == i || _activeTabIndex == i - 1 ? DBorder(data: '+') : DBorder(data: '-'));
       tabsColumns3.add(_activeTabIndex == i ? Container() : HDash());
     }
-    columnWidth.addAll({widget.tabsInfo.length * 2 + 1: FixedColumnWidth(cWSize)});
-    columnWidth.addAll({widget.tabsInfo.length * 2 + 2: FlexColumnWidth(1)});
-    columnWidth.addAll({widget.tabsInfo.length * 2 + 3: FixedColumnWidth(cWSize)});
+    columnWidth.addAll({prefix + widget.tabsInfo.length * 2 + 1: FixedColumnWidth(cWSize)});
+    columnWidth.addAll({prefix + widget.tabsInfo.length * 2 + 2: FlexColumnWidth(1)});
+    columnWidth.addAll({prefix + widget.tabsInfo.length * 2 + 3: FixedColumnWidth(cWSize)});
     tabsColumns1.add(_activeTabIndex == widget.tabsInfo.length - 1 ? DBorder(data: '+') : Container());
     tabsColumns2.add(DBorder(data: '|'));
     tabsColumns3.add(_activeTabIndex == widget.tabsInfo.length - 1 ? DBorder(data: '+') : DBorder(data: '-'));

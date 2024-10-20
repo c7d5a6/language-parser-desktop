@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/app.dart';
+import 'package:language_parser_desktop/features/grammar/grammar.dart';
 import 'package:language_parser_desktop/features/open_file/open_file_screen.dart';
 import 'package:language_parser_desktop/persistence/repository_manager.dart';
 import 'package:language_parser_desktop/service_provider.dart';

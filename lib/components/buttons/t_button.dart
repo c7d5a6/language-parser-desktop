@@ -37,12 +37,12 @@ class _TButton extends State<TButton> {
             ),
             onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(
-              foregroundColor: hover ? widget._hover : widget._color,
-              minimumSize: Size.zero,
-              padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              enableFeedback: false,
-            ),
+                foregroundColor: hover ? widget._hover : widget._color,
+                minimumSize: Size.zero,
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                enableFeedback: false,
+                animationDuration: Duration()),
           ),
         ),
       );
