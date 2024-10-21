@@ -5,13 +5,12 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
-import 'package:language_parser_desktop/util/ipa_utils.dart';
-import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../persistence/entities/language_entity.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
 import '../../services/service_manager.dart';
+import '../../text_measure_provider.dart';
 import '../../util/constants.dart';
 
 class LanguageDescription extends StatefulWidget {
@@ -71,7 +70,7 @@ class _LanguageDescription extends State<LanguageDescription> {
   @override
   Widget build(BuildContext context) {
     final canDelete = _languageService.canDelete(language.id);
-    var cWidth = measureTextWidth('-', context);
+    final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     var emptyRow = TableRow(children: [
       Container(),
       DBorder(data: ' | '),

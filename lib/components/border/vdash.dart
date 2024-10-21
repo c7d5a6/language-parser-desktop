@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 
+import '../../text_measure_provider.dart';
 import '../../util/layout.dart';
 
 class VDash extends StatelessWidget {
@@ -14,9 +15,8 @@ class VDash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      log('vdash constraints ${constraints.maxWidth}:${constraints.maxHeight} __ $maxDashes');
       return Container(
-        width: measureTextWidth('|', context),
+        width: TextMeasureProvider.of(context)!.characterWidth,
         child: DBorder(
           data: calculateDashes(constraints, context),
         ),

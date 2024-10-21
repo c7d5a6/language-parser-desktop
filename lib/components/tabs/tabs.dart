@@ -5,6 +5,7 @@ import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../components/border/hdash.dart';
 import '../../components/buttons/t_button.dart';
+import '../../text_measure_provider.dart';
 import '../../util/constants.dart';
 
 class TabContent {
@@ -36,7 +37,7 @@ class _TabsState extends State<Tabs> {
 
   @override
   Widget build(BuildContext context) {
-    final cWSize = measureTextWidth('-', context);
+    final cWSize = TextMeasureProvider.of(context)!.characterWidth;
     final prefix = widget.noFirstPlus ? 0 : 1;
     Map<int, TableColumnWidth> columnWidth = {};
     List<Widget> tabsColumns1 = [];

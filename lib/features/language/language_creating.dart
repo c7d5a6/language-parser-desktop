@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
@@ -8,8 +6,8 @@ import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../persistence/repositories/language_repository.dart';
+import '../../text_measure_provider.dart';
 import '../../util/constants.dart';
-
 
 class LanguageCreating extends StatefulWidget {
   final void Function(LanguageCreatingModel model) createLanguage;
@@ -25,7 +23,7 @@ class _LanguageCreating extends State<LanguageCreating> {
 
   @override
   Widget build(BuildContext context) {
-    var symbolWidth = measureTextWidth('|', context);
+    final symbolWidth = TextMeasureProvider.of(context)!.characterWidth;
     var symbolHeight = measureTextHeight('|', context);
     return Container(
         width: 1000,

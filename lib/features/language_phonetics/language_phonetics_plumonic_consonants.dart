@@ -4,11 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/phonetic_button.dart';
-import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_header.dart';
-import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../services/language_service.dart';
+import '../../text_measure_provider.dart';
 
 class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   final bool disabled;
@@ -36,7 +35,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      final cWidth = measureTextWidth('-', context);
+      final cWidth = TextMeasureProvider.of(context)!.characterWidth;
       final rowHeaderCharacters = rowHeaders.fold(0, (p, s) => math.max(p, s.length));
       var delta = ((constraints.maxWidth) % (cWidth * 12));
       final rowHeaderLength =

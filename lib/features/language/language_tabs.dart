@@ -11,7 +11,7 @@ import '../../persistence/repositories/language_repository.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
 import '../../services/service_manager.dart';
-import '../../util/layout.dart';
+import '../../text_measure_provider.dart';
 import 'language_new_button.dart';
 import 'language_search.dart';
 import 'language_tab.dart';
@@ -99,8 +99,7 @@ class _LanguageTabs extends State<LanguageTabs> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      log('L Tabs $constraints');
-      final cWSize = measureTextWidth('-', context);
+      final cWSize = TextMeasureProvider.of(context)!.characterWidth;
       double maxLanguageWidth = cWSize * 8 +
           cWSize * _languages.map((language) => language.displayName.length).fold(0, (a, b) => a > b ? a : b);
       maxLanguageWidth = math.max(maxLanguageWidth, cWSize * 9);
@@ -160,9 +159,9 @@ class HDashWithPrefix extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final maxWidth = constraints.maxWidth;
-      final width = maxWidth -
-          ((_prefix != null) ? measureTextWidth(_prefix, context) : 0) -
-          ((_postfix != null) ? measureTextWidth(_postfix, context) : 0);
+      final prefixWidth = _prefix == null ? 0 : _prefix.length * TextMeasureProvider.of(context)!.characterWidth;
+      final postfixWidth = _postfix == null ? 0 : _postfix.length * TextMeasureProvider.of(context)!.characterWidth;
+      final width = maxWidth - ((_prefix != null) ? prefixWidth : 0) - ((_postfix != null) ? postfixWidth : 0);
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

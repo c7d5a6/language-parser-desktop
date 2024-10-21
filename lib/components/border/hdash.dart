@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
+import 'package:language_parser_desktop/text_measure_provider.dart';
 
 import '../../util/layout.dart';
 
@@ -17,7 +18,7 @@ class HDash extends StatelessWidget {
   }
 
   String calculateDashes(BoxConstraints constraints, BuildContext context) {
-    double dashWidth = measureTextWidth('-', context);
+    final dashWidth = TextMeasureProvider.of(context)!.characterWidth;
     final width = constraints.maxWidth;
     int numberOfDashes = (width / dashWidth).ceil();
     return '-' * numberOfDashes;

@@ -2,12 +2,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/app.dart';
-import 'package:language_parser_desktop/features/grammar/grammar.dart';
 import 'package:language_parser_desktop/features/open_file/open_file_screen.dart';
 import 'package:language_parser_desktop/persistence/repository_manager.dart';
 import 'package:language_parser_desktop/service_provider.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
+import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/constants.dart';
+import 'package:language_parser_desktop/util/layout.dart';
 
 import 'util/sqlite.dart' as sl;
 
@@ -103,6 +104,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Container(
+        child: TextMeasureProvider(
+      characterWidth: measureTextWidth('-', context),
       child: isFileOpened
           ? ServiceProvider(_serviceManager!,
               child: App(
@@ -113,6 +116,6 @@ class _MyHomePageState extends State<MyHomePage> {
               onOpenFile: openFile,
               onNewFile: newFile,
             ),
-    );
+    ));
   }
 }
