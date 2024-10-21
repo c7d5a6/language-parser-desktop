@@ -23,10 +23,9 @@ class LanguageNewButton extends StatelessWidget {
         columnWidths: <int, TableColumnWidth>{
           0: FixedColumnWidth(cWSize),
           1: FlexColumnWidth(1),
-          2: FixedColumnWidth(cWSize),
         },
         children: [
-          TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+          TableRow(children: [DBorder(data: '+'), HDash()]),
           TableRow(children: [
             DBorder(data: '|'),
             TButton(
@@ -35,9 +34,8 @@ class LanguageNewButton extends StatelessWidget {
               hover: LPColor.greenBrightColor,
               onPressed: onPressed,
             ),
-            DBorder(data: '|')
           ]),
-          TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+          TableRow(children: [DBorder(data: '+'), HDash()]),
         ]);
   }
 }

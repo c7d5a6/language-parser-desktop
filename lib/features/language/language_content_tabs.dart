@@ -26,6 +26,6 @@ class LanguageContentTabs extends StatelessWidget {
             // TabContent(tabName: 'Grammatical Categories', shortTabName: 'm/n/f', content: Text('GC')),
             // TabContent(tabName: 'Declensions', shortTabName: '-us/ūs', content: Text('Decl')),
           ];
-    return Tabs(tabsInfo: tabsInfo, noFirstPlus: true);
+    return Tabs(tabsInfo: tabsInfo, langPrefix: true);
   }
 }

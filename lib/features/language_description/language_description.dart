@@ -72,6 +72,7 @@ class _LanguageDescription extends State<LanguageDescription> {
     final canDelete = _languageService.canDelete(language.id);
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     var emptyRow = TableRow(children: [
+      DBorder(data: '|'),
       Container(),
       DBorder(data: ' | '),
       Container(),
@@ -80,14 +81,16 @@ class _LanguageDescription extends State<LanguageDescription> {
     return Column(children: [
       Table(
         columnWidths: {
-          0: FixedColumnWidth(cWidth * displayName.length),
-          1: FixedColumnWidth(3 * cWidth),
-          2: FlexColumnWidth(1),
-          3: FixedColumnWidth(cWidth),
+          0: FixedColumnWidth(cWidth),
+          1: FixedColumnWidth(cWidth * (displayName.length + 1)),
+          2: FixedColumnWidth(3 * cWidth),
+          3: FlexColumnWidth(1),
+          4: FixedColumnWidth(cWidth),
         },
         children: [
           emptyRow,
           TableRow(children: [
+            DBorder(data: '|'),
             DBorder(data: displayName),
             DBorder(data: ' | '),
             TextFormField(
@@ -110,15 +113,17 @@ class _LanguageDescription extends State<LanguageDescription> {
       ),
       Table(
         columnWidths: {
-          0: FlexColumnWidth(1),
-          1: FixedColumnWidth(cWidth * 2),
-          2: FixedColumnWidth(cWidth * save.length),
-          3: FixedColumnWidth(cWidth * 5),
-          4: FixedColumnWidth(cWidth * delete.length),
-          5: FixedColumnWidth(cWidth * 4),
+          0: FixedColumnWidth(cWidth),
+          1: FlexColumnWidth(1),
+          2: FixedColumnWidth(cWidth * 2),
+          3: FixedColumnWidth(cWidth * save.length),
+          4: FixedColumnWidth(cWidth * 5),
+          5: FixedColumnWidth(cWidth * delete.length),
+          6: FixedColumnWidth(cWidth * 4),
         },
         children: [
           TableRow(children: [
+            DBorder(data: '+'),
             HDash(),
             DBorder(data: '[ '),
             modified

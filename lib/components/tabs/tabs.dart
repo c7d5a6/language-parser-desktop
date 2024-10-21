@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/ldash.dart';
-import 'package:language_parser_desktop/util/layout.dart';
 
 import '../../components/border/hdash.dart';
 import '../../components/buttons/t_button.dart';
@@ -18,9 +17,9 @@ class TabContent {
 
 class Tabs extends StatefulWidget {
   final List<TabContent> tabsInfo;
-  final bool noFirstPlus;
+  final bool langPrefix;
 
-  const Tabs({super.key, required this.tabsInfo, this.noFirstPlus = false});
+  const Tabs({super.key, required this.tabsInfo, this.langPrefix = false});
 
   @override
   _TabsState createState() => _TabsState();
@@ -38,15 +37,20 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     final cWSize = TextMeasureProvider.of(context)!.characterWidth;
-    final prefix = widget.noFirstPlus ? 0 : 1;
+    final prefix = 1; // widget.langPrefix ? 1 : 1;
     Map<int, TableColumnWidth> columnWidth = {};
     List<Widget> tabsColumns1 = [];
     List<Widget> tabsColumns2 = [];
     List<Widget> tabsColumns3 = [];
-    if (!widget.noFirstPlus) {
+    if (!widget.langPrefix) {
       columnWidth.addAll({0: FixedColumnWidth(cWSize)});
       tabsColumns1.addAll([DBorder(data: ' ')]);
       tabsColumns2.addAll([DBorder(data: ' ')]);
+      tabsColumns3.addAll([DBorder(data: '+')]);
+    } else {
+      columnWidth.addAll({0: FixedColumnWidth(cWSize)});
+      tabsColumns1.addAll([DBorder(data: '+')]);
+      tabsColumns2.addAll([DBorder(data: '|')]);
       tabsColumns3.addAll([DBorder(data: '+')]);
     }
     columnWidth.addAll({prefix + 0: FixedColumnWidth(cWSize)});

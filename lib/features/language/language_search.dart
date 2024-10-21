@@ -23,7 +23,6 @@ class LanguageSearch extends StatelessWidget {
           0: FixedColumnWidth(cWSize),
           1: FixedColumnWidth(cWSize),
           2: FlexColumnWidth(1),
-          3: FixedColumnWidth(cWSize),
         },
         children: [
           TableRow(children: [
@@ -38,10 +37,9 @@ class LanguageSearch extends StatelessWidget {
                       hintText: 'Search',
                       border: InputBorder.none,
                       hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
-                )),
-            DBorder(data: '|')
+                ))
           ]),
-          TableRow(children: [DBorder(data: ' '), DBorder(data: '+'), HDash(), DBorder(data: '|')]),
+          TableRow(children: [DBorder(data: ' '), DBorder(data: '+'), HDash()]),
         ]);
   }
 }

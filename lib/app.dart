@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/features/grammar/grammar.dart';
+import 'package:language_parser_desktop/text_measure_provider.dart';
+import 'package:language_parser_desktop/util/layout.dart';
 
 import 'features/language/languages.dart';
 
@@ -26,9 +30,16 @@ class _App extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    log('main size $size');
+    final cHeight = measureTextHeight('|', context);
+    final cWidth = TextMeasureProvider.of(context)!.characterWidth;
+    final paddingDelta = ((size.width - 16 * 2) % cWidth) / 2;
+    log('main padding delta $paddingDelta');
+    log('main padding delta ${1238.6 / cWidth}');
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size(10, 20),
+        preferredSize: Size(size.width, cHeight * 2),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -41,13 +52,14 @@ class _App extends State<App> {
           ],
         ),
       ),
-      bottomNavigationBar: const Text(' f o o t e r '),
+      bottomNavigationBar:
+          PreferredSize(preferredSize: Size(size.width, cHeight * 2), child: const Text(' f o o t e r ')),
       body: SingleChildScrollView(
           child: Center(
               child: Column(
         children: [
           Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.0 + paddingDelta),
               child: SelectionArea(
                   child: IndexedStack(
                 index: _tabIndex,

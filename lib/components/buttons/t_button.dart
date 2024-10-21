@@ -34,6 +34,7 @@ class _TButton extends State<TButton> {
               widget._text,
               style: LPFont.defaultTextStyle,
               maxLines: 1,
+              overflow: TextOverflow.visible,
             ),
             onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(

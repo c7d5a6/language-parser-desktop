@@ -13,20 +13,20 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   final bool disabled;
   final ListOfLanguagePhonemes phonemes;
   final Function(String) onPress;
-  static const List<String> rowHeaders = [
-    "Nasal",
-    "Plosive",
-    "Sibilant affricate",
-    "Non-sibilant affricate",
-    "Sibilant fricative",
-    "Non-sibilant fricative",
-    "Approximant",
-    "Tap/flap",
-    "Trill",
-    "Lateral affricate",
-    "Lateral fricative",
-    "Lateral approximant",
-    "Lateral tap/flap",
+  static const List<List<String>> rowHeaders = [
+    ["Nasal", "Nas"],
+    ["Plosive", "Pl"],
+    ["Sibilant affricate", "SA"],
+    ["Non-sibilant affricate", "NSA"],
+    ["Sibilant fricative", "SF"],
+    ["Non-sibilant fricative", "NSF"],
+    ["Approximant", "App"],
+    ["Tap/flap", "T/F"],
+    ["Trill", "Tr"],
+    ["Lateral affricate", "LAf"],
+    ["Lateral fricative", "LF"],
+    ["Lateral approximant", "LAp"],
+    ["Lateral tap/flap", "LTF"]
   ];
 
   const LanguagePhoneticsPlumonicConsonants(
@@ -36,7 +36,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final cWidth = TextMeasureProvider.of(context)!.characterWidth;
-      final rowHeaderCharacters = rowHeaders.fold(0, (p, s) => math.max(p, s.length));
+      final rowHeaderCharacters = rowHeaders.fold(0, (p, s) => math.max(p, s[0].length));
       var delta = ((constraints.maxWidth) % (cWidth * 12));
       final rowHeaderLength =
           math.max(0, rowHeaderCharacters - 0 - (delta / cWidth).floorToDouble()) * cWidth + delta % cWidth;
@@ -44,20 +44,29 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
       return Column(
         children: [
           Table(
-            columnWidths: {0: FlexColumnWidth(), 1: FixedColumnWidth(cWidth)},
+            columnWidths: {
+              0: FixedColumnWidth(cWidth),
+              1: FlexColumnWidth(),
+              2: FixedColumnWidth(cWidth),
+            },
             children: [
-              TableRow(children: [Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---')), DBorder(data: '|')])
+              TableRow(children: [
+                DBorder(data: '|'),
+                Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---')),
+                DBorder(data: '|')
+              ])
             ],
           ),
           Table(
             columnWidths: {
-              0: FixedColumnWidth(rowHeaderLength),
-              1: FixedColumnWidth(cWidth),
-              2: FlexColumnWidth(),
-              3: FixedColumnWidth(cWidth)
+              0: FixedColumnWidth(cWidth),
+              1: FixedColumnWidth(rowHeaderLength),
+              2: FixedColumnWidth(cWidth),
+              3: FlexColumnWidth(),
+              4: FixedColumnWidth(cWidth)
             },
             children: [
-              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')])
+              TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')])
             ],
           ),
           Table(
@@ -254,7 +263,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             30: FixedColumnWidth(cWidth),
           }, children: [
             TableRow(children: [
-              Center(child: CLPhHeader(header: rowHeaders[0])),
+              Center(child: CLPhHeader(header: rowHeaders[0][0], short: rowHeaders[0][1])),
               DBorder(data: '|'),
               CPhoneticButton(phonetic: 'm̥', phonemes: phonemes, disabled: disabled, onPressed: onPress),
               CPhoneticButton(phonetic: 'm', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -359,7 +368,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             },
             children: [
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[1])),
+                Center(child: CLPhHeader(header: rowHeaders[1][0], short: rowHeaders[1][1])),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'p', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 CPhoneticButton(phonetic: 'b', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -459,7 +468,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             23: FixedColumnWidth(cWidth),
           }, children: [
             TableRow(children: [
-              Center(child: CLPhHeader(header: rowHeaders[2])),
+              Center(child: CLPhHeader(header: rowHeaders[2][0], short: rowHeaders[2][1])),
               DBorder(data: '|'),
               Container(),
               Container(),
@@ -568,7 +577,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '+'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[3])),
+                Center(child: CLPhHeader(header: rowHeaders[3][0], short: rowHeaders[3][1])),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'p͡ɸ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 CPhoneticButton(phonetic: 'b͡β', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -676,7 +685,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             23: FixedColumnWidth(cWidth),
           }, children: [
             TableRow(children: [
-              Center(child: CLPhHeader(header: rowHeaders[4])),
+              Center(child: CLPhHeader(header: rowHeaders[4][0], short: rowHeaders[4][1])),
               DBorder(data: '|'),
               Container(),
               Container(),
@@ -785,7 +794,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '+'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[5])),
+                Center(child: CLPhHeader(header: rowHeaders[5][0], short: rowHeaders[5][1])),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'ɸ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 CPhoneticButton(phonetic: 'β', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -903,7 +912,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
             },
             children: [
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[6])),
+                Center(child: CLPhHeader(header: rowHeaders[6][0], short: rowHeaders[6][1])),
                 DBorder(data: '|'),
                 Container(),
                 Container(),
@@ -971,7 +980,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '+'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[7])),
+                Center(child: CLPhHeader(header: rowHeaders[7][0], short: rowHeaders[7][1])),
                 DBorder(data: '|'),
                 Container(),
                 CPhoneticButton(phonetic: 'ⱱ̟', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -1039,7 +1048,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '|'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[8])),
+                Center(child: CLPhHeader(header: rowHeaders[8][0], short: rowHeaders[8][1])),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'ʙ̥', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 CPhoneticButton(phonetic: 'ʙ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -1107,7 +1116,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '|'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[9])),
+                Center(child: CLPhHeader(header: rowHeaders[9][0], short: rowHeaders[9][1])),
                 DBorder(data: '|'),
                 Container(),
                 Container(),
@@ -1175,7 +1184,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '|'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[10])),
+                Center(child: CLPhHeader(header: rowHeaders[10][0], short: rowHeaders[10][1])),
                 DBorder(data: '|'),
                 Container(),
                 Container(),
@@ -1243,7 +1252,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '|'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[11])),
+                Center(child: CLPhHeader(header: rowHeaders[11][0], short: rowHeaders[11][1])),
                 DBorder(data: '|'),
                 Container(),
                 Container(),
@@ -1311,7 +1320,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 DBorder(data: '|'),
               ]),
               TableRow(children: [
-                Center(child: CLPhHeader(header: rowHeaders[12])),
+                Center(child: CLPhHeader(header: rowHeaders[12][0], short: rowHeaders[12][1])),
                 DBorder(data: '|'),
                 Container(),
                 Container(),

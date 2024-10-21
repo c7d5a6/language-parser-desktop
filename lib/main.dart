@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Container(
         child: TextMeasureProvider(
-      characterWidth: measureTextWidth('-', context),
+      characterWidth: measureTextWidth('a', context),
       child: isFileOpened
           ? ServiceProvider(_serviceManager!,
               child: App(

@@ -33,7 +33,6 @@ class LanguageTab extends StatelessWidget {
         2: FixedColumnWidth(cWSize),
         3: FixedColumnWidth(cWSize),
         4: FlexColumnWidth(1),
-        5: FixedColumnWidth(cWSize),
       },
       children: [
         TableRow(children: [
@@ -48,16 +47,14 @@ class LanguageTab extends StatelessWidget {
                 onPressed: () => onSelect(id),
                 color: selected ? LPColor.primaryColor : LPColor.greyColor,
                 hover: LPColor.greyBrightColor,
-              )),
-          selected ? DBorder(data: ' ') : DBorder(data: '|'),
+              ))
         ]),
         TableRow(children: [
           Container(),
           Container(),
           selected || prevSelected ? DBorder(data: '+') : Container(),
           selected || prevSelected ? DBorder(data: '-') : Container(),
-          HDash(),
-          selected || prevSelected ? DBorder(data: '+') : DBorder(data: '|'),
+          HDash()
         ]),
       ],
     );

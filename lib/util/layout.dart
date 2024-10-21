@@ -6,7 +6,7 @@ import 'constants.dart';
 
 double measureTextWidth(String text, BuildContext context) {
   assert(text.length > 0, 'Text "${text}" length should be not empty');
-  final style = DefaultTextStyle.of(context).style.merge(LPFont.defaultTextStyle);
+  final style = DefaultTextStyle.of(context).style.merge(LPFont.borderFontStyle);
   final TextPainter textPainter = TextPainter(
     text: TextSpan(
       text: text,
@@ -16,7 +16,7 @@ double measureTextWidth(String text, BuildContext context) {
   )..layout();
   var width = textPainter.width;
   assert(width > 0, 'Text ${text} width ${width} should be bigger than 0');
-  return width;
+  return width * 1.0000000;
 }
 
 double measureTextHeight(String text, BuildContext context) {
