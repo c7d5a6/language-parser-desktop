@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/features/grammar_grammatical_categories/grammar_grammatical_categories.dart';
+import 'package:language_parser_desktop/features/grammar_word_classes/grammar_word_classes.dart';
 
 import '../../components/tabs/tabs.dart';
 
@@ -18,7 +19,7 @@ class Grammar extends StatelessWidget {
         ),
         child: Tabs(
           tabsInfo: [
-            TabContent(tabName: 'Word Classes', shortTabName: 'Word Classes', content: Text('Word Classes')),
+            TabContent(tabName: 'Word Classes', shortTabName: 'Word Classes', content: GrammarWordClasses()),
             TabContent(
                 tabName: 'Grammatical Categories',
                 shortTabName: 'Grammatical Categories',
