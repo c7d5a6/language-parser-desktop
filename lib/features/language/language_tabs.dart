@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/features/language/language_creating.dart';
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 
-import '../../components/border/border.dart';
-import '../../components/border/hdash.dart';
 import '../../persistence/entities/language_entity.dart';
 import '../../persistence/repositories/language_repository.dart';
 import '../../service_provider.dart';
@@ -27,7 +25,7 @@ class LanguageTabs extends StatefulWidget {
   State<StatefulWidget> createState() => _LanguageTabs();
 }
 
-class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInvalidator {
+class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
   late List<Language> _languages;
   Language? _selectedLanguage;
   ServiceManager? _serviceManager;
@@ -35,20 +33,16 @@ class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInv
   bool creating = false;
   String search = '';
 
-  _LanguageTabs() {}
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final sm = ServiceProvider.of(context)?.serviceManager;
     if (_serviceManager != sm) {
+      if (_serviceManager != null) {
+        _serviceManager!.repositoryManager.removeLanguageInvalidator(this);
+      }
       _serviceManager = sm;
-      _serviceManager!.repositoryManager.languageRepository.addInvalidator(this);
+      _serviceManager!.repositoryManager.addLanguageInvalidator(this);
       _languageService = _serviceManager!.languageService;
       _languageService.langsUpdated = () => _getLanguages();
       _getLanguages();
@@ -57,8 +51,13 @@ class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInv
 
   @override
   void dispose() {
-    _serviceManager!.repositoryManager.languageRepository.removeInvalidator(this);
+    _serviceManager!.repositoryManager.removeLanguageInvalidator(this);
     super.dispose();
+  }
+
+  @override
+  void invalidate() {
+    _getLanguages();
   }
 
   void selectLanguage(int? id) {
@@ -100,7 +99,6 @@ class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInv
 
   void _saveLanguage(LanguageCreatingModel model) {
     final toSelect = _languageService.save(model);
-    _getLanguages();
     selectLanguage(toSelect.id);
   }
 
@@ -151,56 +149,6 @@ class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInv
         ),
         if (creating) LanguageCreating(createLanguage: _saveLanguage),
       ]);
-    });
-  }
-
-  @override
-  void invalidate() {
-    // TODO: implement invalidate
-  }
-
-  @override
-  void invalidateLanguages() {
-    // TODO: implement invalidateLanguages
-  }
-}
-
-class HDashWithPrefix extends StatelessWidget {
-  const HDashWithPrefix({super.key, String? prefix, String? postfix})
-      : _prefix = prefix,
-        _postfix = postfix;
-
-  final String? _prefix;
-  final String? _postfix;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final maxWidth = constraints.maxWidth;
-      final prefixWidth = _prefix == null ? 0 : _prefix.length * TextMeasureProvider.of(context)!.characterWidth;
-      final postfixWidth = _postfix == null ? 0 : _postfix.length * TextMeasureProvider.of(context)!.characterWidth;
-      final width = maxWidth - ((_prefix != null) ? prefixWidth : 0) - ((_postfix != null) ? postfixWidth : 0);
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          (_prefix != null
-              ? DBorder(
-                  data: _prefix,
-                  maxLines: 1,
-                )
-              : Container()),
-          Container(
-            width: width - 1.25,
-            child: HDash(),
-          ),
-          (_postfix != null
-              ? DBorder(
-                  data: _postfix,
-                  maxLines: 1,
-                )
-              : Container()),
-        ],
-      );
     });
   }
 }

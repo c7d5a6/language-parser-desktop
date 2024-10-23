@@ -1,5 +1,4 @@
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
-import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
 
 class LanguageCreatingModel {
@@ -18,7 +17,7 @@ class LanguageUpdatingModel {
   LanguageUpdatingModel({required this.id, required this.displayName});
 }
 
-class LanguageRepository extends Repository with RepositoryCache<LanguageRepositoryInvalidator> {
+class LanguageRepository extends Repository {
   LanguageRepository(super.db);
 
   List<Language> getAll() {
@@ -41,15 +40,18 @@ class LanguageRepository extends Repository with RepositoryCache<LanguageReposit
         '(?);',
         [model.displayName]);
     final resultSet = db.select('SELECT * from ${Language.table_name} WHERE id = last_insert_rowid();', []);
+    invalidate();
     return convertFullEntity(resultSet.single);
   }
 
   void update(LanguageUpdatingModel model) {
     db.execute('UPDATE ${Language.table_name} SET display_name = ? WHERE id = ${model.id};', [model.displayName]);
+    invalidate();
   }
 
   void delete(int id) {
     db.execute('DELETE FROM ${Language.table_name} WHERE id = ${id};', []);
+    invalidate();
   }
 }
 

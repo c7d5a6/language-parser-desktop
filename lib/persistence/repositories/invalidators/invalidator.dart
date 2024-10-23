@@ -4,23 +4,14 @@ abstract class Invalidator {
   void invalidate();
 }
 
-abstract interface class LanguageRepositoryInvalidator extends Invalidator {
-  @override
-  void invalidate() {
-    invalidateLanguages();
-  }
+mixin RepositoryCache {
+  List<Invalidator> _invalidators = [];
 
-  void invalidateLanguages();
-}
-
-mixin RepositoryCache<T extends Invalidator> {
-  List<T> _invalidators = [];
-
-  void addInvalidator(T invalidator) {
+  void addInvalidator(Invalidator invalidator) {
     _invalidators.add(invalidator);
   }
 
-  void removeInvalidator(T invalidator) {
+  void removeInvalidator(Invalidator invalidator) {
     log('Remove invalidator $invalidator');
     final removed = _invalidators.remove(invalidator);
     log('Removed: $removed');

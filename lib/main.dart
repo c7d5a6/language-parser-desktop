@@ -10,11 +10,8 @@ import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
-import 'util/sqlite.dart' as sl;
-
 void main() async {
   runApp(const MyApp());
-  sl.main();
 }
 
 class MyApp extends StatelessWidget {

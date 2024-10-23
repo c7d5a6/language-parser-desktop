@@ -15,11 +15,13 @@ class LanguagePhonemeRepository extends Repository {
         '(?, ?);',
         [phoneme, langId]);
     final resultSet = db.select('SELECT * from ${LanguagePhoneme.table_name} WHERE id = last_insert_rowid();', []);
+    invalidate();
     return convertFullEntity(resultSet.single);
   }
 
   void delete(int id) {
     db.execute('DELETE FROM ${LanguagePhoneme.table_name} WHERE id = ${id};', []);
+    invalidate();
   }
 }
 
