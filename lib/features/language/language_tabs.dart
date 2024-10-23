@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/features/language/language_creating.dart';
+import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 
 import '../../components/border/border.dart';
 import '../../components/border/hdash.dart';
@@ -26,7 +27,7 @@ class LanguageTabs extends StatefulWidget {
   State<StatefulWidget> createState() => _LanguageTabs();
 }
 
-class _LanguageTabs extends State<LanguageTabs> {
+class _LanguageTabs extends State<LanguageTabs> implements LanguageRepositoryInvalidator {
   late List<Language> _languages;
   Language? _selectedLanguage;
   ServiceManager? _serviceManager;
@@ -47,10 +48,17 @@ class _LanguageTabs extends State<LanguageTabs> {
     final sm = ServiceProvider.of(context)?.serviceManager;
     if (_serviceManager != sm) {
       _serviceManager = sm;
+      _serviceManager!.repositoryManager.languageRepository.addInvalidator(this);
       _languageService = _serviceManager!.languageService;
       _languageService.langsUpdated = () => _getLanguages();
       _getLanguages();
     }
+  }
+
+  @override
+  void dispose() {
+    _serviceManager!.repositoryManager.languageRepository.removeInvalidator(this);
+    super.dispose();
   }
 
   void selectLanguage(int? id) {
@@ -144,6 +152,16 @@ class _LanguageTabs extends State<LanguageTabs> {
         if (creating) LanguageCreating(createLanguage: _saveLanguage),
       ]);
     });
+  }
+
+  @override
+  void invalidate() {
+    // TODO: implement invalidate
+  }
+
+  @override
+  void invalidateLanguages() {
+    // TODO: implement invalidateLanguages
   }
 }
 

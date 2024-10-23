@@ -1,4 +1,5 @@
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
+import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
 
 class LanguageCreatingModel {
@@ -17,7 +18,7 @@ class LanguageUpdatingModel {
   LanguageUpdatingModel({required this.id, required this.displayName});
 }
 
-class LanguageRepository extends Repository {
+class LanguageRepository extends Repository with RepositoryCache<LanguageRepositoryInvalidator> {
   LanguageRepository(super.db);
 
   List<Language> getAll() {
