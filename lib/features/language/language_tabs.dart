@@ -44,7 +44,6 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
       _serviceManager = sm;
       _serviceManager!.repositoryManager.addLanguageInvalidator(this);
       _languageService = _serviceManager!.languageService;
-      _languageService.langsUpdated = () => _getLanguages();
       _getLanguages();
     }
   }

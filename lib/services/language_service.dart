@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:developer';
 
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 import 'package:language_parser_desktop/persistence/entities/language_phoneme_entity.dart';
@@ -13,7 +12,6 @@ class LanguageService {
   final LanguageRepository _languageRepository;
   final LanguagePhonemeRepository _languagePhonemeRepository;
   final WordRepository _wordRepository;
-  Function()? langsUpdated;
 
   LanguageService(this._languageRepository, this._languagePhonemeRepository, this._wordRepository);
 
@@ -27,7 +25,6 @@ class LanguageService {
 
   Language save(LanguageCreatingModel model) {
     var res = _languageRepository.save(model);
-    if (langsUpdated != null) langsUpdated!();
     return res;
   }
 
@@ -37,12 +34,10 @@ class LanguageService {
 
   void persist(LanguageUpdatingModel model) {
     _languageRepository.update(model);
-    if (langsUpdated != null) langsUpdated!();
   }
 
   void delete(int id) {
     _languageRepository.delete(id);
-    if (langsUpdated != null) langsUpdated!();
   }
 
   LanguagePhoneme addPhoneme(int langId, String phoneme) {

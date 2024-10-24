@@ -1,6 +1,7 @@
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 import 'package:language_parser_desktop/util/sqlite.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -14,6 +15,7 @@ class RepositoryManager {
     migrate(db);
     _database = db;
     _languageRepository = LanguageRepository(_database!);
+    _posRepository = PosRepository(_database!);
     _languagePhonemeRepository = LanguagePhonemeRepository(_database!);
     _wordRepository = WordRepository(_database!);
   }
@@ -37,6 +39,22 @@ class RepositoryManager {
   LanguageRepository get languageRepository {
     assert(_database != null);
     return _languageRepository;
+  }
+
+  //
+  late PosRepository _posRepository;
+
+  void addPosInvalidator(Invalidator invalidator) {
+    _posRepository.addInvalidator(invalidator);
+  }
+
+  void removePosInvalidator(Invalidator invalidator) {
+    _posRepository.removeInvalidator(invalidator);
+  }
+
+  PosRepository get posRepository {
+    assert(_database != null);
+    return _posRepository;
   }
 
   //

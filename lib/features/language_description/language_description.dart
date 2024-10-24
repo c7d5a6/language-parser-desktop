@@ -6,6 +6,7 @@ import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
 
+import '../../components/input/text_field.dart';
 import '../../persistence/entities/language_entity.dart';
 import '../../service_provider.dart';
 import '../../services/language_service.dart';
@@ -93,18 +94,11 @@ class _LanguageDescription extends State<LanguageDescription> {
             DBorder(data: '|'),
             DBorder(data: displayName),
             DBorder(data: ' | '),
-            TextFormField(
-              onChanged: (word) {
-                setState(() {
-                  modified = true;
-                });
-              },
+            TTextField(
+              onChanged: (word) => setState(() {
+                modified = true;
+              }),
               controller: _displayNameController,
-              style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
-              decoration: InputDecoration.collapsed(
-                  hintText: 'Display Name',
-                  border: UnderlineInputBorder(),
-                  hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
             ),
             DBorder(data: '|'),
           ]),
