@@ -18,8 +18,10 @@ mixin RepositoryCache {
   }
 
   void invalidate() {
+    final st = DateTime.now().millisecondsSinceEpoch;
     _invalidators.forEach((invalidator) {
       invalidator.invalidate();
     });
+    print('Repository cache ${this.runtimeType} invalidates for: ${DateTime.now().millisecondsSinceEpoch - st}ms');
   }
 }
