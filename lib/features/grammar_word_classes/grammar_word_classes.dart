@@ -5,6 +5,7 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/components/input/text_field.dart';
+import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart';
 import 'package:language_parser_desktop/services/pos_service.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
@@ -23,7 +24,10 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
   ServiceManager? _serviceManager;
   late PosService _posService;
   List<Pos> _poses = [];
+  bool _updated = false;
   int? _selected;
+  late TextEditingController _nameController = TextEditingController();
+  late TextEditingController _abbrController = TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -34,6 +38,8 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
         _serviceManager!.repositoryManager.removePosInvalidator(this);
       }
       _serviceManager = sm;
+      _nameController = TextEditingController();
+      _abbrController = TextEditingController();
       _serviceManager!.repositoryManager.addPosInvalidator(this);
       _posService = _serviceManager!.posService;
       _getPoses();
@@ -56,7 +62,34 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
     log('Poses $list');
     setState(() {
       _poses = list;
+      _select(_selected);
     });
+  }
+
+  void _select(int? i) {
+    if (i != null) {
+      if (!_poses.any((p) => p.id == i)) {
+        i = null;
+      }
+    }
+    if (_selected != i) {
+      final pos = i == null ? null : _poses.firstWhere((p) => p.id == i);
+      setState(() {
+        _updated = false;
+        _selected = i;
+        if (pos == null) {
+          _nameController.clear();
+          _abbrController.clear();
+        } else {
+          _nameController.text = pos.name;
+          if (pos.abbreviation != null) {
+            _abbrController.text = pos.abbreviation!;
+          } else {
+            _abbrController.clear();
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -64,21 +97,58 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     List<TableRow> rows = List.empty(growable: true);
     final posLen = 2 + _poses.fold(5, (l, p) => p.name.length > l ? p.name.length : l);
+    final buttons = _selected == null
+        ? HDash()
+        : Table(
+            columnWidths: {
+              0: FlexColumnWidth(1),
+              1: FixedColumnWidth(cWidth),
+              2: FixedColumnWidth(cWidth * 6),
+              3: FixedColumnWidth(cWidth * 3 + 1),
+              4: FixedColumnWidth(cWidth * 8),
+              5: FixedColumnWidth(cWidth * 2 + 1)
+            },
+            children: [
+              TableRow(children: [
+                HDash(),
+                DBorder(data: '['),
+                TButton(
+                    text: 'Save',
+                    color: LPColor.greenColor,
+                    hover: LPColor.greenBrightColor,
+                    disabled: !_updated,
+                    onPressed: () =>
+                        _posService.persist(PosUpdatingModel(_selected!, _nameController.text, _abbrController.text))),
+                DBorder(data: ']-['),
+                TButton(
+                    text: 'Delete',
+                    color: LPColor.redColor,
+                    hover: LPColor.redBrightColor,
+                    onPressed: () => _posService.delete(_selected!)),
+                DBorder(data: ']-')
+              ])
+            ],
+          );
     int i = 0;
     posButton(int i) => TButton(
         text: _poses[i].name,
-        color: i == _selected ? LPColor.primaryColor : LPColor.greyColor,
+        color: _poses[i].id == _selected ? LPColor.primaryColor : LPColor.greyColor,
         hover: LPColor.greyBrightColor,
-        onPressed: () => setState(() {
-              _selected = i;
-            }));
+        onPressed: () => _select(_poses[i].id));
     rows.add(TableRow(children: [
       DBorder(data: '|'),
       if (_poses.length > i) posButton(i) else Container(),
       DBorder(data: '|'),
       Container(alignment: Alignment.centerRight, child: DBorder(data: 'Name')),
       DBorder(data: '|'),
-      TTextField(onChanged: (_) {}, controller: TextEditingController()),
+      if (_selected != null)
+        TTextField(
+            onChanged: (_) => setState(() {
+                  _updated = true;
+                }),
+            controller: _nameController)
+      else
+        Container(),
       DBorder(data: '|')
     ]));
     i = 1;
@@ -88,7 +158,14 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
       DBorder(data: '|'),
       Container(alignment: Alignment.centerRight, child: DBorder(data: 'Abbreviation')),
       DBorder(data: '|'),
-      TTextField(onChanged: (_) {}, controller: TextEditingController()),
+      if (_selected != null)
+        TTextField(
+            onChanged: (_) => setState(() {
+                  _updated = true;
+                }),
+            controller: _abbrController)
+      else
+        Container(),
       DBorder(data: '|')
     ]));
     i = 2;
@@ -98,7 +175,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
       DBorder(data: '|'),
       HDash(),
       DBorder(data: '+'),
-      HDash(),
+      buttons,
       DBorder(data: '|')
     ]));
     i = 3;

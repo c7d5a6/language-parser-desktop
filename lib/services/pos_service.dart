@@ -11,23 +11,23 @@ class PosService {
   List<Pos> getAll() {
     return _posRepository.getAll();
   }
-//
-// Language save(LanguageCreatingModel model) {
-//   var res = _languageRepository.save(model);
-//   return res;
-// }
-//
+
+  Pos save(PosCreatingModel model) {
+    var res = _posRepository.save(model);
+    return res;
+  }
+
 // bool canDelete(int id) {
 //   return true;
 // }
-//
-// void persist(LanguageUpdatingModel model) {
-//   _languageRepository.update(model);
-// }
-//
-// void delete(int id) {
-//   _languageRepository.delete(id);
-// }
+
+  void persist(PosUpdatingModel model) {
+    _posRepository.update(model);
+  }
+
+  void delete(int id) {
+    _posRepository.delete(id);
+  }
 //
 // LanguagePhoneme addPhoneme(int langId, String phoneme) {
 //   return _languagePhonemeRepository.save(langId, phoneme);
