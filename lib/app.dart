@@ -43,10 +43,11 @@ class _App extends State<App> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TButton(text: '[ LANGUAGES ]', onPressed: () => setIndex(0)),
             DBorder(data: ' - '),
-            TButton(text: '[ GRAMMAR ]', onPressed: () => setIndex(1)),
-            const Text(' [ TBD ] '),
+            TButton(text: '[LANGUAGES]', onPressed: () => setIndex(0)),
+            DBorder(data: ' - '),
+            TButton(text: '[GRAMMAR]', onPressed: () => setIndex(1)),
+            DBorder(data: ' - '),
             TextButton(onPressed: widget.onNewFile, child: const Text('[ NEW ]')),
             TextButton(onPressed: widget.onOpenFile, child: const Text('[ LOAD ]')),
           ],

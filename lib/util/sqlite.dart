@@ -56,6 +56,10 @@ Future<void> migrate(Database db) async {
       .toList(growable: false)
     ..sort();
   var uversion = db.select("PRAGMA user_version;").single['user_version'];
+  log('Uversion ${uversion}');
+  printPragma();
+  setPragmas(db);
+  printPragma();
   for (int version in versions) {
     if (version <= uversion) continue;
     var migrationPath = migrations.firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
@@ -87,6 +91,14 @@ Future<void> migrate(Database db) async {
       }
     }
   }
+}
+
+void setPragmas(Database db) {
+  db.execute('BEGIN TRANSACTION;');
+  db.execute('''
+      PRAGMA foreign_keys = ON;
+      ''');
+  db.execute('COMMIT;');
 }
 
 void checkData() {
@@ -126,12 +138,13 @@ void printPragma() {
   pragmaSelect(db, 'data_version');
   // pragmaSelect(db, 'optimize');
   pragmaSelect(db, 'user_version');
+  pragmaSelect(db, 'foreign_keys');
   db.dispose();
 }
 
 void pragmaSelect(Database db, String variable) {
   var pragma = db.select("PRAGMA $variable;");
   for (final Row row in pragma) {
-    print("$variable ${row[variable]}");
+    log("$variable ${row[variable]}");
   }
 }

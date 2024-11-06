@@ -25,6 +25,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
   late PosService _posService;
   List<Pos> _poses = [];
   bool _updated = false;
+  bool creating = false;
   int? _selected;
   late TextEditingController _nameController = TextEditingController();
   late TextEditingController _abbrController = TextEditingController();
@@ -58,12 +59,13 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
   }
 
   void _getPoses() {
-    var list = _posService.getAll();
+    var list = _posService.getAll()..sort((p1, p2) => p1.name.compareTo(p2.name));
     log('Poses $list');
     setState(() {
       _poses = list;
-      _select(_selected);
+      _updated = false;
     });
+    _select(_selected);
   }
 
   void _select(int? i) {
@@ -77,6 +79,9 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
       setState(() {
         _updated = false;
         _selected = i;
+        if (_selected != null) {
+          creating = false;
+        }
         if (pos == null) {
           _nameController.clear();
           _abbrController.clear();
@@ -92,13 +97,47 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
     }
   }
 
+  void _startCreating() {
+    setState(() {
+      creating = true;
+    });
+    _select(null);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     List<TableRow> rows = List.empty(growable: true);
     final posLen = 2 + _poses.fold(5, (l, p) => p.name.length > l ? p.name.length : l);
     final buttons = _selected == null
-        ? HDash()
+        ? (creating
+            ? Table(
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FixedColumnWidth(cWidth),
+                  2: FixedColumnWidth(cWidth * 7),
+                  3: FixedColumnWidth(cWidth * 2 + 1)
+                },
+                children: [
+                  TableRow(children: [
+                    HDash(),
+                    DBorder(data: '['),
+                    TButton(
+                      text: 'Create',
+                      color: LPColor.greenColor,
+                      hover: LPColor.greenBrightColor,
+                      disabled: _nameController.text.isEmpty,
+                      onPressed: () {
+                        final pos = _posService.save(PosCreatingModel(
+                            _nameController.text, _abbrController.text.isEmpty ? null : _abbrController.text));
+                        _select(pos.id);
+                      },
+                    ),
+                    DBorder(data: ']-')
+                  ])
+                ],
+              )
+            : HDash())
         : Table(
             columnWidths: {
               0: FlexColumnWidth(1),
@@ -141,7 +180,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
       DBorder(data: '|'),
       Container(alignment: Alignment.centerRight, child: DBorder(data: 'Name')),
       DBorder(data: '|'),
-      if (_selected != null)
+      if (_selected != null || creating)
         TTextField(
             onChanged: (_) => setState(() {
                   _updated = true;
@@ -158,7 +197,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
       DBorder(data: '|'),
       Container(alignment: Alignment.centerRight, child: DBorder(data: 'Abbreviation')),
       DBorder(data: '|'),
-      if (_selected != null)
+      if (_selected != null || creating)
         TTextField(
             onChanged: (_) => setState(() {
                   _updated = true;
@@ -225,7 +264,8 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
         children: [
           TableRow(children: [
             DBorder(data: '|'),
-            TButton(text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor),
+            TButton(
+                text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor, onPressed: _startCreating),
             DBorder(data: '|'),
             Container(),
             Container(),

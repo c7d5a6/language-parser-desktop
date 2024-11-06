@@ -8,7 +8,7 @@ CREATE TABLE word_tbl
     pos          INTEGER NOT NULL,
     comment      TEXT,
     forgotten_yn BOOLEAN NOT NULL DEFAULT FALSE,
-    source_type  TEXT NOT NULL,
-    FOREIGN KEY (language) REFERENCES language_tbl (id),
+    source_type  TEXT    NOT NULL,
+    FOREIGN KEY (language) REFERENCES language_tbl (id) ON DELETE RESTRICT,
     FOREIGN KEY (pos) REFERENCES pos_tbl (id)
 );

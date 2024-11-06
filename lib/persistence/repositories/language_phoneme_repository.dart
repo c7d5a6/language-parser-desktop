@@ -20,7 +20,7 @@ class LanguagePhonemeRepository extends Repository {
   }
 
   void delete(int id) {
-    db.execute('DELETE FROM ${LanguagePhoneme.table_name} WHERE id = ${id};', []);
+    db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${LanguagePhoneme.table_name} WHERE id = ${id};', []);
     invalidate();
   }
 }
