@@ -23,6 +23,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Language parser Demo',
       theme: ThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: LPColor.primaryColor, width: 1.0)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: LPColor.greyColor, width: 1.0))),
         colorScheme: ColorScheme.fromSeed(
             seedColor: Color(0xffaf7fa8), brightness: Brightness.dark, surface: LPColor.backgroundColor),
         useMaterial3: true,

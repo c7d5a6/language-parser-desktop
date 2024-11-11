@@ -17,7 +17,7 @@ class TTextField extends StatelessWidget {
       style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
       decoration: InputDecoration.collapsed(
           hintText: hint,
-          border: UnderlineInputBorder(borderSide: BorderSide(color: LPColor.greyColor, width: 0.0)),
+          border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 0.0)),
           hintStyle: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor))),
     );
   }
