@@ -20,20 +20,33 @@ class GCService {
     return _gcvRepository.getAllByGCId(id);
   }
 
-// Pos save(PosCreatingModel model) {
-//   var res = _posRepository.save(model);
-//   return res;
-// }
+  GrammaticalCategory saveGC(GrammaticalCategoryCreatingModel model) {
+    var res = _gcRepository.save(model);
+    return res;
+  }
+
+  GrammaticalCategoryValue saveGCV(GrammaticalCategoryValueCreatingModel model) {
+    var res = _gcvRepository.save(model);
+    return res;
+  }
+
+  void persistGC(GrammaticalCategoryUpdatingModel model) {
+    _gcRepository.update(model);
+  }
+
+  void persistGCV(GrammaticalCategoryValueUpdatingModel model) {
+    _gcvRepository.update(model);
+  }
+
+  void deleteGC(int id) {
+    _gcRepository.delete(id);
+  }
+
+  void deleteGCV(int id) {
+    _gcvRepository.delete(id);
+  }
 
 // bool canDelete(int id) {
 //   return true;
-// }
-
-// void persist(PosUpdatingModel model) {
-//   _posRepository.update(model);
-// }
-//
-// void delete(int id) {
-//   _posRepository.delete(id);
 // }
 }

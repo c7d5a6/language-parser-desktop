@@ -7,10 +7,12 @@ import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
+import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
 import 'package:language_parser_desktop/services/gc_service.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../components/input/text_field.dart';
+import '../../persistence/repositories/gcv_repository.dart';
 import '../../persistence/repositories/invalidators/invalidator.dart';
 import '../../service_provider.dart';
 import '../../services/service_manager.dart';
@@ -70,6 +72,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
   @override
   void invalidate() {
     _getGCs();
+    _getGCVs();
   }
 
   void _getGCs() {
@@ -114,6 +117,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
     setState(() {
       _gcvs = list;
       _gcvUpdated = false;
+      _gcvCreating = false;
     });
     _selectGCV(_gcvSelected);
   }
@@ -174,35 +178,16 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
         DBorder(data: '|'),
         createNameCell(i),
         createNameBorderCell(i),
-        createGCNameEditCell(i),
+        createGCNameEditCell(i, cWidth),
         DBorder(data: '|'),
         createGCVCell(i),
         DBorder(data: '|'),
         createNameCell(i),
         createNameBorderCell(i),
-        createGCVNameEditCell(i),
+        createGCVNameEditCell(i, cWidth),
         DBorder(data: '|'),
       ]));
     }
-    // int i = 0;
-    // rows.add(TableRow(children: [
-    //   DBorder(data: '|'),
-    //   createGCCell(i),
-    //   DBorder(data: '|'),
-    //   Container(alignment: Alignment.centerRight, child: DBorder(data: 'Name')),
-    //   DBorder(data: '|'),
-    //   if (_gcSelected != null || _gcCreating)
-    //     TTextField(
-    //         onChanged: (_) => setState(() {
-    //               _gcUpdated = true;
-    //             }),
-    //         controller: _gcNameController)
-    //   else
-    //     Container(),
-    //   DBorder(data: '|'),
-    //   createGCCell(i),
-    //   DBorder(data: '|'),
-    // ]));
     return Column(children: [
       Table(
         columnWidths: {
@@ -251,7 +236,68 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
     ]);
   }
 
-  Widget createGCNameEditCell(int i) {
+  Widget createGCNameButtons(double cWidth) {
+    return _gcCreating
+        ? Table(
+            columnWidths: {
+              0: FlexColumnWidth(1),
+              1: FixedColumnWidth(cWidth),
+              2: FixedColumnWidth(cWidth * 7),
+              3: FixedColumnWidth(cWidth * 2 + 1)
+            },
+            children: [
+              TableRow(children: [
+                HDash(),
+                DBorder(data: '['),
+                TButton(
+                  text: 'Create',
+                  color: LPColor.greenColor,
+                  hover: LPColor.greenBrightColor,
+                  disabled: _gcNameController.text.isEmpty,
+                  onPressed: () {
+                    final pos = _gcService.saveGC(GrammaticalCategoryCreatingModel(_gcNameController.text));
+                    _selectGC(pos.id);
+                  },
+                ),
+                DBorder(data: ']-')
+              ])
+            ],
+          )
+        : (_gcSelected == null)
+            ? HDash()
+            : Table(
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FixedColumnWidth(cWidth),
+                  2: FixedColumnWidth(cWidth * 6),
+                  3: FixedColumnWidth(cWidth * 3 + 1),
+                  4: FixedColumnWidth(cWidth * 8),
+                  5: FixedColumnWidth(cWidth * 2 + 1)
+                },
+                children: [
+                  TableRow(children: [
+                    HDash(),
+                    DBorder(data: '['),
+                    TButton(
+                        text: 'Save',
+                        color: LPColor.greenColor,
+                        hover: LPColor.greenBrightColor,
+                        disabled: !_gcUpdated,
+                        onPressed: () => _gcService
+                            .persistGC(GrammaticalCategoryUpdatingModel(_gcSelected!, _gcNameController.text))),
+                    DBorder(data: ']-['),
+                    TButton(
+                        text: 'Delete',
+                        color: LPColor.redColor,
+                        hover: LPColor.redBrightColor,
+                        onPressed: () => _gcService.deleteGC(_gcSelected!)),
+                    DBorder(data: ']-')
+                  ])
+                ],
+              );
+  }
+
+  Widget createGCNameEditCell(int i, double cWidth) {
     switch (i) {
       case 0:
         if (_gcSelected != null || _gcCreating)
@@ -263,25 +309,87 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
         else
           return Container();
       case 1:
-        return HDash();
+        return createGCNameButtons(cWidth);
       default:
         return Container();
     }
   }
 
-  Widget createGCVNameEditCell(int i) {
+  Widget createGCVNameButtons(double cWidth) {
+    final gc = _gcSelected == null ? null : _gcs.firstWhere((p) => p.id == _gcSelected);
+    return (_gcvCreating && gc != null)
+        ? Table(
+            columnWidths: {
+              0: FlexColumnWidth(1),
+              1: FixedColumnWidth(cWidth),
+              2: FixedColumnWidth(cWidth * 7),
+              3: FixedColumnWidth(cWidth * 2 + 1)
+            },
+            children: [
+              TableRow(children: [
+                HDash(),
+                DBorder(data: '['),
+                TButton(
+                  text: 'Create',
+                  color: LPColor.greenColor,
+                  hover: LPColor.greenBrightColor,
+                  disabled: _gcvNameController.text.isEmpty,
+                  onPressed: () {
+                    final pos = _gcService.saveGCV(GrammaticalCategoryValueCreatingModel(_gcvNameController.text, gc));
+                    _selectGCV(pos.id);
+                  },
+                ),
+                DBorder(data: ']-')
+              ])
+            ],
+          )
+        : (_gcvSelected == null || gc == null)
+            ? HDash()
+            : Table(
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FixedColumnWidth(cWidth),
+                  2: FixedColumnWidth(cWidth * 6),
+                  3: FixedColumnWidth(cWidth * 3 + 1),
+                  4: FixedColumnWidth(cWidth * 8),
+                  5: FixedColumnWidth(cWidth * 2 + 1)
+                },
+                children: [
+                  TableRow(children: [
+                    HDash(),
+                    DBorder(data: '['),
+                    TButton(
+                        text: 'Save',
+                        color: LPColor.greenColor,
+                        hover: LPColor.greenBrightColor,
+                        disabled: !_gcvUpdated,
+                        onPressed: () => _gcService
+                            .persistGCV(GrammaticalCategoryValueUpdatingModel(_gcvSelected!, _gcvNameController.text))),
+                    DBorder(data: ']-['),
+                    TButton(
+                        text: 'Delete',
+                        color: LPColor.redColor,
+                        hover: LPColor.redBrightColor,
+                        onPressed: () => _gcService.deleteGCV(_gcvSelected!)),
+                    DBorder(data: ']-')
+                  ])
+                ],
+              );
+  }
+
+  Widget createGCVNameEditCell(int i, double cWidth) {
     switch (i) {
       case 0:
         if (_gcvSelected != null || _gcvCreating)
           return TTextField(
               onChanged: (_) => setState(() {
-                _gcvUpdated = true;
-              }),
+                    _gcvUpdated = true;
+                  }),
               controller: _gcvNameController);
         else
           return Container();
       case 1:
-        return HDash();
+        return createGCVNameButtons(cWidth);
       default:
         return Container();
     }
@@ -317,13 +425,16 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
               ? createValueBtn(i, _selectGC, _gcs, _gcSelected)
               : Container();
 
-  Widget createGCVCell(int i) => ((i == _gcvs.length + 1 && i != 1) || (i == 0 && _gcvs.length == 0))
-      ? TButton(text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor, onPressed: _startCreatingGCV)
-      : (i == _gcvs.length)
-          ? HDash()
-          : (_gcvs.length > i)
-              ? createValueBtn(i, _selectGCV, _gcvs, _gcvSelected)
-              : Container();
+  Widget createGCVCell(int i) => _gcCreating
+      ? Container()
+      : ((i == _gcvs.length + 1 && i != 1) || (i == 0 && _gcvs.length == 0))
+          ? TButton(
+              text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor, onPressed: _startCreatingGCV)
+          : (i == _gcvs.length)
+              ? HDash()
+              : (_gcvs.length > i)
+                  ? createValueBtn(i, _selectGCV, _gcvs, _gcvSelected)
+                  : Container();
 
   Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
       text: list[i].name,
