@@ -1,3 +1,5 @@
+import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/gcv_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
@@ -14,6 +16,8 @@ class RepositoryManager {
     var db = sqlite3.open(filePath);
     migrate(db);
     _database = db;
+    _grammaticalCategoryRepository = GrammaticalCategoryRepository(_database!);
+    _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
     _languageRepository = LanguageRepository(_database!);
     _posRepository = PosRepository(_database!);
     _languagePhonemeRepository = LanguagePhonemeRepository(_database!);
@@ -23,6 +27,38 @@ class RepositoryManager {
   void dispose() {
     if (_database != null) _database!.dispose();
     _database = null;
+  }
+
+  //
+  late GrammaticalCategoryRepository _grammaticalCategoryRepository;
+
+  void addGCValidator(Invalidator invalidator) {
+    _grammaticalCategoryRepository.addInvalidator(invalidator);
+  }
+
+  void removeGCInvalidator(Invalidator invalidator) {
+    _grammaticalCategoryRepository.removeInvalidator(invalidator);
+  }
+
+  GrammaticalCategoryRepository get grammaticalCategoryRepository {
+    assert(_database != null);
+    return _grammaticalCategoryRepository;
+  }
+
+  //
+  late GrammaticalCategoryValueRepository _grammaticalCategoryValueRepository;
+
+  void addGCVValidator(Invalidator invalidator) {
+    _grammaticalCategoryValueRepository.addInvalidator(invalidator);
+  }
+
+  void removeGCVInvalidator(Invalidator invalidator) {
+    _grammaticalCategoryValueRepository.removeInvalidator(invalidator);
+  }
+
+  GrammaticalCategoryValueRepository get grammaticalCategoryValueRepository {
+    assert(_database != null);
+    return _grammaticalCategoryValueRepository;
   }
 
   //
