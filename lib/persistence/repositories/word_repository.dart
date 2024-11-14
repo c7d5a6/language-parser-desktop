@@ -64,6 +64,11 @@ class WordRepository extends Repository {
     ''', []);
     return (resultSet).map(convertFullEntity).toList(growable: false);
   }
+
+  Set<int> getAllPosIDsByLang(int langId) {
+    final result = db.select("SELECT pos FROM ${Word.table_name} WHERE language = $langId GROUP BY pos");
+    return (result).map((row) => row['pos'] as int).toSet();
+  }
 }
 
 Word convertFullEntity(row) {

@@ -13,9 +13,6 @@ void main() {
     db = sqlite3.openInMemory();
     await migrate(db);
     wordRepository = WordRepository(db);
-  });
-
-  test('Get all words', () async {
     db.execute('''
     INSERT INTO language_tbl (id, display_name, native_name, comment) VALUES 
     (1, 'Language 1', 'Native name 1', 'Comment 1'),
@@ -23,8 +20,13 @@ void main() {
     ''');
     db.execute('''
     INSERT INTO pos_tbl (id, name, abbreviation) VALUES 
-    (1001, 'Pos 1', 'pos1');
+    (1001, 'Pos 1', 'pos1'),
+    (1002, 'Pos 2', 'pos2'),
+    (1003, 'Pos 3', 'pos3');
     ''');
+  });
+
+  test('Get all words', () async {
     db.execute('''
     INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES 
     ('Word 1', 1, 1001, 'NEW', 'Comment word 1'),
@@ -49,5 +51,21 @@ void main() {
     expect(word.forgotten, false);
     expect(word.comment, 'Comment word 1');
     expect(word.sourceType, 'NEW');
+  });
+
+  test('Get all poses', () {
+    db.execute('''
+    INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES
+    ('Word 1', 1, 1001, 'NEW', 'Comment word 1'),
+    ('Word 2', 2, 1001, 'NEW', 'Comment word 2'),
+    ('Word 3', 1, 1001, 'NEW', 'Comment word 3'),
+    ('Word 4', 1, 1002, 'NEW', 'Comment word 4');
+    ''');
+
+    final poses = wordRepository.getAllPosIDsByLang(1);
+
+    expect(poses.length, 2);
+    expect(poses.contains(1001), true);
+    expect(poses.contains(1002), true);
   });
 }

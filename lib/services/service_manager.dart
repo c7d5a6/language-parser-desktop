@@ -16,7 +16,7 @@ class ServiceManager {
             repositoryManager.grammaticalCategoryRepository, repositoryManager.grammaticalCategoryValueRepository),
         _languageService = LanguageService(repositoryManager.languageRepository,
             repositoryManager.languagePhonemeRepository, repositoryManager.wordRepository),
-        _posService = PosService(repositoryManager.posRepository),
+        _posService = PosService(repositoryManager.posRepository, repositoryManager.posLangConnectionRepository),
         _wordService = WordService(repositoryManager.wordRepository);
 
   GCService get gcService => _gcService;

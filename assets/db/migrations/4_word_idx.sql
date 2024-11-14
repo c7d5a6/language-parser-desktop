@@ -1,4 +1,6 @@
 CREATE INDEX word_idx ON word_tbl (word);
+CREATE INDEX word_pos_idx ON word_tbl (pos);
+CREATE INDEX word_lang_idx ON word_tbl (language);
 
 CREATE VIRTUAL TABLE fts5_word
     USING fts5

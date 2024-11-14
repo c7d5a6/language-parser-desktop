@@ -3,6 +3,7 @@ import 'package:language_parser_desktop/persistence/repositories/gcv_repository.
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/pos_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 import 'package:language_parser_desktop/util/sqlite.dart';
@@ -20,6 +21,7 @@ class RepositoryManager {
     _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
     _languageRepository = LanguageRepository(_database!);
     _posRepository = PosRepository(_database!);
+    _posLangConnectionRepository = PosLangConnectionRepository(_database!);
     _languagePhonemeRepository = LanguagePhonemeRepository(_database!);
     _wordRepository = WordRepository(_database!);
   }
@@ -91,6 +93,22 @@ class RepositoryManager {
   PosRepository get posRepository {
     assert(_database != null);
     return _posRepository;
+  }
+
+  //
+  late PosLangConnectionRepository _posLangConnectionRepository;
+
+  void addPosLangConnectionInvalidator(Invalidator invalidator) {
+    _posLangConnectionRepository.addInvalidator(invalidator);
+  }
+
+  void removePosLangConnectionInvalidator(Invalidator invalidator) {
+    _posLangConnectionRepository.removeInvalidator(invalidator);
+  }
+
+  PosLangConnectionRepository get posLangConnectionRepository {
+    assert(_database != null);
+    return _posLangConnectionRepository;
   }
 
   //

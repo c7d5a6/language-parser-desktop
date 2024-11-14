@@ -9,4 +9,7 @@ class WordService {
 // return _wordRepository.getWords(size, string);
 // return
 // }
+  Set<int> getAllPosIDsByLang(int langId) {
+    return _wordRepository.getAllPosIDsByLang(langId);
+  }
 }
