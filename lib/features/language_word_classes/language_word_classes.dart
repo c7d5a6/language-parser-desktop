@@ -120,7 +120,7 @@ class _LanguageWordClasses extends State<LanguageWordClasses> implements Invalid
   }
 
   Widget getWordClassCell(int i) => i == -2
-      ? Center(child: LPhHeader(header: 'ENABLED'))
+      ? Center(child: LPhHeader(header: 'ENABLE'))
       : i == -1
           ? HDash()
           : i < _poses.length
@@ -155,7 +155,13 @@ class _LanguageWordClasses extends State<LanguageWordClasses> implements Invalid
           : used
               ? LPColor.redColor
               : LPColor.greyColor,
-      hover: LPColor.greyBrightColor,
+      hover: enabled
+          ? used
+              ? LPColor.greenBrightColor
+              : LPColor.yellowBrightColor
+          : used
+              ? LPColor.redBrightColor
+              : LPColor.greyBrightColor,
       onPressed: () => enabled
           ? _posService.deletePosLangConnection(widget.languageId, posId)
           : _posService.savePosLangConnection(widget.languageId, posId),

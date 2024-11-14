@@ -66,12 +66,7 @@ class _TabsState extends State<Tabs> {
       tabsColumns1.add(_activeTabIndex == i || _activeTabIndex == i - 1 ? DBorder(data: '+') : Container());
       tabsColumns1.add(_activeTabIndex == i ? HDash() : LDash());
       tabsColumns2.add(DBorder(data: '|'));
-      tabsColumns2.add(TButton(
-        onPressed: () => _onTabSelected(i),
-        text: _activeTabIndex == i ? widget.tabsInfo[i].tabName : widget.tabsInfo[i].shortTabName,
-        color: _activeTabIndex == i ? LPColor.primaryColor : LPColor.greyColor,
-        hover: LPColor.greyBrightColor,
-      ));
+      tabsColumns2.add(buildTabButton(i));
       tabsColumns3.add(_activeTabIndex == i || _activeTabIndex == i - 1 ? DBorder(data: '+') : DBorder(data: '-'));
       tabsColumns3.add(_activeTabIndex == i ? Container() : HDash());
     }
@@ -109,5 +104,28 @@ class _TabsState extends State<Tabs> {
         ),
       ],
     );
+  }
+
+  Widget buildTabButton(int i) {
+    var isActive = _activeTabIndex == i;
+    return isActive
+        ? TButton(
+            onPressed: () => _onTabSelected(i),
+            text: widget.tabsInfo[i].tabName,
+            color: LPColor.primaryColor,
+            hover: LPColor.greyBrightColor,
+          )
+        : Tooltip(
+            decoration: BoxDecoration(color: LPColor.greyColor),
+            message: widget.tabsInfo[i].tabName,
+            textStyle: LPFont.headerFontStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
+            waitDuration: Duration(milliseconds: 500),
+            child: TButton(
+              onPressed: () => _onTabSelected(i),
+              text: widget.tabsInfo[i].shortTabName,
+              color: LPColor.greyColor,
+              hover: LPColor.greyBrightColor,
+            ),
+          );
   }
 }
