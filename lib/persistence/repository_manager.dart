@@ -17,6 +17,7 @@ class RepositoryManager {
     var db = sqlite3.open(filePath);
     migrate(db);
     _database = db;
+    db.execute('PRAGMA foreign_keys = ON;');
     _grammaticalCategoryRepository = GrammaticalCategoryRepository(_database!);
     _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
     _languageRepository = LanguageRepository(_database!);

@@ -50,7 +50,7 @@ class LanguageRepository extends Repository {
   }
 
   void delete(int id) {
-    db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${Language.table_name} WHERE id = ${id};', []);
+    db.execute(' DELETE FROM ${Language.table_name} WHERE id = ${id};', []);
     invalidate();
   }
 }
