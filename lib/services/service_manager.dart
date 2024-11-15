@@ -12,11 +12,12 @@ class ServiceManager {
   late final WordService _wordService;
 
   ServiceManager(this.repositoryManager)
-      : _gcService = GCService(
-            repositoryManager.grammaticalCategoryRepository, repositoryManager.grammaticalCategoryValueRepository),
+      : _gcService = GCService(repositoryManager.grammaticalCategoryRepository,
+            repositoryManager.grammaticalCategoryValueRepository, repositoryManager.gcvLangConnectionRepository),
         _languageService = LanguageService(repositoryManager.languageRepository,
             repositoryManager.languagePhonemeRepository, repositoryManager.wordRepository),
-        _posService = PosService(repositoryManager.posRepository, repositoryManager.posLangConnectionRepository),
+        _posService = PosService(repositoryManager.posRepository, repositoryManager.posLangConnectionRepository,
+            repositoryManager.posGCLangConnectionRepository),
         _wordService = WordService(repositoryManager.wordRepository);
 
   GCService get gcService => _gcService;

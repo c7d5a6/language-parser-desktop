@@ -1,8 +1,10 @@
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/gcv_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_phoneme_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/pos_category_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/pos_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
@@ -49,6 +51,22 @@ class RepositoryManager {
   }
 
   //
+  late GCVLangConnectionRepository _gcvLangConnectionRepository;
+
+  void addGCVLangInvalidator(Invalidator invalidator) {
+    _gcvLangConnectionRepository.addInvalidator(invalidator);
+  }
+
+  void removeGCVLangInvalidator(Invalidator invalidator) {
+    _gcvLangConnectionRepository.removeInvalidator(invalidator);
+  }
+
+  GCVLangConnectionRepository get gcvLangConnectionRepository {
+    assert(_database != null);
+    return _gcvLangConnectionRepository;
+  }
+
+  //
   late GrammaticalCategoryValueRepository _grammaticalCategoryValueRepository;
 
   void addGCVValidator(Invalidator invalidator) {
@@ -78,6 +96,22 @@ class RepositoryManager {
   LanguageRepository get languageRepository {
     assert(_database != null);
     return _languageRepository;
+  }
+
+  //
+  late PosGCLangConnectionRepository _posGCLangConnectionRepository;
+
+  void addPosGCLangConnectionInvalidator(Invalidator invalidator) {
+    _posGCLangConnectionRepository.addInvalidator(invalidator);
+  }
+
+  void removePosGCLangConnectionInvalidator(Invalidator invalidator) {
+    _posGCLangConnectionRepository.removeInvalidator(invalidator);
+  }
+
+  PosGCLangConnectionRepository get posGCLangConnectionRepository {
+    assert(_database != null);
+    return _posGCLangConnectionRepository;
   }
 
   //

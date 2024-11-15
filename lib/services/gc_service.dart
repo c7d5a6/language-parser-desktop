@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/gcv_lang_connection_repository.dart';
 
 import '../persistence/entities/grammatical_category_entity.dart';
 import '../persistence/repositories/gcv_repository.dart';
@@ -9,8 +10,9 @@ import '../persistence/repositories/gcv_repository.dart';
 class GCService {
   final GrammaticalCategoryRepository _gcRepository;
   final GrammaticalCategoryValueRepository _gcvRepository;
+  final GCVLangConnectionRepository _gcvLangConnectionRepository;
 
-  GCService(this._gcRepository, this._gcvRepository);
+  GCService(this._gcRepository, this._gcvRepository, this._gcvLangConnectionRepository);
 
   List<GrammaticalCategory> getAllGCs() {
     return _gcRepository.getAll();
@@ -46,7 +48,15 @@ class GCService {
     _gcvRepository.delete(id);
   }
 
-// bool canDelete(int id) {
-//   return true;
-// }
+  Set<int> getGCVIdsByLangIdAndGCId(int langId, int gcId) {
+    return _gcvLangConnectionRepository.getGCVIdsByLangIdAndGCId(langId, gcId);
+  }
+
+  void saveGCVLangConnection(int langId, int gcvId) {
+    _gcvLangConnectionRepository.save(langId, gcvId);
+  }
+
+  void deleteGCVLangConnection(int langId, int gcvId) {
+    _gcvLangConnectionRepository.delete(langId, gcvId);
+  }
 }

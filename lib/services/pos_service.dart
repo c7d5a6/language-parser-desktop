@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:language_parser_desktop/persistence/repositories/pos_category_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/pos_lang_connection_repository.dart';
 
 import '../persistence/entities/pos_entity.dart';
@@ -8,8 +9,9 @@ import '../persistence/repositories/pos_repository.dart';
 class PosService {
   final PosRepository _posRepository;
   final PosLangConnectionRepository _posLangConnectionRepository;
+  final PosGCLangConnectionRepository _posGCLangConnectionRepository;
 
-  PosService(this._posRepository, this._posLangConnectionRepository);
+  PosService(this._posRepository, this._posLangConnectionRepository, this._posGCLangConnectionRepository);
 
   List<Pos> getAll() {
     return _posRepository.getAll();
@@ -54,5 +56,17 @@ class PosService {
 
   void deletePosLangConnection(int langId, int posId) {
     _posLangConnectionRepository.delete(langId, posId);
+  }
+
+  Set<int> getPosGCIdsByLangIdGCId(int langId, int gcId) {
+    return _posGCLangConnectionRepository.getPosIdsByLangIdGCId(langId, gcId);
+  }
+
+  void savePosGCLangConnection(int langId, int gcId, int posId) {
+    _posGCLangConnectionRepository.save(langId, gcId, posId);
+  }
+
+  void deletePosGCLangConnection(int langId, int gcId, int posId) {
+    _posGCLangConnectionRepository.delete(langId, gcId, posId);
   }
 }
