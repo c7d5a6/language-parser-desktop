@@ -67,6 +67,14 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   }
 
   @override
+  void didUpdateWidget(LanguageGrammaticalCategories oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.languageId != oldWidget.languageId) {
+      invalidate();
+    }
+  }
+
+  @override
   void dispose() {
     _serviceManager!.repositoryManager.removeGCInvalidator(this);
     _serviceManager!.repositoryManager.removeGCVInvalidator(this);

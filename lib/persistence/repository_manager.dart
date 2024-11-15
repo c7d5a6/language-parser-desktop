@@ -22,9 +22,11 @@ class RepositoryManager {
     db.execute('PRAGMA foreign_keys = ON;');
     _grammaticalCategoryRepository = GrammaticalCategoryRepository(_database!);
     _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
+    _gcvLangConnectionRepository = GCVLangConnectionRepository(_database!);
     _languageRepository = LanguageRepository(_database!);
     _posRepository = PosRepository(_database!);
     _posLangConnectionRepository = PosLangConnectionRepository(_database!);
+    _posGCLangConnectionRepository = PosGCLangConnectionRepository(_database!);
     _languagePhonemeRepository = LanguagePhonemeRepository(_database!);
     _wordRepository = WordRepository(_database!);
   }
