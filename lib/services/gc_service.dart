@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:developer';
 
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
@@ -53,10 +54,12 @@ class GCService {
   }
 
   void saveGCVLangConnection(int langId, int gcvId) {
+    log("saveGCVLangConnection lang $langId gcv $gcvId");
     _gcvLangConnectionRepository.save(langId, gcvId);
   }
 
   void deleteGCVLangConnection(int langId, int gcvId) {
+    log("deleteGCVLangConnection lang $langId gcv $gcvId");
     _gcvLangConnectionRepository.delete(langId, gcvId);
   }
 }

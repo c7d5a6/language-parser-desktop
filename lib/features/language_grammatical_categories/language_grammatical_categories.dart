@@ -90,11 +90,11 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     _getGCs();
     _getGCVs();
     _getPoses();
+    _getSelectedPoses();
   }
 
   void _getGCs() {
     var list = _gcService.getAllGCs()..sort((p1, p2) => p1.name.compareTo(p2.name));
-    log('GCs $list');
     setState(() {
       _gcs = list;
     });
@@ -119,7 +119,6 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   void _getPoses() {
     var list = _posService.getAll()..sort((p1, p2) => p1.name.compareTo(p2.name));
     var enabled = _posService.getPosIdsByLangId(widget.languageId);
-    log("Poses enabled: $enabled");
     setState(() {
       _poses = list;
       _enabledPoses = enabled;
@@ -129,6 +128,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   void _getSelectedPoses() {
     final gc = _gcSelected == null ? null : _gcs.firstWhere((p) => p.id == _gcSelected);
     Set<int> selectedPos = gc == null ? {} : _posService.getPosGCIdsByLangIdGCId(widget.languageId, gc.id);
+    log("Selected poses: $selectedPos");
     setState(() {
       _selectedPoses = selectedPos;
     });
@@ -139,6 +139,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     List<GrammaticalCategoryValue> list = gc == null ? [] : _gcService.getAllGCVs(gc.id)
       ..sort((p1, p2) => p1.name.compareTo(p2.name));
     Set<int> selectedGCVs = gc == null ? {} : _gcService.getGCVIdsByLangIdAndGCId(widget.languageId, gc.id);
+    log("Selected gcvs: $selectedGCVs");
     setState(() {
       _gcvs = list;
       _selectedGCVs = selectedGCVs;
@@ -197,6 +198,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   Widget createPOSCell(int i, double posWidth) {
     var pos = i >= 2 && _poses.length > i - 2 ? _poses[i - 2] : null;
     var enabled = _enabledPoses.contains(pos?.id);
+    var selected = _selectedPoses.contains(pos?.id);
     return (i == 0)
         ? Center(child: LPhHeader(header: 'ENABLE FOR CLASSES'))
         : (i == 1)
@@ -207,41 +209,22 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
                         width: posWidth,
                         child: Row(children: [
                           DBorder(data: "["),
-                          enablePosBtn(pos!.id, enabled),
+                          enablePosBtn(
+                              selected,
+                              enabled,
+                              () => _posService.deletePosGCLangConnection(widget.languageId, _gcSelected!, pos!.id),
+                              () => _posService.savePosGCLangConnection(widget.languageId, _gcSelected!, pos!.id)),
                           DBorder(data: "] "),
-                          Text(pos.name,
+                          Text(pos!.name,
                               style: LPFont.defaultTextStyle
                                   .merge(TextStyle(color: enabled ? LPColor.greyBrightColor : LPColor.greyColor)))
                         ])))
                 : Container();
   }
 
-  TButton enablePosBtn(int posId, bool posEnabled) {
-    return TButton(
-      text: posEnabled ? "o" : "x",
-      disabled: _gcSelected == null,
-      color: posEnabled
-          ? false
-              ? LPColor.greenColor
-              : LPColor.yellowColor
-          : false
-              ? LPColor.redColor
-              : LPColor.greyColor,
-      hover: posEnabled
-          ? false
-              ? LPColor.greenBrightColor
-              : LPColor.yellowBrightColor
-          : false
-              ? LPColor.redBrightColor
-              : LPColor.greyBrightColor,
-      onPressed: () => posEnabled
-          ? _posService.deletePosLangConnection(widget.languageId, posId)
-          : _posService.savePosLangConnection(widget.languageId, posId),
-    );
-  }
-
   Widget createGCVCell(int i, double width) {
     var gcv = i >= 2 && _gcvs.length > i - 2 ? _gcvs[i - 2] : null;
+    var selected = _selectedGCVs.contains(gcv?.id);
     return (i == 0)
         ? Center(child: LPhHeader(header: 'ENABLE VALUES'))
         : (i == 1)
@@ -252,12 +235,38 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
                         width: width,
                         child: Row(children: [
                           DBorder(data: "["),
-                          enablePosBtn(gcv!.id, true),
+                          enablePosBtn(
+                            selected,
+                            true,
+                            () => _gcService.deleteGCVLangConnection(widget.languageId, gcv!.id),
+                            () {
+                              log("save gcv $gcv");
+                              _gcService.saveGCVLangConnection(widget.languageId, gcv!.id);
+                            },
+                          ),
                           DBorder(data: "] "),
-                          Text(gcv.name,
+                          Text(gcv!.name,
                               style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)))
                         ])))
                 : Container();
+  }
+
+  TButton enablePosBtn(bool selected, bool enabled, void Function() delete, void Function() save) {
+    return TButton(
+      text: selected ? "o" : "x",
+      disabled: _gcSelected == null,
+      color: selected
+          ? enabled
+              ? LPColor.greenColor
+              : LPColor.yellowColor
+          : LPColor.greyColor,
+      hover: selected
+          ? enabled
+              ? LPColor.greenBrightColor
+              : LPColor.yellowBrightColor
+          : LPColor.greyBrightColor,
+      onPressed: _gcSelected == null ? () => log("gc not selected") : () => selected ? delete() : save(),
+    );
   }
 
   Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
