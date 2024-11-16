@@ -18,26 +18,25 @@ import '../../services/service_manager.dart';
 import '../../text_measure_provider.dart';
 import '../language_phonetics/language_phonetics_header.dart';
 
-class LanguageGrammaticalCategories extends StatefulWidget {
+class LanguageDeclensions extends StatefulWidget {
   final int languageId;
 
-  const LanguageGrammaticalCategories(this.languageId);
+  const LanguageDeclensions(this.languageId);
 
   @override
-  State<StatefulWidget> createState() => _LanguageGrammaticalCategories();
+  State<StatefulWidget> createState() => _LanguageDeclensions();
 }
 
-class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories> implements Invalidator {
+class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalidator {
   ServiceManager? _serviceManager;
-  late GCService _gcService;
   late PosService _posService;
+  List<Pos> _poses = [];
+  late GCService _gcService;
   List<GrammaticalCategory> _gcs = [];
+  Set<int> _gcsEnabled = {};
   List<GrammaticalCategoryValue> _gcvs = [];
   Set<int> _selectedGCVs = {};
-  List<Pos> _poses = [];
-  Set<int> _enabledPoses = {};
-  Set<int> _selectedPoses = {};
-  int? _gcSelected;
+  int? _posSelected;
 
   @override
   void didChangeDependencies() {
@@ -61,13 +60,13 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
       _serviceManager!.repositoryManager.addPosGCLangConnectionInvalidator(this);
       _gcService = _serviceManager!.gcService;
       _posService = _serviceManager!.posService;
-      _gcSelected = null;
+      _posSelected = null;
       invalidate();
     }
   }
 
   @override
-  void didUpdateWidget(LanguageGrammaticalCategories oldWidget) {
+  void didUpdateWidget(LanguageDeclensions oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.languageId != oldWidget.languageId) {
       invalidate();
@@ -90,52 +89,44 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     _getGCs();
     _getGCVs();
     _getPoses();
-    _getSelectedPoses();
+  }
+
+  void _getPoses() {
+    var enabled = _posService.getPosIdsByLangId(widget.languageId);
+    var list = _posService.getAll().where((pos) => enabled.contains(pos.id)).toList(growable: false)
+      ..sort((p1, p2) => p1.name.compareTo(p2.name));
+    setState(() {
+      _poses = list;
+    });
+    _selectPos(_posSelected);
+  }
+
+  void _selectPos(int? i) {
+    if (i != null) {
+      if (!_poses.any((p) => p.id == i)) {
+        i = null;
+      }
+    }
+    if (_posSelected != i) {
+      setState(() {
+        _posSelected = i;
+      });
+      _getGCs();
+    }
   }
 
   void _getGCs() {
     var list = _gcService.getAllGCs()..sort((p1, p2) => p1.name.compareTo(p2.name));
+    Set<int> enabled =
+        _posSelected == null ? {} : _gcService.getGCsIdsByLangIdAndPosId(widget.languageId, _posSelected!);
     setState(() {
       _gcs = list;
-    });
-    _selectGC(_gcSelected);
-  }
-
-  void _selectGC(int? i) {
-    if (i != null) {
-      if (!_gcs.any((p) => p.id == i)) {
-        i = null;
-      }
-    }
-    if (_gcSelected != i) {
-      setState(() {
-        _gcSelected = i;
-      });
-      _getGCVs();
-      _getSelectedPoses();
-    }
-  }
-
-  void _getPoses() {
-    var list = _posService.getAll()..sort((p1, p2) => p1.name.compareTo(p2.name));
-    var enabled = _posService.getPosIdsByLangId(widget.languageId);
-    setState(() {
-      _poses = list;
-      _enabledPoses = enabled;
-    });
-  }
-
-  void _getSelectedPoses() {
-    final gc = _gcSelected == null ? null : _gcs.firstWhere((p) => p.id == _gcSelected);
-    Set<int> selectedPos = gc == null ? {} : _posService.getPosGCIdsByLangIdGCId(widget.languageId, gc.id);
-    log("Selected poses: $selectedPos");
-    setState(() {
-      _selectedPoses = selectedPos;
+      _gcsEnabled = enabled;
     });
   }
 
   void _getGCVs() {
-    final gc = _gcSelected == null ? null : _gcs.firstWhere((p) => p.id == _gcSelected);
+    final gc = _posSelected == null ? null : _gcs.firstWhere((p) => p.id == _posSelected);
     List<GrammaticalCategoryValue> list = gc == null ? [] : _gcService.getAllGCVs(gc.id)
       ..sort((p1, p2) => p1.name.compareTo(p2.name));
     Set<int> selectedGCVs = gc == null ? {} : _gcService.getGCVIdsByLangIdAndGCId(widget.languageId, gc.id);
@@ -149,8 +140,8 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   @override
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
-    final gcLen = 6 + _gcs.fold(5, ((n, gc) => math.max(n, gc.name.length)));
-    final posLen = 5 + _poses.fold(0, ((n, pos) => math.max(n, pos.name.length)));
+    final posLen = 4 + _poses.fold(0, ((n, pos) => math.max(n, pos.name.length)));
+    final gcLen = math.max(6 + _gcs.fold(0, ((n, gc) => math.max(n, gc.name.length))), "USED CATEGORIES".length + 2);
     final gcvLen = 5 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length)));
     final rowLength = 2 + math.max(math.max(_poses.length, math.max(_gcs.length, _gcvs.length)), 0);
 
@@ -159,9 +150,9 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     for (int i = 0; i < rowLength; i++) {
       rows.add(TableRow(children: [
         DBorder(data: '|'),
-        createGCCell(i),
+        createPosCell(i),
         DBorder(data: '|'),
-        createPOSCell(i, posLen * cWidth),
+        createGCCell(i),
         DBorder(data: '|'),
         createGCVCell(i, gcvLen * cWidth),
         DBorder(data: '|'),
@@ -179,9 +170,9 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     return Column(children: [
       Table(columnWidths: {
         0: FixedColumnWidth(cWidth),
-        1: FixedColumnWidth(cWidth * gcLen),
+        1: FixedColumnWidth(cWidth * posLen),
         2: FixedColumnWidth(cWidth),
-        3: FlexColumnWidth(2),
+        3: FixedColumnWidth(cWidth * gcLen),
         4: FixedColumnWidth(cWidth),
         5: FlexColumnWidth(2),
         6: FixedColumnWidth(cWidth),
@@ -189,36 +180,33 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     ]);
   }
 
-  Widget createGCCell(int i) => (i < 1)
+  Widget createPosCell(int i) => (i < 1)
       ? Container()
-      : (_gcs.length > i - 1)
-          ? createValueBtn(i - 1, _selectGC, _gcs, _gcSelected)
+      : (_poses.length > i - 1)
+          ? createValueBtn(i - 1, _selectPos, _poses, _posSelected)
           : Container();
 
-  Widget createPOSCell(int i, double posWidth) {
-    var pos = i >= 2 && _poses.length > i - 2 ? _poses[i - 2] : null;
-    var enabled = _enabledPoses.contains(pos?.id);
-    var selected = _selectedPoses.contains(pos?.id);
+  Widget createGCCell(int i) {
+    var gc = i >= 2 && _gcs.length > i - 2 ? _gcs[i - 2] : null;
+    var enabled = _gcsEnabled.contains(gc?.id);
+    var selected = false;
     return (i == 0)
-        ? Center(child: LPhHeader(header: 'ENABLED FOR CLASSES'))
+        ? Center(child: LPhHeader(header: 'USED CATEGORIES'))
         : (i == 1)
             ? HDash()
-            : (_poses.length > i - 2)
-                ? Center(
-                    child: Container(
-                        width: posWidth,
-                        child: Row(children: [
-                          DBorder(data: "["),
-                          enablePosBtn(
-                              selected,
-                              enabled,
-                              () => _posService.deletePosGCLangConnection(widget.languageId, _gcSelected!, pos!.id),
-                              () => _posService.savePosGCLangConnection(widget.languageId, _gcSelected!, pos!.id)),
-                          DBorder(data: "] "),
-                          Text(pos!.name,
-                              style: LPFont.defaultTextStyle
-                                  .merge(TextStyle(color: enabled ? LPColor.greyBrightColor : LPColor.greyColor)))
-                        ])))
+            : (_gcs.length > i - 2)
+                ? Row(children: [
+                    DBorder(data: "["),
+                    enablePosBtn(
+                        selected,
+                        enabled,
+                        () => _posService.deletePosGCLangConnection(widget.languageId, _posSelected!, gc!.id),
+                        () => _posService.savePosGCLangConnection(widget.languageId, _posSelected!, gc!.id)),
+                    DBorder(data: "] "),
+                    Text(gc!.name,
+                        style: LPFont.defaultTextStyle
+                            .merge(TextStyle(color: enabled ? LPColor.greyBrightColor : LPColor.greyColor)))
+                  ])
                 : Container();
   }
 
@@ -226,7 +214,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     var gcv = i >= 2 && _gcvs.length > i - 2 ? _gcvs[i - 2] : null;
     var selected = _selectedGCVs.contains(gcv?.id);
     return (i == 0)
-        ? Center(child: LPhHeader(header: 'ENABLED VALUES'))
+        ? Center(child: LPhHeader(header: 'ENABLED DECLENSIONS'))
         : (i == 1)
             ? HDash()
             : (_gcvs.length > i - 2)
@@ -254,7 +242,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   TButton enablePosBtn(bool selected, bool enabled, void Function() delete, void Function() save) {
     return TButton(
       text: selected ? "o" : "x",
-      disabled: _gcSelected == null,
+      disabled: _posSelected == null,
       color: selected
           ? enabled
               ? LPColor.greenColor
@@ -265,7 +253,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
               ? LPColor.greenBrightColor
               : LPColor.yellowBrightColor
           : LPColor.greyBrightColor,
-      onPressed: _gcSelected == null ? () => log("gc not selected") : () => selected ? delete() : save(),
+      onPressed: _posSelected == null ? () => log("gc not selected") : () => selected ? delete() : save(),
     );
   }
 

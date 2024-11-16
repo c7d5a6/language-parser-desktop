@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_lang_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/pos_category_lang_connection_repository.dart';
 
 import '../persistence/entities/grammatical_category_entity.dart';
 import '../persistence/repositories/gcv_repository.dart';
@@ -12,8 +13,14 @@ class GCService {
   final GrammaticalCategoryRepository _gcRepository;
   final GrammaticalCategoryValueRepository _gcvRepository;
   final GCVLangConnectionRepository _gcvLangConnectionRepository;
+  final PosGCLangConnectionRepository _posGCLangConnectionRepository;
 
-  GCService(this._gcRepository, this._gcvRepository, this._gcvLangConnectionRepository);
+  GCService(
+    this._gcRepository,
+    this._gcvRepository,
+    this._gcvLangConnectionRepository,
+    this._posGCLangConnectionRepository,
+  );
 
   List<GrammaticalCategory> getAllGCs() {
     return _gcRepository.getAll();
@@ -61,5 +68,9 @@ class GCService {
   void deleteGCVLangConnection(int langId, int gcvId) {
     log("deleteGCVLangConnection lang $langId gcv $gcvId");
     _gcvLangConnectionRepository.delete(langId, gcvId);
+  }
+
+  Set<int> getGCsIdsByLangIdAndPosId(int langId, int posId) {
+    return _posGCLangConnectionRepository.getGCsIdsByLangIdAndPosId(langId, posId);
   }
 }

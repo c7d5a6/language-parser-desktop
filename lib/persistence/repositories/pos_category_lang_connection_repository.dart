@@ -11,6 +11,12 @@ class PosGCLangConnectionRepository extends Repository {
     return (result).map((row) => row['pos_id'] as int).toSet();
   }
 
+  Set<int> getGCsIdsByLangIdAndPosId(int langId, int posId) {
+    final result =
+    db.select("SELECT gc_id FROM ${PosGCLangConnection.table_name} WHERE lang_id = $langId AND pos_id = $posId");
+    return (result).map((row) => row['gc_id'] as int).toSet();
+  }
+
   void save(int langId, int gcId, int posId) {
     db.execute(
         'INSERT INTO ${PosGCLangConnection.table_name} (lang_id, gc_id, pos_id) VALUES'
