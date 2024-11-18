@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart' as gc;
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
@@ -14,11 +16,23 @@ class GrammaticalCategoryValueRepository extends Repository {
     grammatical_category_tbl.id as gc_id,
     grammatical_category_tbl.name as gc_name
   FROM grammatical_category_value_tbl
-  JOIN grammatical_category_tbl ON grammatical_category_value_tbl.category_id = grammatical_category_tbl.id
+  INNER JOIN grammatical_category_tbl ON grammatical_category_value_tbl.category_id = grammatical_category_tbl.id
   ''';
 
   List<GrammaticalCategoryValue> getAllByGCId(int id) {
     final resultSet = db.select('$select WHERE gc_id = $id ORDER BY gcv_id', []);
+    return (resultSet).map(convertFullEntity).toList(growable: false);
+  }
+
+  List<GrammaticalCategoryValue> getByGCIdAndLangId(int gcId, int langId) {
+    final resultSet = db.select('''
+    $select 
+      INNER JOIN category_value_lang_connection_tbl ON category_value_lang_connection_tbl.gcv_id = grammatical_category_value_tbl.id
+    WHERE gc_id = $gcId AND category_value_lang_connection_tbl.lang_id = $langId
+    GROUP BY grammatical_category_value_tbl.id
+    ORDER BY gc_name, gcv_name
+    ''', []);
+    log("$resultSet");
     return (resultSet).map(convertFullEntity).toList(growable: false);
   }
 
@@ -38,8 +52,7 @@ class GrammaticalCategoryValueRepository extends Repository {
   }
 
   void update(GrammaticalCategoryValueUpdatingModel model) {
-    db.execute('UPDATE ${GrammaticalCategoryValue.table_name} SET name = ? WHERE id = ${model.id};',
-        [model.name]);
+    db.execute('UPDATE ${GrammaticalCategoryValue.table_name} SET name = ? WHERE id = ${model.id};', [model.name]);
     invalidate();
   }
 

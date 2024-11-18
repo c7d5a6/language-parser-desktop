@@ -73,4 +73,8 @@ class GCService {
   Set<int> getGCsIdsByLangIdAndPosId(int langId, int posId) {
     return _posGCLangConnectionRepository.getGCsIdsByLangIdAndPosId(langId, posId);
   }
+
+  Set<int> getConnectedGCsIdsByLangId(int langId) {
+    return _posGCLangConnectionRepository.getConnectedGCsIdsByLangId(langId);
+  }
 }

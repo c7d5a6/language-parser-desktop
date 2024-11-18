@@ -6,11 +6,12 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
-import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
+import 'package:language_parser_desktop/services/declension_service.dart';
 import 'package:language_parser_desktop/services/gc_service.dart';
 import 'package:language_parser_desktop/services/pos_service.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
+import '../../persistence/entities/grammatical_category_value_entity.dart';
 import '../../persistence/entities/pos_entity.dart';
 import '../../persistence/repositories/invalidators/invalidator.dart';
 import '../../service_provider.dart';
@@ -29,14 +30,16 @@ class LanguageDeclensions extends StatefulWidget {
 
 class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalidator {
   ServiceManager? _serviceManager;
+  late DeclensionService _declensionService;
+  late GCService _gcService;
   late PosService _posService;
   List<Pos> _poses = [];
-  late GCService _gcService;
+  Set<int> _posesUsed = {};
+  Set<int> _posesEnabled = {};
+  int? _posSelected;
   List<GrammaticalCategory> _gcs = [];
   Set<int> _gcsEnabled = {};
-  List<GrammaticalCategoryValue> _gcvs = [];
-  Set<int> _selectedGCVs = {};
-  int? _posSelected;
+  List<List<GrammaticalCategoryValue>> _declensions = [];
 
   @override
   void didChangeDependencies() {
@@ -44,6 +47,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
     final sm = ServiceProvider.of(context)?.serviceManager;
     if (_serviceManager != sm) {
       if (_serviceManager != null) {
+        _serviceManager!.repositoryManager.removeDeclensionCategoryPosLangConnectionInvalidator(this);
         _serviceManager!.repositoryManager.removeGCInvalidator(this);
         _serviceManager!.repositoryManager.removeGCVInvalidator(this);
         _serviceManager!.repositoryManager.removeGCVLangInvalidator(this);
@@ -52,6 +56,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         _serviceManager!.repositoryManager.removePosGCLangConnectionInvalidator(this);
       }
       _serviceManager = sm;
+      _serviceManager!.repositoryManager.addDeclensionCategoryPosLangConnectionInvalidator(this);
       _serviceManager!.repositoryManager.addGCValidator(this);
       _serviceManager!.repositoryManager.addGCVValidator(this);
       _serviceManager!.repositoryManager.addGCVLangInvalidator(this);
@@ -60,6 +65,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
       _serviceManager!.repositoryManager.addPosGCLangConnectionInvalidator(this);
       _gcService = _serviceManager!.gcService;
       _posService = _serviceManager!.posService;
+      _declensionService = _serviceManager!.declensionService;
       _posSelected = null;
       invalidate();
     }
@@ -75,6 +81,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
 
   @override
   void dispose() {
+    _serviceManager!.repositoryManager.removeDeclensionCategoryPosLangConnectionInvalidator(this);
     _serviceManager!.repositoryManager.removeGCInvalidator(this);
     _serviceManager!.repositoryManager.removeGCVInvalidator(this);
     _serviceManager!.repositoryManager.removeGCVLangInvalidator(this);
@@ -86,17 +93,23 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
 
   @override
   void invalidate() {
-    _getGCs();
-    _getGCVs();
     _getPoses();
+    _getGCs();
+    _getDeclensions();
   }
 
   void _getPoses() {
     var enabled = _posService.getPosIdsByLangId(widget.languageId);
-    var list = _posService.getAll().where((pos) => enabled.contains(pos.id)).toList(growable: false)
+    var used = _declensionService.getPosIdsByLangId(widget.languageId);
+    var list = _posService
+        .getAll()
+        .where((pos) => enabled.contains(pos.id) || used.contains(pos.id))
+        .toList(growable: false)
       ..sort((p1, p2) => p1.name.compareTo(p2.name));
     setState(() {
       _poses = list;
+      _posesUsed = used;
+      _posesEnabled = enabled;
     });
     _selectPos(_posSelected);
   }
@@ -112,38 +125,35 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         _posSelected = i;
       });
       _getGCs();
+      _getDeclensions();
     }
   }
 
   void _getGCs() {
     var list = _gcService.getAllGCs()..sort((p1, p2) => p1.name.compareTo(p2.name));
     Set<int> enabled =
-        _posSelected == null ? {} : _gcService.getGCsIdsByLangIdAndPosId(widget.languageId, _posSelected!);
+        _posSelected == null ? {} : _declensionService.getGCsIdsByLangIdAndPosId(widget.languageId, _posSelected!);
     setState(() {
       _gcs = list;
       _gcsEnabled = enabled;
     });
   }
 
-  void _getGCVs() {
-    final gc = _posSelected == null ? null : _gcs.firstWhere((p) => p.id == _posSelected);
-    List<GrammaticalCategoryValue> list = gc == null ? [] : _gcService.getAllGCVs(gc.id)
-      ..sort((p1, p2) => p1.name.compareTo(p2.name));
-    Set<int> selectedGCVs = gc == null ? {} : _gcService.getGCVIdsByLangIdAndGCId(widget.languageId, gc.id);
-    log("Selected gcvs: $selectedGCVs");
-    setState(() {
-      _gcvs = list;
-      _selectedGCVs = selectedGCVs;
-    });
+  void _getDeclensions() {
+    if (_posSelected != null) {
+      var declensions = _declensionService.getDeclensions(widget.languageId, _posSelected!);
+      log("Declensions: $declensions");
+      _declensions = declensions;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     final posLen = 4 + _poses.fold(0, ((n, pos) => math.max(n, pos.name.length)));
-    final gcLen = math.max(6 + _gcs.fold(0, ((n, gc) => math.max(n, gc.name.length))), "USED CATEGORIES".length + 2);
-    final gcvLen = 5 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length)));
-    final rowLength = 2 + math.max(math.max(_poses.length, math.max(_gcs.length, _gcvs.length)), 0);
+    final gcLen =
+        math.max(6 + _gcs.fold(0, ((n, gc) => math.max(n, gc.name.length))), "USED FOR DECLENSION".length + 2);
+    final rowLength = 2 + math.max(math.max(_poses.length, math.max(_gcs.length, _declensions.length)), 0);
 
     List<TableRow> rows = List.empty(growable: true);
 
@@ -154,7 +164,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         DBorder(data: '|'),
         createGCCell(i),
         DBorder(data: '|'),
-        createGCVCell(i, gcvLen * cWidth),
+        createDeclensionCell(i),
         DBorder(data: '|'),
       ]));
     }
@@ -189,19 +199,18 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
   Widget createGCCell(int i) {
     var gc = i >= 2 && _gcs.length > i - 2 ? _gcs[i - 2] : null;
     var enabled = _gcsEnabled.contains(gc?.id);
-    var selected = false;
     return (i == 0)
-        ? Center(child: LPhHeader(header: 'USED CATEGORIES'))
+        ? Center(child: LPhHeader(header: 'USED FOR DECLENSION'))
         : (i == 1)
             ? HDash()
             : (_gcs.length > i - 2)
                 ? Row(children: [
                     DBorder(data: "["),
-                    enablePosBtn(
-                        selected,
+                    enableBtn(
                         enabled,
-                        () => _posService.deletePosGCLangConnection(widget.languageId, _posSelected!, gc!.id),
-                        () => _posService.savePosGCLangConnection(widget.languageId, _posSelected!, gc!.id)),
+                        enabled,
+                        () => _declensionService.delete(widget.languageId, gc!.id, _posSelected!),
+                        () => _declensionService.save(widget.languageId, gc!.id, _posSelected!)),
                     DBorder(data: "] "),
                     Text(gc!.name,
                         style: LPFont.defaultTextStyle
@@ -210,36 +219,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
                 : Container();
   }
 
-  Widget createGCVCell(int i, double width) {
-    var gcv = i >= 2 && _gcvs.length > i - 2 ? _gcvs[i - 2] : null;
-    var selected = _selectedGCVs.contains(gcv?.id);
-    return (i == 0)
-        ? Center(child: LPhHeader(header: 'ENABLED DECLENSIONS'))
-        : (i == 1)
-            ? HDash()
-            : (_gcvs.length > i - 2)
-                ? Center(
-                    child: Container(
-                        width: width,
-                        child: Row(children: [
-                          DBorder(data: "["),
-                          enablePosBtn(
-                            selected,
-                            true,
-                            () => _gcService.deleteGCVLangConnection(widget.languageId, gcv!.id),
-                            () {
-                              log("save gcv $gcv");
-                              _gcService.saveGCVLangConnection(widget.languageId, gcv!.id);
-                            },
-                          ),
-                          DBorder(data: "] "),
-                          Text(gcv!.name,
-                              style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)))
-                        ])))
-                : Container();
-  }
-
-  TButton enablePosBtn(bool selected, bool enabled, void Function() delete, void Function() save) {
+  TButton enableBtn(bool selected, bool enabled, void Function() delete, void Function() save) {
     return TButton(
       text: selected ? "o" : "x",
       disabled: _posSelected == null,
@@ -257,9 +237,38 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
     );
   }
 
-  Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
-      text: list[i].name,
-      color: list[i].id == selected ? LPColor.primaryColor : LPColor.greyColor,
-      hover: LPColor.greyBrightColor,
-      onPressed: () => select(list[i].id));
+  Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) {
+    var elem = list[i];
+    var id = elem.id;
+    var used = _posesUsed.contains(id);
+    var enabled = _posesEnabled.contains(id);
+    return TButton(
+        text: elem.name,
+        color: id == selected
+            ? LPColor.primaryColor
+            : !used
+                ? LPColor.greyColor
+                : enabled
+                    ? LPColor.greyBrightColor
+                    : LPColor.redColor,
+        hover: id == selected
+            ? LPColor.primaryBrightColor
+            : !used
+                ? LPColor.greyBrightColor
+                : enabled
+                    ? LPColor.whiteColor
+                    : LPColor.redBrightColor,
+        onPressed: () => select(id));
+  }
+
+  createDeclensionCell(int i) {
+    var declension = i >= 2 && _declensions.length > i - 2 ? _declensions[i - 2] : null;
+    return (i == 0)
+        ? Center(child: LPhHeader(header: 'ENABLED DECLENSIONS'))
+        : (i == 1)
+            ? HDash()
+            : (_declensions.length > i - 2)
+                ? Row(children: declension!.map((d) => Text("${d.name} ")).toList())
+                : Container();
+  }
 }

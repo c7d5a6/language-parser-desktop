@@ -32,6 +32,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   late GCService _gcService;
   late PosService _posService;
   List<GrammaticalCategory> _gcs = [];
+  Set<int> _usedGCs = {};
   List<GrammaticalCategoryValue> _gcvs = [];
   Set<int> _selectedGCVs = {};
   List<Pos> _poses = [];
@@ -95,8 +96,10 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
 
   void _getGCs() {
     var list = _gcService.getAllGCs()..sort((p1, p2) => p1.name.compareTo(p2.name));
+    var used = _gcService.getConnectedGCsIdsByLangId(widget.languageId);
     setState(() {
       _gcs = list;
+      _usedGCs = used;
     });
     _selectGC(_gcSelected);
   }
@@ -271,7 +274,11 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
 
   Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
       text: list[i].name,
-      color: list[i].id == selected ? LPColor.primaryColor : LPColor.greyColor,
-      hover: LPColor.greyBrightColor,
+      color: list[i].id == selected
+          ? (LPColor.primaryColor)
+          : (_usedGCs.contains(list[i].id) ? LPColor.greyBrightColor : LPColor.greyColor),
+      hover: list[i].id == selected
+          ? (LPColor.primaryBrightColor)
+          : (_usedGCs.contains(list[i].id) ? LPColor.whiteColor : LPColor.greyBrightColor),
       onPressed: () => select(list[i].id));
 }
