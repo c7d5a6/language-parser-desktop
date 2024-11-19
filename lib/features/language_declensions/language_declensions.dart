@@ -268,7 +268,8 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         : (i == 1)
             ? HDash()
             : (_declensions.length > i - 2)
-                ? Row(children: declension!.map((d) => Text("${d.name} ")).toList())
+                // ? Row(children: declension!.map((d) => Text("${d.name} ")).toList())
+                ? Row(children: [TButton(text: declension!.fold("", (prev, decl) => "$prev ${decl.name}"))])
                 : Container();
   }
 }

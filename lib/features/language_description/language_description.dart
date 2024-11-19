@@ -110,10 +110,10 @@ class _LanguageDescription extends State<LanguageDescription> {
           0: FixedColumnWidth(cWidth),
           1: FlexColumnWidth(1),
           2: FixedColumnWidth(cWidth * 2),
-          3: FixedColumnWidth(cWidth * save.length),
+          3: FixedColumnWidth(cWidth * save.length + 1),
           4: FixedColumnWidth(cWidth * 5),
-          5: FixedColumnWidth(cWidth * delete.length),
-          6: FixedColumnWidth(cWidth * 4),
+          5: FixedColumnWidth(cWidth * delete.length + 1),
+          6: FixedColumnWidth(cWidth * 4 + 1),
         },
         children: [
           TableRow(children: [
