@@ -1,4 +1,5 @@
 import 'package:language_parser_desktop/persistence/repositories/declension_category_pos_lang_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_repository.dart';
@@ -22,6 +23,7 @@ class RepositoryManager {
     _database = db;
     db.execute('PRAGMA foreign_keys = ON;');
     _declensionCategoryPosLangConnectionRepository = DeclensionCategoryPosLangConnectionRepository(_database!);
+    _declensionRepository = DeclensionRepository(_database!);
     _grammaticalCategoryRepository = GrammaticalCategoryRepository(_database!);
     _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
     _gcvLangConnectionRepository = GCVLangConnectionRepository(_database!);
@@ -36,6 +38,22 @@ class RepositoryManager {
   void dispose() {
     if (_database != null) _database!.dispose();
     _database = null;
+  }
+
+  //
+  late DeclensionRepository _declensionRepository;
+
+  void addDeclensionInvalidator(Invalidator invalidator) {
+    _declensionRepository.addInvalidator(invalidator);
+  }
+
+  void removeDeclensionInvalidator(Invalidator invalidator) {
+    _declensionRepository.removeInvalidator(invalidator);
+  }
+
+  DeclensionRepository get declensionRepository {
+    assert(_database != null);
+    return _declensionRepository;
   }
 
   //

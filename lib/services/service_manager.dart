@@ -16,6 +16,7 @@ class ServiceManager {
   ServiceManager(this.repositoryManager)
       : _declensionService = DeclensionService(
           repositoryManager.declensionCategoryPosLangConnectionRepository,
+          repositoryManager.declensionRepository,
           repositoryManager.grammaticalCategoryValueRepository,
         ),
         _gcService = GCService(

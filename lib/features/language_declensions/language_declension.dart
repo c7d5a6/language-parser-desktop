@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
-import 'package:language_parser_desktop/features/language_declensions/language_declension.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
 import 'package:language_parser_desktop/services/declension_service.dart';
 import 'package:language_parser_desktop/services/gc_service.dart';
@@ -19,16 +18,17 @@ import '../../services/service_manager.dart';
 import '../../text_measure_provider.dart';
 import '../language_phonetics/language_phonetics_header.dart';
 
-class LanguageDeclensions extends StatefulWidget {
+class LanguageDeclension extends StatefulWidget {
   final int languageId;
+  final DeclensionRow declension;
 
-  const LanguageDeclensions(this.languageId);
+  const LanguageDeclension(this.languageId, this.declension);
 
   @override
-  State<StatefulWidget> createState() => _LanguageDeclensions();
+  State<StatefulWidget> createState() => _LanguageDeclension();
 }
 
-class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalidator {
+class _LanguageDeclension extends State<LanguageDeclension> implements Invalidator {
   ServiceManager? _serviceManager;
   late DeclensionService _declensionService;
   late GCService _gcService;
@@ -75,7 +75,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
   }
 
   @override
-  void didUpdateWidget(LanguageDeclensions oldWidget) {
+  void didUpdateWidget(LanguageDeclension oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.languageId != oldWidget.languageId) {
       invalidate();
@@ -174,8 +174,6 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
 
     List<TableRow> rows = List.empty(growable: true);
 
-    DeclensionRow? declension = _declensions.where((d) => d.used && d.declensionId == _declensionSelected).firstOrNull;
-
     for (int i = 0; i < rowLength; i++) {
       rows.add(TableRow(children: [
         DBorder(data: '|'),
@@ -199,14 +197,20 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
     return Column(children: [
       Table(columnWidths: {
         0: FixedColumnWidth(cWidth),
-        1: FixedColumnWidth(cWidth * posLen),
+        1: FlexColumnWidth(),
         2: FixedColumnWidth(cWidth),
-        3: FixedColumnWidth(cWidth * gcLen),
-        4: FixedColumnWidth(cWidth),
-        5: FlexColumnWidth(2),
-        6: FixedColumnWidth(cWidth),
-      }, children: rows),
-      if (declension != null) LanguageDeclension(widget.languageId, declension)
+      }, children: [
+        TableRow(children: [
+          DBorder(data: '|'),
+          Center(child: LPhHeader(header: widget.declension.name.toUpperCase())),
+          DBorder(data: '|'),
+        ]),
+        TableRow(children: [
+          DBorder(data: '+'),
+          HDash(),
+          DBorder(data: '+'),
+        ]),
+      ])
     ]);
   }
 
