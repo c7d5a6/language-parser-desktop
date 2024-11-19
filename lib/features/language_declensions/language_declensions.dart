@@ -92,7 +92,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getPoses();
     _getGCs();
     _getDeclensions();

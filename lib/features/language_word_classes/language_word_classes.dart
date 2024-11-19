@@ -67,7 +67,7 @@ class _LanguageWordClasses extends State<LanguageWordClasses> implements Invalid
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getPoses();
   }
 

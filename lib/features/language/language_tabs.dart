@@ -55,7 +55,7 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getLanguages();
   }
 

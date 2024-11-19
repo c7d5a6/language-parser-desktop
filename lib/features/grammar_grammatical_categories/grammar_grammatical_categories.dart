@@ -70,7 +70,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getGCs();
     _getGCVs();
   }

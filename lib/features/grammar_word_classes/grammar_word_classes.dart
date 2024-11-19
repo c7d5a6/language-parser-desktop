@@ -54,7 +54,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getPoses();
   }
 

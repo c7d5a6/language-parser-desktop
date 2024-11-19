@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 abstract class Invalidator {
-  void invalidate();
+  Future<void> invalidate();
 }
 
 mixin RepositoryCache {
@@ -19,9 +19,16 @@ mixin RepositoryCache {
 
   void invalidate() {
     final st = DateTime.now().millisecondsSinceEpoch;
-    _invalidators.forEach((invalidator) {
-      invalidator.invalidate();
-    });
-    print('Repository cache ${this.runtimeType} invalidates for: ${DateTime.now().millisecondsSinceEpoch - st}ms');
+    for (final invalidator in _invalidators) {
+      Future.microtask(() async {
+        try {
+          await invalidator.invalidate();
+          print(
+              'Repository cache ${invalidator.runtimeType} ${this.runtimeType} invalidates for: ${DateTime.now().millisecondsSinceEpoch - st}ms');
+        } catch (e, stack) {
+          print('Error during invalidation: $e\n$stack');
+        }
+      });
+    }
   }
 }

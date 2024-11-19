@@ -87,7 +87,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
   }
 
   @override
-  void invalidate() {
+  Future<void> invalidate() async {
     _getGCs();
     _getGCVs();
     _getPoses();
