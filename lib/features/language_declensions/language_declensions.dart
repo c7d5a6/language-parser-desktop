@@ -263,7 +263,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
     var used = _posesUsed.contains(id);
     var enabled = _posesEnabled.contains(id);
     return TButton(
-        text: (id == selected) ? "< ${elem.name} >" : elem.name,
+        text: (id == selected) ? "> ${elem.name} <" : elem.name,
         color: id == selected
             ? LPColor.primaryColor
             : !used
@@ -278,6 +278,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
                 : enabled
                     ? LPColor.whiteColor
                     : LPColor.redBrightColor,
+        background: id == selected ? LPColor.selectedBackgroundColor : null,
         onPressed: () => select(id));
   }
 

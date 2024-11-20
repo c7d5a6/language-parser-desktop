@@ -13,6 +13,7 @@ class LPColor {
   static const Color yellowColor = Color(0xffb7a036);
   static const Color yellowBrightColor = Color(0xfff6e44d);
   static const Color borderColor = Color(0xff424242);
+  static const Color selectedBackgroundColor = Color(0xff333333);
 
   static const Color backgroundColor = Color(0xff212121);
 }

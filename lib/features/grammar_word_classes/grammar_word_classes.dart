@@ -108,7 +108,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
     List<TableRow> rows = List.empty(growable: true);
-    final posLen = 2 + _poses.fold(5, (l, p) => p.name.length > l ? p.name.length : l);
+    final posLen = 5 + _poses.fold(5, (l, p) => p.name.length > l ? p.name.length : l);
     final buttons = _selected == null
         ? (creating
             ? Table(
@@ -170,7 +170,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
           );
     int i = 0;
     posButton(int i) => TButton(
-        text: _poses[i].name,
+        text: _poses[i].id == _selected ? "< ${_poses[i].name} >" : _poses[i].name,
         color: _poses[i].id == _selected ? LPColor.primaryColor : LPColor.greyColor,
         hover: LPColor.greyBrightColor,
         onPressed: () => _select(_poses[i].id));

@@ -167,8 +167,8 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
 
     List<TableRow> rows = List.empty(growable: true);
 
-    final gcLen = 2 + _gcs.fold(5, ((n, gc) => math.max(n, gc.name.length)));
-    final gcvLen = 2 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length)));
+    final gcLen = 5 + _gcs.fold(5, ((n, gc) => math.max(n, gc.name.length)));
+    final gcvLen = 5 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length)));
     final rowLength = math.max(math.max(_gcs.length, _gcvs.length) + 2, 2);
 
     for (int i = 0; i < rowLength; i++) {
@@ -437,8 +437,9 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
                   : Container();
 
   Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
-      text: list[i].name,
+      text: list[i].id == selected ? "> ${list[i].name} <" : list[i].name,
       color: list[i].id == selected ? LPColor.primaryColor : LPColor.greyColor,
+      background: list[i].id == selected ? LPColor.selectedBackgroundColor : null,
       hover: LPColor.greyBrightColor,
       onPressed: () => select(list[i].id));
 }

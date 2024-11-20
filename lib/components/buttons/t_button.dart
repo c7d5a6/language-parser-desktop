@@ -6,13 +6,16 @@ class TButton extends StatefulWidget {
   final void Function()? _onPressed;
   final Color? _color;
   final Color? _hover;
+  final Color? _background;
   final bool disabled;
 
-  const TButton({super.key, required text, onPressed, color = LPColor.primaryColor, hover, this.disabled = false})
+  const TButton(
+      {super.key, required text, onPressed, color = LPColor.primaryColor, hover, background, this.disabled = false})
       : _text = text,
         _onPressed = onPressed,
         _color = color,
-        _hover = hover == null ? color : hover;
+        _hover = hover == null ? color : hover,
+        _background = background == null ? Colors.transparent : background;
 
   @override
   State<StatefulWidget> createState() => _TButton();
@@ -39,6 +42,7 @@ class _TButton extends State<TButton> {
             onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(
                 foregroundColor: hover ? widget._hover : widget._color,
+                backgroundColor: widget._background,
                 minimumSize: Size.zero,
                 padding: EdgeInsets.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
