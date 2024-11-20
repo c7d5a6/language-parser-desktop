@@ -51,3 +51,5 @@ temp.sqlt3-wal
 docs/.vitepress/cache/
 
 node_modules/
+
+docs/.vitepress/dist/
