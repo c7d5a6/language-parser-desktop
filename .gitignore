@@ -47,3 +47,7 @@ temp.sqlt3
 temp.sqlt3-shm
 
 temp.sqlt3-wal
+
+docs/.vitepress/cache/
+
+node_modules/
