@@ -2,15 +2,6 @@
 
 ## Grammar
 
-### Classes
-
-- grey
-
-### Categories
-
-- white = has values
-- grey = no values
-
 ## Language
 
 ### Classes

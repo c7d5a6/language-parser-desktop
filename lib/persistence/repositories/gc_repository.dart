@@ -1,4 +1,5 @@
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
+import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
 
 class GrammaticalCategoryRepository extends Repository {
@@ -32,6 +33,17 @@ class GrammaticalCategoryRepository extends Repository {
   void delete(int id) {
     db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${GrammaticalCategory.table_name} WHERE id = ${id};', []);
     invalidate();
+  }
+
+  Set<int> getAllGCsIdWValues() {
+    final resultSet = db.select('''
+    SELECT ${GrammaticalCategory.table_name}.id AS gc_id
+    FROM ${GrammaticalCategory.table_name}
+    INNER JOIN ${GrammaticalCategoryValue.table_name} 
+      ON ${GrammaticalCategory.table_name}.id = ${GrammaticalCategoryValue.table_name}.category_id
+    GROUP BY ${GrammaticalCategory.table_name}.id 
+    ''', []);
+    return (resultSet).map((row) => row['gc_id'] as int).toSet();
   }
 }
 

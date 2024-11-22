@@ -9,14 +9,23 @@ export default defineConfig({
         // https://vitepress.dev/reference/default-theme-config
         nav: [
             {text: 'Home', link: '/'},
-            {text: 'Examples', link: '/markdown-examples'}
+            {text: 'Documentation', link: '/docs/'}
         ],
 
         sidebar: [
             {
                 text: 'Examples',
                 items: [
-                    {text: 'Markdown Examples', link: '/markdown-examples'},
+                    {
+                        text: 'Documentation', base: 'docs', items: [
+                            {
+                                text: 'Grammar', base: 'docs/grammar', items: [
+                                    {text: 'Word Classes', link: '/word-classes.md'},
+                                    {text: 'Grammatical Categories', link: '/grammatical-categories.md'}
+                                ]
+                            }
+                        ]
+                    },
                     {text: 'Runtime API Examples', link: '/api-examples'}
                 ]
             }

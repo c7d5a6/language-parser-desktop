@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class LPColor {
   static const Color primaryColor = Color(0xffaf7fa8);
   static const Color primaryBrightColor = Color(0xffE8B2E0);
+  static const Color primaryBrighterColor = Color(0xffEEC8EA);
   static const Color whiteColor = Color(0xffFFFFFF);
-  static const Color greyBrightColor = Color(0xffBDBDBD);
+  static const Color greyBrightColor = Color(0xffADADAD);
   static const Color greyColor = Color(0xff616161);
   static const Color greenBrightColor = Color(0xff8fd637);
   static const Color greenColor = Color(0xff568a21);

@@ -169,11 +169,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
             ],
           );
     int i = 0;
-    posButton(int i) => TButton(
-        text: _poses[i].id == _selected ? "< ${_poses[i].name} >" : _poses[i].name,
-        color: _poses[i].id == _selected ? LPColor.primaryColor : LPColor.greyColor,
-        hover: LPColor.greyBrightColor,
-        onPressed: () => _select(_poses[i].id));
+    posButton(int i) => selectBtn(i);
     rows.add(TableRow(children: [
       DBorder(data: '|'),
       if (_poses.length > i) posButton(i) else Container(),
@@ -289,5 +285,16 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
         ],
       ),
     ]);
+  }
+
+  TButton selectBtn(int i) {
+    var selected = _poses[i].id == _selected;
+    var text = _poses[i].name;
+    return TButton(
+        text: selected ? "> ${text} <" : text,
+        color: selected ? LPColor.primaryBrightColor : LPColor.greyBrightColor,
+        hover: selected ? LPColor.primaryBrighterColor : LPColor.whiteColor,
+        background: selected ? LPColor.selectedBackgroundColor : null,
+        onPressed: () => _select(_poses[i].id));
   }
 }

@@ -17,6 +17,7 @@ import '../../persistence/repositories/invalidators/invalidator.dart';
 import '../../service_provider.dart';
 import '../../services/service_manager.dart';
 import '../../text_measure_provider.dart';
+import '../language_phonetics/language_phonetics_header.dart';
 
 class GrammarGrammaticalCategories extends StatefulWidget {
   @override
@@ -29,6 +30,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
   late TextEditingController _gcvNameController = TextEditingController();
   late GCService _gcService;
   List<GrammaticalCategory> _gcs = [];
+  Set<int> _gcsWValues = {};
   List<GrammaticalCategoryValue> _gcvs = [];
   bool _gcUpdated = false;
   bool _gcvUpdated = false;
@@ -77,10 +79,13 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
 
   void _getGCs() {
     var list = _gcService.getAllGCs()..sort((p1, p2) => p1.name.compareTo(p2.name));
+    var wValues = _gcService.getAllGCsIdWValues();
     log('GCs $list');
+    log('GC WVAlues $wValues');
     setState(() {
       _gcs = list;
       _gcUpdated = false;
+      _gcsWValues = wValues;
     });
     _selectGC(_gcSelected);
   }
@@ -167,9 +172,40 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
 
     List<TableRow> rows = List.empty(growable: true);
 
-    final gcLen = 5 + _gcs.fold(5, ((n, gc) => math.max(n, gc.name.length)));
-    final gcvLen = 5 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length)));
-    final rowLength = math.max(math.max(_gcs.length, _gcvs.length) + 2, 2);
+    final gcLen = math.max(5 + _gcs.fold(5, ((n, gc) => math.max(n, gc.name.length))), "CATEGORIES".length + 2);
+    final gcvLen = math.max(5 + _gcvs.fold(5, ((n, gcv) => math.max(n, gcv.name.length))), "VALUES".length + 2);
+    final rowLength = math.max(math.max(_gcs.length, _gcvs.length) + 4, 4);
+
+    rows.add(TableRow(children: [
+      DBorder(data: '|'),
+      Center(child: LPhHeader(header: 'CATEGORIES')),
+      DBorder(data: '|'),
+      Container(),
+      Container(),
+      Container(),
+      DBorder(data: '|'),
+      Center(child: LPhHeader(header: 'VALUES')),
+      DBorder(data: '|'),
+      Container(),
+      Container(),
+      Container(),
+      DBorder(data: '|'),
+    ]));
+    rows.add(TableRow(children: [
+      DBorder(data: '|'),
+      HDash(),
+      DBorder(data: '|'),
+      HDash(),
+      DBorder(data: '+'),
+      HDash(),
+      DBorder(data: '|'),
+      HDash(),
+      DBorder(data: '|'),
+      HDash(),
+      DBorder(data: '+'),
+      HDash(),
+      DBorder(data: '|'),
+    ]));
 
     for (int i = 0; i < rowLength; i++) {
       rows.add(TableRow(children: [
@@ -422,7 +458,8 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
       : i == _gcs.length
           ? HDash()
           : (_gcs.length > i)
-              ? createValueBtn(i, _selectGC, _gcs, _gcSelected)
+              ? createValueBtn(() => _selectGC(_gcs[i].id), _gcs[i].id == _gcSelected, _gcsWValues.contains(_gcs[i].id),
+                  _gcs[i].name)
               : Container();
 
   Widget createGCVCell(int i) => _gcCreating
@@ -433,13 +470,23 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
           : (i == _gcvs.length)
               ? HDash()
               : (_gcvs.length > i)
-                  ? createValueBtn(i, _selectGCV, _gcvs, _gcvSelected)
+                  ? createValueBtn(() => _selectGCV(_gcvs[i].id), _gcvs[i].id == _gcvSelected, true, _gcvs[i].name)
                   : Container();
 
-  Widget createValueBtn(int i, void Function(int?) select, List<dynamic> list, int? selected) => TButton(
-      text: list[i].id == selected ? "> ${list[i].name} <" : list[i].name,
-      color: list[i].id == selected ? LPColor.primaryColor : LPColor.greyColor,
-      background: list[i].id == selected ? LPColor.selectedBackgroundColor : null,
-      hover: LPColor.greyBrightColor,
-      onPressed: () => select(list[i].id));
+  Widget createValueBtn(void Function() select, bool selected, bool used, String text) {
+    return TButton(
+        text: selected ? "> ${text} <" : text,
+        color: selected
+            ? LPColor.primaryBrightColor
+            : used
+                ? LPColor.greyBrightColor
+                : LPColor.greyColor,
+        hover: selected
+            ? LPColor.primaryBrighterColor
+            : used
+                ? LPColor.whiteColor
+                : LPColor.greyBrightColor,
+        background: selected ? LPColor.selectedBackgroundColor : null,
+        onPressed: select);
+  }
 }
