@@ -1,0 +1,1 @@
+import{_ as e,c as a,o as t}from"./chunks/framework.Btr2WmhD.js";const l=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"docs/languages/index.md","filePath":"docs/languages/index.md"}'),n={name:"docs/languages/index.md"};function s(o,c,r,d,i,p){return t(),a("div")}const m=e(n,[["render",s]]);export{l as __pageData,m as default};
