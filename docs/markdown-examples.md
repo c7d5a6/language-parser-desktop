@@ -4,11 +4,6 @@
 
 ## Language
 
-### Classes
-
-- white has words
-- grey = no words
-
 ### Categories
 
 Classes
