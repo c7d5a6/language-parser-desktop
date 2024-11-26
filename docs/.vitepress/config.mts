@@ -21,6 +21,7 @@ export default defineConfig({
                             {
                                 text: 'Languages', base: 'docs/languages', link: '/index', items: [
                                     {text: 'Word Classes', link: '/word-classes.md'},
+                                    {text: 'Grammatical Categories', link: '/grammatical-categories.md'}
                                 ]
                             },
                             {

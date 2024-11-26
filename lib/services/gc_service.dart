@@ -78,6 +78,10 @@ class GCService {
     return _posGCLangConnectionRepository.getConnectedGCsIdsByLangId(langId);
   }
 
+  Set<int> getGCsWithValuesEnabled(int langId) {
+    return _gcvLangConnectionRepository.getGCsWithValuesEnabled(langId);
+  }
+
   Set<int> getAllGCsIdWValues() {
     return _gcRepository.getAllGCsIdWValues();
   }

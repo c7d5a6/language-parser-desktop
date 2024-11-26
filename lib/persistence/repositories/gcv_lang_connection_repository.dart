@@ -16,6 +16,17 @@ class GCVLangConnectionRepository extends Repository {
     return (result).map((row) => row['gcv_id'] as int).toSet();
   }
 
+  Set<int> getGCsWithValuesEnabled(int langId) {
+    final result = db.select('''
+      SELECT category_id 
+      FROM ${GrammaticalCategoryValue.table_name}
+      JOIN ${GCVLangConnection.table_name} 
+        ON ${GCVLangConnection.table_name}.gcv_id = ${GrammaticalCategoryValue.table_name}.id 
+      WHERE lang_id = $langId 
+    ''');
+    return (result).map((row) => row['category_id'] as int).toSet();
+  }
+
   void save(int langId, int gcvId) {
     db.execute(
         'INSERT INTO ${GCVLangConnection.table_name} (lang_id, gcv_id) VALUES'
