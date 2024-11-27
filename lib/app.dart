@@ -44,9 +44,13 @@ class _App extends State<App> {
           mainAxisSize: MainAxisSize.min,
           children: [
             DBorder(data: ' - '),
-            TButton(text: '[LANGUAGES]', onPressed: () => setIndex(0)),
+            TButton(text: '[GRAMMAR]', onPressed: () => setIndex(0)),
             DBorder(data: ' - '),
-            TButton(text: '[GRAMMAR]', onPressed: () => setIndex(1)),
+            TButton(text: '[LANGUAGES]', onPressed: () => setIndex(1)),
+            DBorder(data: ' - '),
+            TButton(text: '[EVOLUTION]', onPressed: () => setIndex(2)),
+            DBorder(data: ' - '),
+            TButton(text: '[WORDS]', onPressed: () => setIndex(3)),
             DBorder(data: ' - '),
             // TextButton(onPressed: widget.onNewFile, child: const Text('[ NEW ]')),
             // TextButton(onPressed: widget.onOpenFile, child: const Text('[ LOAD ]')),
@@ -64,7 +68,7 @@ class _App extends State<App> {
               child: SelectionArea(
                   child: IndexedStack(
                 index: _tabIndex,
-                children: [Languages(), Grammar()],
+                children: [Grammar(), Languages()],
               ))),
         ],
       ))),
