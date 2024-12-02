@@ -3,6 +3,7 @@ import 'package:language_parser_desktop/components/tabs/tabs.dart';
 import 'package:language_parser_desktop/features/language_declensions/language_declensions.dart';
 import 'package:language_parser_desktop/features/language_description/language_description.dart';
 import 'package:language_parser_desktop/features/language_grammatical_categories/language_grammatical_categories.dart';
+import 'package:language_parser_desktop/features/language_orthography/language_orthography.dart';
 import 'package:language_parser_desktop/features/language_phonetics/language_phonetics.dart';
 import 'package:language_parser_desktop/features/language_word_classes/language_word_classes.dart';
 
@@ -26,7 +27,7 @@ class LanguageContentTabs extends StatelessWidget {
                 shortTabName: 'm/n/f',
                 content: LanguageGrammaticalCategories(languageId!)),
             TabContent(tabName: 'Declensions', shortTabName: '-us/ūs', content: LanguageDeclensions(languageId!)),
-            TabContent(tabName: 'Orthography', shortTabName: 'abc', content: Text('Orthography')),
+            TabContent(tabName: 'Orthography', shortTabName: 'abc', content: LanguageOrthography(languageId!)),
           ];
     return Tabs(tabsInfo: tabsInfo, langPrefix: true);
   }
