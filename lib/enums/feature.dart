@@ -74,7 +74,48 @@ enum Feature {
   long,
   nasal,
   stress,
+  //
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////// PLACE FEATURES FOR CONSONANTS  ////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
+  // ////////////// Major articulator features ///////////////////
+  //
+  labial,
+  coronal,
+  dorsal,
+  //
+  // ////////////// Features for classifying the coronals ///////////////////
+  //
+  anterior,
+  distributed,
+  strident,
+  lateral,
+  //
+  // ////////////// Features used for classifying the labials ///////////////////
+  //
+  // round,
+  labiodental,
+  //
+  // ////////////// Features used for classifying the dorsals ///////////////////
+  //
+  // high,
+  // low,
+  // front,
+  // back,
+  //
+  // ////////////// Secondary articulations ///////////////////
+  //
+  // palatalization (IPA [ʲ]):    add [+dorsal, +high, −low, +front, −back]
+  // velarization (IPA [ˠ]):      add [+dorsal, +high, −low, −front, +back]
+  // pharyngealization (IPA [ˤ]): add [+dorsal, −high, +low, −front, +back]
+  // labialization (IPA [ʷ]):     add [+labial, +round]
+
   ;
 
   int get hash => 1 << this.index;
+}
+
+enum Notation {
+  place,
 }

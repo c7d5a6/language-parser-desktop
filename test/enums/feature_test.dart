@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 void main() {
   test('Less than 64 features', () {
     var size = Feature.values.length;
+    print("THERE ARE $size FEATURES TOTAL");
     expect(size < 64, true);
   });
 

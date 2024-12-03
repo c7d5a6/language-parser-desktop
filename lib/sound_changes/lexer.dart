@@ -1,53 +1,12 @@
-/// Here is the list of trimmed characters according to Unicode version 6.3:
-/// ```plaintext
-///     0009..000D    ; White_Space # Cc   <control-0009>..<control-000D>
-///     0020          ; White_Space # Zs   SPACE
-///     0085          ; White_Space # Cc   <control-0085>
-///     00A0          ; White_Space # Zs   NO-BREAK SPACE
-///     1680          ; White_Space # Zs   OGHAM SPACE MARK
-///     2000..200A    ; White_Space # Zs   EN QUAD..HAIR SPACE
-///     2028          ; White_Space # Zl   LINE SEPARATOR
-///     2029          ; White_Space # Zp   PARAGRAPH SEPARATOR
-///     202F          ; White_Space # Zs   NARROW NO-BREAK SPACE
-///     205F          ; White_Space # Zs   MEDIUM MATHEMATICAL SPACE
-///     3000          ; White_Space # Zs   IDEOGRAPHIC SPACE
-///
-///     FEFF          ; BOM                ZERO WIDTH NO_BREAK SPACE
-/// ```
-const whitespaces = [
-  0x0009,
-  0x000A,
-  0x000B,
-  0x000C,
-  0x000D,
-  0x0020,
-  0x0085,
-  0x00A0,
-  0x1680,
-  0x2000,
-  0x2001,
-  0x2002,
-  0x2003,
-  0x2004,
-  0x2005,
-  0x2006,
-  0x2007,
-  0x2008,
-  0x2009,
-  0x200A,
-  0x2028,
-  0x2029,
-  0x202F,
-  0x205F,
-  0x3000,
-  0xFEFF,
-];
+import 'lexer_utils.dart';
 
-class Lexer {
+abstract class Lexer<T, TType> {
   String _source;
   String _curChar;
   int _curPos;
   int _startPos;
+
+  get curChar => _curChar;
 
   Lexer(String source)
       : _source = "$source\0",
@@ -55,7 +14,7 @@ class Lexer {
         _startPos = -1,
         _curPos = -1 {}
 
-  void nextChar() {
+  void goNextChar() {
     _startPos += 1;
     _curPos = _startPos;
     if (_startPos >= _source.length) {
@@ -65,7 +24,7 @@ class Lexer {
     }
   }
 
-  String peekNext() {
+  String peekNextChar() {
     if (_curPos + 1 >= _source.length) return '\0';
     return _source[_curPos + 1];
   }
@@ -74,56 +33,26 @@ class Lexer {
     throw new Exception(message);
   }
 
-  void skipWhitespace() {}
+  T getToken();
 
-  bool isWhitespace(String s) {
-    return s.codeUnits.fold(true, (prev, code) => prev && whitespaces.contains(code));
-  }
-
-  Token getToken() {
-    nextChar();
-    if (isWhitespace(_curChar)) {
-      return _getWhitespaceToken();
-    }
-    if (_curChar == '\0') {
-      return _getToken(TokenType.End);
-    }
-    return _getToken(TokenType.Phoneme);
-  }
-
-  Token _getWhitespaceToken() {
-    while (isWhitespace(peekNext())) {
+  T getWhitespaceToken() {
+    while (isWhitespace(peekNextChar())) {
       _curPos++;
     }
-    return _getToken(TokenType.Whitespace);
+    return getTokenByType(getWhitespaceType());
   }
 
-  Token _getToken(TokenType type) {
-    return _getTokenWithLiteral(type, null);
+  T getTokenByType(TType type) {
+    return getTokenWithLiteral(type, null);
   }
 
-  Token _getTokenWithLiteral(TokenType type, Object? literal) {
+  T getTokenWithLiteral(TType type, Object? literal) {
     String text = _source.substring(_startPos, _curPos + 1);
     _startPos = _curPos;
-    return Token(type, text, literal);
+    return newToken(type, text, literal);
   }
-}
 
-class Token {
-  TokenType type;
-  String text;
-  Object? literal;
+  TType getWhitespaceType();
 
-  Token(this.type, this.text, this.literal);
-
-  @override
-  String toString() {
-    return 'Token{type: $type, text: $text, literal: $literal}';
-  }
-}
-
-enum TokenType {
-  End,
-  Phoneme,
-  Whitespace,
+  T newToken(TType type, String text, Object? literal);
 }

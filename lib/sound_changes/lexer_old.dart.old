@@ -1,0 +1,83 @@
+import 'lexer_utils.dart';
+
+class Lexer {
+  String _source;
+  String _curChar;
+  int _curPos;
+  int _startPos;
+
+
+  Lexer(String source)
+      : _source = "$source\0",
+        _curChar = "",
+        _startPos = -1,
+        _curPos = -1 {}
+
+  void nextChar() {
+    _startPos += 1;
+    _curPos = _startPos;
+    if (_startPos >= _source.length) {
+      _curChar = '\0';
+    } else {
+      _curChar = _source[_startPos];
+    }
+  }
+
+  String peekNext() {
+    if (_curPos + 1 >= _source.length) return '\0';
+    return _source[_curPos + 1];
+  }
+
+  void abort(message) {
+    throw new Exception(message);
+  }
+
+  void skipWhitespace() {}
+
+  Token getToken() {
+    nextChar();
+    if (isWhitespace(_curChar)) {
+      return _getWhitespaceToken();
+    }
+    if (_curChar == '\0') {
+      return _getToken(TokenType.End);
+    }
+    return _getToken(TokenType.Phoneme);
+  }
+
+  Token _getWhitespaceToken() {
+    while (isWhitespace(peekNext())) {
+      _curPos++;
+    }
+    return _getToken(TokenType.Whitespace);
+  }
+
+  Token _getToken(TokenType type) {
+    return _getTokenWithLiteral(type, null);
+  }
+
+  Token _getTokenWithLiteral(TokenType type, Object? literal) {
+    String text = _source.substring(_startPos, _curPos + 1);
+    _startPos = _curPos;
+    return Token(type, text, literal);
+  }
+}
+
+class Token {
+  TokenType type;
+  String text;
+  Object? literal;
+
+  Token(this.type, this.text, this.literal);
+
+  @override
+  String toString() {
+    return 'Token{type: $type, text: $text, literal: $literal}';
+  }
+}
+
+enum TokenType {
+  End,
+  Phoneme,
+  Whitespace,
+}
