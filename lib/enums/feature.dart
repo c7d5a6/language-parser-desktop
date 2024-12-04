@@ -15,7 +15,7 @@ enum Feature {
   // +--------------------------------+--------+-------------+
   // |               [+sonorant]               | [−sonorant] |
   // +-----------------------------------------+-------------+
-  syllabic,
+  syllabic, // syllabic ˌ • ◌̩ // non syllabic ◌͏̯
   consonantal,
   approximant,
   sonorant,
@@ -104,13 +104,6 @@ enum Feature {
   // front,
   // back,
   //
-  // ////////////// Secondary articulations ///////////////////
-  //
-  // palatalization (IPA [ʲ]):    add [+dorsal, +high, −low, +front, −back]
-  // velarization (IPA [ˠ]):      add [+dorsal, +high, −low, −front, +back]
-  // pharyngealization (IPA [ˤ]): add [+dorsal, −high, +low, −front, +back]
-  // labialization (IPA [ʷ]):     add [+labial, +round]
-
   ;
 
   int get hash => 1 << this.index;
