@@ -5,7 +5,7 @@ import { defineUserConfig } from "vuepress";
 import theme from "./theme.js";
 
 export default defineUserConfig({
-  base: "/",
+  base: '/language-parser-desktop/',
 
   lang: "en-US",
   title: "PHDocs",
