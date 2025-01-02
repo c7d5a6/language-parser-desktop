@@ -1,0 +1,1 @@
+export const sidebarData = {"/docs/":["index",{"text":"Grammar","prefix":"grammar/","collapsible":true,"children":["index","grammatical-categories","word-classes"]},{"text":"Languages","prefix":"languages/","collapsible":true,"children":["index","grammatical-categories","word-classes"]}]};

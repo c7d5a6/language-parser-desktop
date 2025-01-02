@@ -1,6 +1,6 @@
 ---
 # https://vitepress.dev/reference/default-theme-home-page
-layout: home
+# layout: home
 
 hero:
   name: "Language Parser"
