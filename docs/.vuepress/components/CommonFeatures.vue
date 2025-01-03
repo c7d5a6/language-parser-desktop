@@ -20,9 +20,13 @@ const contain = (f, req) => {
 const update = () => {
     const requestOptions = {
         method: 'POST',
-        body: smb.value,
+        body: smb.value, mode: 'cors',
+        headers: {
+            "Content-Type": "text/plain",
+            "Accept": "*/*",
+        },
     };
-    fetch("http://localhost:3003/api/features/common", requestOptions)
+    fetch("https://api-ph.foundry.owlbeardm.com/api/features/common", requestOptions)
         .then(response => response.json(), err => out.value = "")
         .then(data => {
             const res = data
