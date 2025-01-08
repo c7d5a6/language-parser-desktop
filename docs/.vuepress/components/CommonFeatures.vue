@@ -1,7 +1,10 @@
 <template>
-    <input :style="{ margin: ['10px'] }" type="text" :id="symbols" v-model="smb" @update:model-value="update('onback', picked)" />
-    <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }">
-        <div :style="{ margin: ['10px'] }">
+    <div class="f-mar">
+        <input :style="{ margin: ['10px'] }" type="text" :id="symbols" v-model="smb"
+            @update:model-value="update('onback', picked)" />
+    </div>
+    <div class="f-cont">
+    <div class="f-mar">
             <h4>Common Features</h4>
             <h6>Manner features</h6>
             <div v-for="f in out.common.manner" :key="f">{{ f }}</div>
@@ -12,7 +15,7 @@
             <h6>Other features</h6>
             <div v-for="f in out.common.other" :key="f">{{ f }}</div>
         </div>
-        <div :style="{ margin: ['10px'] }">
+    <div class="f-mar">
             <h4>Distinctive Features</h4>
             <h6>Manner features</h6>
             <div v-for="f in out.distinctive.manner" :key="f">{{ f }}</div>
@@ -84,3 +87,12 @@ const update = () => {
         });
 }
 </script>
+<style>
+.f-cont {
+    display: flex;
+}
+
+.f-mar {
+    margin: 10px;
+}
+</style>
