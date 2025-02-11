@@ -4,29 +4,74 @@
             @update:model-value="update('onback', picked)" />
     </div>
     <div class="f-cont">
-    <div class="f-mar">
-            <h4>Common Features</h4>
-            <h6>Manner features</h6>
-            <div v-for="f in out.common.manner" :key="f">{{ f }}</div>
-            <h6>Laryngeal features</h6>
-            <div v-for="f in out.common.lar" :key="f">{{ f }}</div>
-            <h6>Place features</h6>
-            <div v-for="f in out.common.place" :key="f">{{ f }}</div>
-            <h6>Other features</h6>
-            <div v-for="f in out.common.other" :key="f">{{ f }}</div>
-        </div>
-    <div class="f-mar">
-            <h4>Distinctive Features</h4>
-            <h6>Manner features</h6>
-            <div v-for="f in out.distinctive.manner" :key="f">{{ f }}</div>
-            <h6>Laryngeal features</h6>
-            <div v-for="f in out.distinctive.lar" :key="f">{{ f }}</div>
-            <h6>Place features</h6>
-            <div v-for="f in out.distinctive.place" :key="f">{{ f }}</div>
-            <h6>Other features</h6>
-            <div v-for="f in out.distinctive.other" :key="f">{{ f }}</div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        <h4>Common Features</h4>
+                    </th>
+                    <th>
+                        <h4>Distinctive Features</h4>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <b>Manner features</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div v-for="f in out.common.manner" :key="f">{{ f }}</div>
+                    </td>
+                    <td>
+                        <div v-for="f in out.distinctive.manner" :key="f">{{ f }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Laryngeal features</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div v-for="f in out.common.lar" :key="f">{{ f }}</div>
+                    </td>
+                    <td>
+                        <div v-for="f in out.distinctive.lar" :key="f">{{ f }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Place features</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div v-for="f in out.common.place" :key="f">{{ f }}</div>
+                    </td>
+                    <td>
+                        <div v-for="f in out.distinctive.place" :key="f">{{ f }}</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <b>Other features</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div v-for="f in out.common.other" :key="f">{{ f }}</div>
+                    </td>
+                    <td>
+                        <div v-for="f in out.distinctive.other" :key="f">{{ f }}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+    <Version />
 </template>
 
 <script setup async>
@@ -42,6 +87,10 @@ const contain = (f, req) => {
     return req.find(pf => f.includes(pf)) !== undefined;
 }
 const update = () => {
+    if (!smb.value) {
+        out.value = { common: { manner: [], lar: [], place: [], other: [] }, distinctive: { manner: [], lar: [], place: [], other: [] } };
+        return;
+    }
     const requestOptions = {
         method: 'POST',
         body: smb.value, mode: 'cors',
@@ -90,6 +139,7 @@ const update = () => {
 <style>
 .f-cont {
     display: flex;
+    margin-bottom: 20px;
 }
 
 .f-mar {
