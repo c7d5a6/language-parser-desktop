@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/features/grammar/grammar.dart';
+import 'package:language_parser_desktop/features/temp_sound_whatata/words_list.dart';
+import 'package:language_parser_desktop/features/word/words_list.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
@@ -57,21 +59,32 @@ class _App extends State<App> {
           ],
         ),
       ),
-      bottomNavigationBar:
-          PreferredSize(preferredSize: Size(size.width, cHeight * 2), child: const Text(' f o o t e r ')),
+      bottomNavigationBar: PreferredSize(
+        preferredSize: Size(size.width, cHeight * 2),
+        child: const Text(' f o o t e r '),
+      ),
       body: SingleChildScrollView(
-          child: Center(
-              child: Column(
-        children: [
-          Padding(
-              padding: EdgeInsets.all(16.0 + paddingDelta),
-              child: SelectionArea(
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16.0 + paddingDelta),
+                child: SelectionArea(
                   child: IndexedStack(
-                index: _tabIndex,
-                children: [Grammar(), Languages()],
-              ))),
-        ],
-      ))),
+                    index: _tabIndex,
+                    children: [
+                      Grammar(),
+                      Languages(),
+                      TempSoundChhh(),
+                      TableExample(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
