@@ -1,6 +1,8 @@
 <template>
     <div class="f-mar">
-        <input :style="{ margin: ['10px'] }" type="text" :id="symbols" v-model="smb"
+        <label class="demo-label" for="symbols-input">Symbols</label>
+        <input class="demo-input" :style="{ margin: ['10px'] }" type="text" id="symbols-input" v-model="smb"
+            placeholder="p b t d"
             @update:model-value="update('onback', picked)" />
     </div>
     <div class="f-cont">
@@ -144,5 +146,9 @@ const update = () => {
 
 .f-mar {
     margin: 10px;
+}
+
+.f-mar .demo-label {
+    margin-left: 10px;
 }
 </style>
