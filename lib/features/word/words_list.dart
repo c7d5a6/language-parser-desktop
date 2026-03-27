@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/components/tabs/tabs.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/services/word_service.dart';
 
@@ -25,14 +26,14 @@ class XDash extends StatelessWidget {
   }
 }
 
-class TableExample extends StatefulWidget {
-  const TableExample({super.key});
+class WordsList extends StatefulWidget {
+  const WordsList({super.key});
 
   @override
-  State<TableExample> createState() => _TableExample();
+  State<WordsList> createState() => _WordsListState();
 }
 
-class _TableExample extends State<TableExample> {
+class _WordsListState extends State<WordsList> {
   List<wrd> _words = [];
   ServiceManager? serviceManager;
   late WordService _wordService;
@@ -159,6 +160,42 @@ class _TableExample extends State<TableExample> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class Words extends StatelessWidget {
+  const Words({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          width: constraints.maxWidth,
+          constraints: const BoxConstraints(
+            minWidth: 1,
+            maxWidth: 3000,
+          ),
+          height: 1000,
+          child: Tabs(
+            tabsInfo: [
+              TabContent(
+                tabName: 'Add New',
+                shortTabName: 'Add New',
+                content: const Center(
+                  child: Text('Add new word (TODO)'),
+                ),
+              ),
+              TabContent(
+                tabName: 'List',
+                shortTabName: 'List',
+                content: const WordsList(),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

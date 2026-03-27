@@ -76,7 +76,7 @@ class _App extends State<App> {
                       Grammar(),
                       Languages(),
                       TempSoundChhh(),
-                      TableExample(),
+                      const Words(),
                     ],
                   ),
                 ),
