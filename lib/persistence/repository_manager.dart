@@ -1,4 +1,7 @@
 import 'package:language_parser_desktop/persistence/repositories/declension_category_pos_lang_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_gc_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_sound_change_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gc_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_lang_connection_repository.dart';
@@ -16,27 +19,36 @@ import 'package:sqlite3/sqlite3.dart';
 class RepositoryManager {
   Database? _database;
 
+  T _createRepository<T>(T Function(Database db) factory) {
+    return factory(_database!);
+  }
+
   void openDatabase(String filePath) {
     dispose();
     var db = sqlite3.open(filePath);
     migrate(db);
     _database = db;
     db.execute('PRAGMA foreign_keys = ON;');
-    _declensionCategoryPosLangConnectionRepository = DeclensionCategoryPosLangConnectionRepository(_database!);
-    _declensionRepository = DeclensionRepository(_database!);
-    _grammaticalCategoryRepository = GrammaticalCategoryRepository(_database!);
-    _grammaticalCategoryValueRepository = GrammaticalCategoryValueRepository(_database!);
-    _gcvLangConnectionRepository = GCVLangConnectionRepository(_database!);
-    _languageRepository = LanguageRepository(_database!);
-    _posRepository = PosRepository(_database!);
-    _posLangConnectionRepository = PosLangConnectionRepository(_database!);
-    _posGCLangConnectionRepository = PosGCLangConnectionRepository(_database!);
-    _languagePhonemeRepository = LanguagePhonemeRepository(_database!);
-    _wordRepository = WordRepository(_database!);
+    _declensionCategoryPosLangConnectionRepository = _createRepository(
+      DeclensionCategoryPosLangConnectionRepository.new,
+    );
+    _declensionRuleRepository = _createRepository(DeclensionRuleRepository.new);
+    _declensionRuleGCConnectionRepository = _createRepository(DeclensionRuleGCConnectionRepository.new);
+    _declensionRuleSoundChangeRepository = _createRepository(DeclensionRuleSoundChangeRepository.new);
+    _declensionRepository = _createRepository(DeclensionRepository.new);
+    _grammaticalCategoryRepository = _createRepository(GrammaticalCategoryRepository.new);
+    _grammaticalCategoryValueRepository = _createRepository(GrammaticalCategoryValueRepository.new);
+    _gcvLangConnectionRepository = _createRepository(GCVLangConnectionRepository.new);
+    _languageRepository = _createRepository(LanguageRepository.new);
+    _posRepository = _createRepository(PosRepository.new);
+    _posLangConnectionRepository = _createRepository(PosLangConnectionRepository.new);
+    _posGCLangConnectionRepository = _createRepository(PosGCLangConnectionRepository.new);
+    _languagePhonemeRepository = _createRepository(LanguagePhonemeRepository.new);
+    _wordRepository = _createRepository(WordRepository.new);
   }
 
   void dispose() {
-    if (_database != null) _database!.dispose();
+    if (_database != null) _database!.close();
     _database = null;
   }
 
@@ -70,6 +82,54 @@ class RepositoryManager {
   DeclensionCategoryPosLangConnectionRepository get declensionCategoryPosLangConnectionRepository {
     assert(_database != null);
     return _declensionCategoryPosLangConnectionRepository;
+  }
+
+  //
+  late DeclensionRuleRepository _declensionRuleRepository;
+
+  void addDeclensionRuleInvalidator(Invalidator invalidator) {
+    _declensionRuleRepository.addInvalidator(invalidator);
+  }
+
+  void removeDeclensionRuleInvalidator(Invalidator invalidator) {
+    _declensionRuleRepository.removeInvalidator(invalidator);
+  }
+
+  DeclensionRuleRepository get declensionRuleRepository {
+    assert(_database != null);
+    return _declensionRuleRepository;
+  }
+
+  //
+  late DeclensionRuleGCConnectionRepository _declensionRuleGCConnectionRepository;
+
+  void addDeclensionRuleGCConnectionInvalidator(Invalidator invalidator) {
+    _declensionRuleGCConnectionRepository.addInvalidator(invalidator);
+  }
+
+  void removeDeclensionRuleGCConnectionInvalidator(Invalidator invalidator) {
+    _declensionRuleGCConnectionRepository.removeInvalidator(invalidator);
+  }
+
+  DeclensionRuleGCConnectionRepository get declensionRuleGCConnectionRepository {
+    assert(_database != null);
+    return _declensionRuleGCConnectionRepository;
+  }
+
+  //
+  late DeclensionRuleSoundChangeRepository _declensionRuleSoundChangeRepository;
+
+  void addDeclensionRuleSoundChangeInvalidator(Invalidator invalidator) {
+    _declensionRuleSoundChangeRepository.addInvalidator(invalidator);
+  }
+
+  void removeDeclensionRuleSoundChangeInvalidator(Invalidator invalidator) {
+    _declensionRuleSoundChangeRepository.removeInvalidator(invalidator);
+  }
+
+  DeclensionRuleSoundChangeRepository get declensionRuleSoundChangeRepository {
+    assert(_database != null);
+    return _declensionRuleSoundChangeRepository;
   }
 
   //

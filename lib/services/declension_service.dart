@@ -1,8 +1,12 @@
 import 'dart:core';
 
 import 'package:flutter/foundation.dart';
+import 'package:language_parser_desktop/persistence/entities/declension_rule_entity.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_category_pos_lang_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_gc_connection_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_repository.dart';
+import 'package:language_parser_desktop/persistence/repositories/declension_rule_sound_change_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_repository.dart';
 
@@ -11,11 +15,17 @@ import '../persistence/entities/declension.dart';
 class DeclensionService {
   final DeclensionCategoryPosLangConnectionRepository _declensionCategoryPosLangConnectionRepository;
   final DeclensionRepository _declensionRepository;
+  final DeclensionRuleRepository _declensionRuleRepository;
+  final DeclensionRuleGCConnectionRepository _declensionRuleGCConnectionRepository;
+  final DeclensionRuleSoundChangeRepository _declensionRuleSoundChangeRepository;
   final GrammaticalCategoryValueRepository _grammaticalCategoryValueRepository;
 
   DeclensionService(
     this._declensionCategoryPosLangConnectionRepository,
     this._declensionRepository,
+    this._declensionRuleRepository,
+    this._declensionRuleGCConnectionRepository,
+    this._declensionRuleSoundChangeRepository,
     this._grammaticalCategoryValueRepository,
   );
 
@@ -45,6 +55,22 @@ class DeclensionService {
 
   void setMainDeclension(int langId, int posId, int declensionId) {
     _declensionRepository.setMainByLangPos(langId, posId, declensionId);
+  }
+
+  List<DeclensionRule> getRulesByDeclensionId(int declensionId) {
+    return _declensionRuleRepository.getByDeclensionId(declensionId);
+  }
+
+  DeclensionRule saveRule(int declensionId, String name, String? wordPattern) {
+    return _declensionRuleRepository.save(declensionId, name, wordPattern);
+  }
+
+  void saveRuleGCConnection(int declensionRuleId, int gcId) {
+    _declensionRuleGCConnectionRepository.save(declensionRuleId, gcId);
+  }
+
+  void saveRuleSoundChange(int declensionRuleId, String change) {
+    _declensionRuleSoundChangeRepository.save(declensionRuleId, change);
   }
 
   List<DeclensionRow> getDeclensions(int languageId, int posId) {
