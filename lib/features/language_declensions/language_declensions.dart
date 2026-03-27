@@ -206,7 +206,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         5: FlexColumnWidth(2),
         6: FixedColumnWidth(cWidth),
       }, children: rows),
-      if (declension != null) LanguageDeclension(widget.languageId, declension)
+      if (declension != null && _posSelected != null) LanguageDeclension(widget.languageId, _posSelected!, declension)
     ]);
   }
 
@@ -290,7 +290,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
             ? HDash()
             : (_declensions.length > i - 2)
                 // ? Row(children: declension!.map((d) => Text("${d.name} ")).toList())
-                ? Row(children: [declensionEnableButton(declension!), declensionButton(declension!)])
+                ? Row(children: [declensionEnableButton(declension as DeclensionRow), declensionButton(declension)])
                 : Container();
   }
 

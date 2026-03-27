@@ -59,4 +59,21 @@ class DeclensionRepository extends Repository {
     db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${Declension.table_name} WHERE id = ${id};', []);
     invalidate();
   }
+
+  void setMainByLangPos(int langId, int posId, int declensionId) {
+    db.execute('BEGIN TRANSACTION;');
+    try {
+      db.execute(
+          'UPDATE ${Declension.table_name} SET main = 0 WHERE lang_id = ? AND pos_id = ?;',
+          [langId, posId]);
+      db.execute(
+          'UPDATE ${Declension.table_name} SET main = 1 WHERE id = ? AND lang_id = ? AND pos_id = ?;',
+          [declensionId, langId, posId]);
+      db.execute('COMMIT;');
+    } catch (e) {
+      db.execute('ROLLBACK;');
+      rethrow;
+    }
+    invalidate();
+  }
 }

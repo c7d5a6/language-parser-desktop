@@ -43,6 +43,10 @@ class DeclensionService {
     _declensionRepository.delete(id);
   }
 
+  void setMainDeclension(int langId, int posId, int declensionId) {
+    _declensionRepository.setMainByLangPos(langId, posId, declensionId);
+  }
+
   List<DeclensionRow> getDeclensions(int languageId, int posId) {
     var gcIds = getGCsIdsByLangIdAndPosId(languageId, posId);
     Map<int, List<GrammaticalCategoryValue>> values = Map.fromIterable(gcIds,
