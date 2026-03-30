@@ -4,7 +4,7 @@ import 'package:language_parser_desktop/persistence/repositories/repository.dart
 class DeclensionRuleGCConnectionRepository extends Repository {
   DeclensionRuleGCConnectionRepository(super.db);
 
-  Set<int> getGCIdsByDeclensionRuleId(int declensionRuleId) {
+  Set<int> getGCVIdsByDeclensionRuleId(int declensionRuleId) {
     final result = db.select(
       'SELECT gcv_id FROM ${DeclensionRuleGCVConnection.table_name} WHERE declension_rule_id = $declensionRuleId',
     );
@@ -19,10 +19,10 @@ class DeclensionRuleGCConnectionRepository extends Repository {
     invalidate();
   }
 
-  void delete(int declensionRuleId, int gcId) {
+  void delete(int declensionRuleId, int gcvId) {
     db.execute(
       'PRAGMA foreign_keys = ON; DELETE FROM ${DeclensionRuleGCVConnection.table_name} '
-      'WHERE declension_rule_id = $declensionRuleId AND gc_id = $gcId;',
+      'WHERE declension_rule_id = $declensionRuleId AND gcv_id = $gcvId;',
       [],
     );
     invalidate();

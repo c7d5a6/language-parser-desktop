@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/persistence/entities/declension_rule_entity.dart';
@@ -15,6 +16,7 @@ class RulesList extends StatelessWidget {
   final maxRowsCount;
   final VoidCallback onSetMainDeclension;
   final ValueChanged<int?> onRuleSelected;
+  final ValueChanged<DeclensionRule> onRuleEnabledToggle;
   final ValueChanged<bool> onAddNewRuleModeChanged;
 
   const RulesList({
@@ -25,6 +27,7 @@ class RulesList extends StatelessWidget {
     required this.maxRowsCount,
     required this.onSetMainDeclension,
     required this.onRuleSelected,
+    required this.onRuleEnabledToggle,
     required this.onAddNewRuleModeChanged,
   });
 
@@ -65,11 +68,25 @@ class RulesList extends StatelessWidget {
       final rule = rules[rowIndex - rulesStartIndex];
       final selected = rule.id == selectedRuleId;
       return Center(
-        child: TButton(
-          text: selected ? '< ${rule.name} >' : rule.name,
-          color: selected ? LPColor.primaryColor : LPColor.greyColor,
-          hover: selected ? LPColor.primaryBrightColor : LPColor.greyBrightColor,
-          onPressed: () => onRuleSelected(rule.id),
+        child: Row(
+          children: [
+            const DBorder(data: '['),
+            TButton(
+              text: rule.enabled ? 'o' : 'x',
+              color: rule.enabled ? LPColor.greenColor : LPColor.greyColor,
+              hover: rule.enabled ? LPColor.greenBrightColor : LPColor.greyBrightColor,
+              onPressed: () => onRuleEnabledToggle(rule),
+            ),
+            const DBorder(data: '] '),
+            Expanded(
+              child: TButton(
+                text: selected ? '< ${rule.name} >' : rule.name,
+                color: selected ? LPColor.primaryColor : LPColor.greyColor,
+                hover: selected ? LPColor.primaryBrightColor : LPColor.greyBrightColor,
+                onPressed: () => onRuleSelected(rule.id),
+              ),
+            ),
+          ],
         ),
       );
     }

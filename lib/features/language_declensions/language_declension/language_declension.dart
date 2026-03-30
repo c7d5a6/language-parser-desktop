@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
@@ -36,6 +37,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   final TextEditingController _ruleWordPatternController = TextEditingController();
   final TextEditingController _ruleBodyController = TextEditingController();
   bool _createRuleMode = false;
+  bool _ruleConnectionsEditMode = false;
 
   @override
   void didChangeDependencies() {
@@ -123,11 +125,11 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
             children: [
               TableRow(
                 children: [
-                  VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
+                  VTableDashes(rowLength: _rules.length + RulesList.ADDITIONAL_ROWS + 1, endOnCross: true),
                   _buildLeftSection(cWidth),
                   VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
                   _buildRightSection(cWidth),
-                  VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
+                  VTableDashes(rowLength: RuleDetailsColumn.ROW_COUNT + 1, endOnCross: true),
                 ],
               ),
             ],
@@ -154,6 +156,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
         isMainDeclension: widget.declension.main,
         onSetMainDeclension: _setMainDeclension,
         onRuleSelected: _selectRule,
+        onRuleEnabledToggle: _toggleRuleEnabled,
         onAddNewRuleModeChanged: (isActive) {
           if (isActive) {
             _startRuleCreation();
@@ -165,6 +168,15 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
 
   Widget _buildRightSection(double cWidth) {
     return RuleDetailsColumn(
+      languageId: widget.languageId,
+      posId: widget.posId,
+      isConnectionsEditMode: _ruleConnectionsEditMode,
+      onConnectionsEditRequested: () {
+        setState(() {
+          _ruleConnectionsEditMode = true;
+        });
+      },
+      selectedDeclensionGcIds: widget.declension.values.map((v) => v.gc.id).toSet(),
       ruleName: _selectedRule()?.name ?? '',
       selectedRule: _selectedRule(),
       nameController: _ruleNameController,
@@ -203,6 +215,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     if (_selectedRuleId != ruleId) {
       setState(() {
         _selectedRuleId = ruleId;
+        _ruleConnectionsEditMode = false;
         _syncSelectedRuleControllers();
       });
     }
@@ -212,6 +225,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     setState(() {
       _createRuleMode = true;
       _selectedRuleId = null;
+      _ruleConnectionsEditMode = false;
       _ruleNameController.clear();
       _ruleWordPatternController.clear();
       _ruleBodyController.clear();
@@ -221,6 +235,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   void _cancelRuleCreation() {
     setState(() {
       _createRuleMode = false;
+      _ruleConnectionsEditMode = false;
       _ruleNameController.clear();
       _ruleWordPatternController.clear();
       _ruleBodyController.clear();
@@ -276,16 +291,24 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
       return;
     }
     _declensionService.updateRule(selectedRule.id, newName, newPattern, selectedRule.enabled);
+    _ruleConnectionsEditMode = false;
     _reloadRules();
     setState(() {});
   }
 
   void _cancelSelectedRuleChanges() {
+    _ruleConnectionsEditMode = false;
+    _reloadRules();
+    setState(() {});
+  }
+
+  void _toggleRuleEnabled(DeclensionRule rule) {
+    _declensionService.updateRule(rule.id, rule.name, rule.wordPattern ?? '', !rule.enabled);
     _reloadRules();
     setState(() {});
   }
 
   int _maxRowsCount() {
-    return _rules.length + RulesList.ADDITIONAL_ROWS;
+    return math.max(_rules.length + RulesList.ADDITIONAL_ROWS, RuleDetailsColumn.ROW_COUNT);
   }
 }

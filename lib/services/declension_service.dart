@@ -69,8 +69,16 @@ class DeclensionService {
     _declensionRuleRepository.update(id, name, wordPattern, enabled);
   }
 
-  void saveRuleGCConnection(int declensionRuleId, int gcId) {
-    _declensionRuleGCConnectionRepository.save(declensionRuleId, gcId);
+  Set<int> getRuleGCVIds(int declensionRuleId) {
+    return _declensionRuleGCConnectionRepository.getGCVIdsByDeclensionRuleId(declensionRuleId);
+  }
+
+  void saveRuleGCConnection(int declensionRuleId, int gcvId) {
+    _declensionRuleGCConnectionRepository.save(declensionRuleId, gcvId);
+  }
+
+  void deleteRuleGCConnection(int declensionRuleId, int gcvId) {
+    _declensionRuleGCConnectionRepository.delete(declensionRuleId, gcvId);
   }
 
   void saveRuleSoundChange(int declensionRuleId, String change) {
