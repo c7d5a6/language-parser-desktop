@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
-import 'package:language_parser_desktop/features/language_declensions/language_declension.dart';
+import 'package:language_parser_desktop/features/language_declensions/language_declension/language_declension.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_entity.dart';
 import 'package:language_parser_desktop/services/declension_service.dart';
 import 'package:language_parser_desktop/services/gc_service.dart';
