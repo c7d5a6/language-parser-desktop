@@ -65,6 +65,10 @@ class DeclensionService {
     return _declensionRuleRepository.save(declensionId, name, wordPattern);
   }
 
+  void updateRule(int id, String name, String wordPattern, bool enabled) {
+    _declensionRuleRepository.update(id, name, wordPattern, enabled);
+  }
+
   void saveRuleGCConnection(int declensionRuleId, int gcId) {
     _declensionRuleGCConnectionRepository.save(declensionRuleId, gcId);
   }

@@ -4,17 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/border/vtabledashes.dart';
-import 'package:language_parser_desktop/components/buttons/t_button.dart';
-import 'package:language_parser_desktop/components/input/text_field.dart';
 import 'package:language_parser_desktop/persistence/entities/declension_rule_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
 import 'package:language_parser_desktop/services/declension_service.dart';
-import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../../service_provider.dart';
 import '../../../services/service_manager.dart';
 import '../../../text_measure_provider.dart';
 import '../../language_phonetics/language_phonetics_header.dart';
+import 'add_rule_mode.dart';
+import 'rule_details_column.dart';
 import 'rules_list.dart';
 
 class LanguageDeclension extends StatefulWidget {
@@ -34,6 +33,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   List<DeclensionRule> _rules = [];
   int? _selectedRuleId;
   final TextEditingController _ruleNameController = TextEditingController();
+  final TextEditingController _ruleWordPatternController = TextEditingController();
   final TextEditingController _ruleBodyController = TextEditingController();
   bool _createRuleMode = false;
 
@@ -76,6 +76,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     _serviceManager?.repositoryManager.removeDeclensionRuleInvalidator(this);
     _serviceManager?.repositoryManager.removeDeclensionRuleSoundChangeInvalidator(this);
     _ruleNameController.dispose();
+    _ruleWordPatternController.dispose();
     _ruleBodyController.dispose();
     super.dispose();
   }
@@ -110,26 +111,35 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
             ),
           ],
         ),
-        Table(
-          columnWidths: {
-            0: FixedColumnWidth(cWidth),
-            1: FixedColumnWidth(22 * cWidth),
-            2: FixedColumnWidth(cWidth),
-            3: const FlexColumnWidth(1),
-            4: FixedColumnWidth(cWidth),
-          },
-          children: [
-            TableRow(
-              children: [
-                VTableDashes(rowLength: _maxRowsCount()+1, endOnCross: true),
-                _buildLeftSection(cWidth),
-                VTableDashes(rowLength: _maxRowsCount()+1, endOnCross: true),
-                _buildRightSection(cWidth),
-                VTableDashes(rowLength: _maxRowsCount()+1, endOnCross: true),
-              ],
-            ),
-          ],
-        ),
+        if (!_createRuleMode)
+          Table(
+            columnWidths: {
+              0: FixedColumnWidth(cWidth),
+              1: FixedColumnWidth(22 * cWidth),
+              2: FixedColumnWidth(cWidth),
+              3: const FlexColumnWidth(1),
+              4: FixedColumnWidth(cWidth),
+            },
+            children: [
+              TableRow(
+                children: [
+                  VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
+                  _buildLeftSection(cWidth),
+                  VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
+                  _buildRightSection(cWidth),
+                  VTableDashes(rowLength: _maxRowsCount() + 1, endOnCross: true),
+                ],
+              ),
+            ],
+          ),
+        if (_createRuleMode)
+          AddRuleMode(
+            ruleNameController: _ruleNameController,
+            ruleBodyController: _ruleBodyController,
+            onNameChanged: (_) => setState(() {}),
+            onSave: _saveRule,
+            onCancel: _cancelRuleCreation,
+          ),
       ],
     );
   }
@@ -154,97 +164,14 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   }
 
   Widget _buildRightSection(double cWidth) {
-    if (!_createRuleMode) {
-      return Container();
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Table(
-          columnWidths: {0: FixedColumnWidth(10 * cWidth), 1: FixedColumnWidth(cWidth), 2: const FlexColumnWidth(1)},
-          children: [
-            TableRow(
-              children: [
-                const Center(child: LPhHeader(header: 'RULE NAME')),
-                const DBorder(data: '|'),
-                TTextField(controller: _ruleNameController, onChanged: (_) => setState(() {})),
-              ],
-            ),
-            const TableRow(
-              children: [
-                HDash(),
-                DBorder(data: '+'),
-                HDash(),
-              ],
-            ),
-          ],
-        ),
-        Table(
-          columnWidths: {0: FixedColumnWidth(10 * cWidth), 1: FixedColumnWidth(cWidth), 2: const FlexColumnWidth(1)},
-          children: [
-            const TableRow(
-              children: [
-                Center(child: LPhHeader(header: 'RULE BODY')),
-                DBorder(data: '|'),
-                SizedBox(),
-              ],
-            ),
-            TableRow(
-              children: [
-                const HDash(),
-                const DBorder(data: '|'),
-                SizedBox(
-                  height: 6 * cWidth,
-                  child: TextFormField(
-                    controller: _ruleBodyController,
-                    maxLines: null,
-                    expands: true,
-                    style: LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
-                    decoration: const InputDecoration(border: InputBorder.none, isCollapsed: true),
-                  ),
-                ),
-              ],
-            ),
-            TableRow(
-              children: [
-                const HDash(),
-                const DBorder(data: '+'),
-                Table(
-                  columnWidths: {
-                    0: FixedColumnWidth(cWidth * 2),
-                    1: FixedColumnWidth(cWidth * 5),
-                    2: FixedColumnWidth(cWidth * 5),
-                    3: FixedColumnWidth(cWidth * 7),
-                    4: const FlexColumnWidth(1),
-                  },
-                  children: [
-                    TableRow(
-                      children: [
-                        const DBorder(data: '[ '),
-                        TButton(
-                          text: 'SAVE',
-                          color: LPColor.greenColor,
-                          hover: LPColor.greenBrightColor,
-                          disabled: _ruleNameController.text.trim().isEmpty,
-                          onPressed: _saveRule,
-                        ),
-                        const DBorder(data: ' ]-[ '),
-                        TButton(
-                          text: 'CANCEL',
-                          color: LPColor.redColor,
-                          hover: LPColor.redBrightColor,
-                          onPressed: _cancelRuleCreation,
-                        ),
-                        const DBorder(data: ' ]-'),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
+    return RuleDetailsColumn(
+      ruleName: _selectedRule()?.name ?? '',
+      selectedRule: _selectedRule(),
+      nameController: _ruleNameController,
+      wordPatternController: _ruleWordPatternController,
+      onChanged: () => setState(() {}),
+      onSave: _saveSelectedRuleChanges,
+      onCancel: _cancelSelectedRuleChanges,
     );
   }
 
@@ -269,12 +196,14 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     if (_selectedRuleId != null && !_rules.any((r) => r.id == _selectedRuleId)) {
       _selectedRuleId = null;
     }
+    _syncSelectedRuleControllers();
   }
 
   void _selectRule(int? ruleId) {
     if (_selectedRuleId != ruleId) {
       setState(() {
         _selectedRuleId = ruleId;
+        _syncSelectedRuleControllers();
       });
     }
   }
@@ -284,6 +213,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
       _createRuleMode = true;
       _selectedRuleId = null;
       _ruleNameController.clear();
+      _ruleWordPatternController.clear();
       _ruleBodyController.clear();
     });
   }
@@ -292,6 +222,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     setState(() {
       _createRuleMode = false;
       _ruleNameController.clear();
+      _ruleWordPatternController.clear();
       _ruleBodyController.clear();
     });
   }
@@ -307,8 +238,51 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     setState(() {
       _createRuleMode = false;
       _ruleNameController.clear();
+      _ruleWordPatternController.clear();
       _ruleBodyController.clear();
     });
+  }
+
+  DeclensionRule? _selectedRule() {
+    if (_selectedRuleId == null) {
+      return null;
+    }
+    try {
+      return _rules.firstWhere((r) => r.id == _selectedRuleId);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _syncSelectedRuleControllers() {
+    final selectedRule = _selectedRule();
+    if (selectedRule == null) {
+      _ruleNameController.clear();
+      _ruleWordPatternController.clear();
+      return;
+    }
+    _ruleNameController.text = selectedRule.name;
+    _ruleWordPatternController.text = selectedRule.wordPattern ?? '';
+  }
+
+  void _saveSelectedRuleChanges() {
+    final selectedRule = _selectedRule();
+    if (selectedRule == null) {
+      return;
+    }
+    final newName = _ruleNameController.text.trim();
+    final newPattern = _ruleWordPatternController.text;
+    if (newName.isEmpty) {
+      return;
+    }
+    _declensionService.updateRule(selectedRule.id, newName, newPattern, selectedRule.enabled);
+    _reloadRules();
+    setState(() {});
+  }
+
+  void _cancelSelectedRuleChanges() {
+    _reloadRules();
+    setState(() {});
   }
 
   int _maxRowsCount() {
