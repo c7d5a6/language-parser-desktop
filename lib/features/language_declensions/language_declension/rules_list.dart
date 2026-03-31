@@ -80,9 +80,10 @@ class RulesList extends StatelessWidget {
             const DBorder(data: '] '),
             Expanded(
               child: TButton(
-                text: selected ? '< ${rule.name} >' : rule.name,
+                text: selected ? '> ${rule.name} <' : rule.name,
                 color: selected ? LPColor.primaryColor : LPColor.greyColor,
                 hover: selected ? LPColor.primaryBrightColor : LPColor.greyBrightColor,
+                background: selected ? LPColor.selectedBackgroundColor : null,
                 onPressed: () => onRuleSelected(rule.id),
               ),
             ),

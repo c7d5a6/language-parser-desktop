@@ -33,8 +33,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   late DeclensionService _declensionService;
   List<DeclensionRule> _rules = [];
   int? _selectedRuleId;
-  final TextEditingController _ruleNameController = TextEditingController();
-  final TextEditingController _ruleWordPatternController = TextEditingController();
+  final TextEditingController _newRuleNameController = TextEditingController();
   final TextEditingController _ruleBodyController = TextEditingController();
   bool _createRuleMode = false;
   bool _ruleConnectionsEditMode = false;
@@ -66,7 +65,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
         widget.declension.declensionId != oldWidget.declension.declensionId) {
       _createRuleMode = false;
       _selectedRuleId = null;
-      _ruleNameController.clear();
+      _newRuleNameController.clear();
       _reloadRules();
       setState(() {});
     }
@@ -77,8 +76,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     _serviceManager?.repositoryManager.removeDeclensionInvalidator(this);
     _serviceManager?.repositoryManager.removeDeclensionRuleInvalidator(this);
     _serviceManager?.repositoryManager.removeDeclensionRuleSoundChangeInvalidator(this);
-    _ruleNameController.dispose();
-    _ruleWordPatternController.dispose();
+    _newRuleNameController.dispose();
     _ruleBodyController.dispose();
     super.dispose();
   }
@@ -136,7 +134,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
           ),
         if (_createRuleMode)
           AddRuleMode(
-            ruleNameController: _ruleNameController,
+            ruleNameController: _newRuleNameController,
             ruleBodyController: _ruleBodyController,
             onNameChanged: (_) => setState(() {}),
             onSave: _saveRule,
@@ -177,11 +175,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
         });
       },
       selectedDeclensionGcIds: widget.declension.values.map((v) => v.gc.id).toSet(),
-      ruleName: _selectedRule()?.name ?? '',
       selectedRule: _selectedRule(),
-      nameController: _ruleNameController,
-      wordPatternController: _ruleWordPatternController,
-      onChanged: () => setState(() {}),
       onSave: _saveSelectedRuleChanges,
       onCancel: _cancelSelectedRuleChanges,
     );
@@ -208,7 +202,6 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     if (_selectedRuleId != null && !_rules.any((r) => r.id == _selectedRuleId)) {
       _selectedRuleId = null;
     }
-    _syncSelectedRuleControllers();
   }
 
   void _selectRule(int? ruleId) {
@@ -216,7 +209,6 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
       setState(() {
         _selectedRuleId = ruleId;
         _ruleConnectionsEditMode = false;
-        _syncSelectedRuleControllers();
       });
     }
   }
@@ -226,8 +218,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
       _createRuleMode = true;
       _selectedRuleId = null;
       _ruleConnectionsEditMode = false;
-      _ruleNameController.clear();
-      _ruleWordPatternController.clear();
+      _newRuleNameController.clear();
       _ruleBodyController.clear();
     });
   }
@@ -236,15 +227,14 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     setState(() {
       _createRuleMode = false;
       _ruleConnectionsEditMode = false;
-      _ruleNameController.clear();
-      _ruleWordPatternController.clear();
+      _newRuleNameController.clear();
       _ruleBodyController.clear();
     });
   }
 
   void _saveRule() {
     final declensionId = widget.declension.declensionId;
-    final name = _ruleNameController.text.trim();
+    final name = _newRuleNameController.text.trim();
     if (declensionId == null || name.isEmpty) {
       return;
     }
@@ -252,8 +242,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     _declensionService.saveRule(declensionId, name, '');
     setState(() {
       _createRuleMode = false;
-      _ruleNameController.clear();
-      _ruleWordPatternController.clear();
+      _newRuleNameController.clear();
       _ruleBodyController.clear();
     });
   }
@@ -269,24 +258,11 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     }
   }
 
-  void _syncSelectedRuleControllers() {
-    final selectedRule = _selectedRule();
-    if (selectedRule == null) {
-      _ruleNameController.clear();
-      _ruleWordPatternController.clear();
-      return;
-    }
-    _ruleNameController.text = selectedRule.name;
-    _ruleWordPatternController.text = selectedRule.wordPattern ?? '';
-  }
-
-  void _saveSelectedRuleChanges() {
+  void _saveSelectedRuleChanges(String newName, String newPattern) {
     final selectedRule = _selectedRule();
     if (selectedRule == null) {
       return;
     }
-    final newName = _ruleNameController.text.trim();
-    final newPattern = _ruleWordPatternController.text;
     if (newName.isEmpty) {
       return;
     }

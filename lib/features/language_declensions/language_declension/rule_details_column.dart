@@ -10,7 +10,7 @@ import '../../../text_measure_provider.dart';
 import '../../language_phonetics/language_phonetics_header.dart';
 import 'rule_gc_values_connections.dart';
 
-class RuleDetailsColumn extends StatelessWidget {
+class RuleDetailsColumn extends StatefulWidget {
   static final int ROW_COUNT = 11;
 
   final int languageId;
@@ -19,11 +19,7 @@ class RuleDetailsColumn extends StatelessWidget {
   final VoidCallback onConnectionsEditRequested;
   final Set<int> selectedDeclensionGcIds;
   final DeclensionRule? selectedRule;
-  final String ruleName;
-  final TextEditingController nameController;
-  final TextEditingController wordPatternController;
-  final VoidCallback onChanged;
-  final VoidCallback onSave;
+  final void Function(String name, String pattern) onSave;
   final VoidCallback onCancel;
 
   const RuleDetailsColumn({
@@ -33,24 +29,64 @@ class RuleDetailsColumn extends StatelessWidget {
     required this.isConnectionsEditMode,
     required this.onConnectionsEditRequested,
     required this.selectedDeclensionGcIds,
-    required this.ruleName,
     required this.selectedRule,
-    required this.nameController,
-    required this.wordPatternController,
-    required this.onChanged,
     required this.onSave,
     required this.onCancel,
   });
 
   @override
+  State<RuleDetailsColumn> createState() => _RuleDetailsColumnState();
+}
+
+class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
+  late TextEditingController _nameController;
+  late TextEditingController _wordPatternController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _wordPatternController = TextEditingController();
+    _syncFromSelectedRule();
+  }
+
+  @override
+  void didUpdateWidget(covariant RuleDetailsColumn oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedRule?.id != oldWidget.selectedRule?.id) {
+      _syncFromSelectedRule();
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _wordPatternController.dispose();
+    super.dispose();
+  }
+
+  void _syncFromSelectedRule() {
+    final rule = widget.selectedRule;
+    if (rule == null) {
+      _nameController.clear();
+      _wordPatternController.clear();
+      return;
+    }
+    _nameController.text = rule.name;
+    _wordPatternController.text = rule.wordPattern ?? '';
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
+    final selectedRule = widget.selectedRule;
     if (selectedRule == null) {
       return Container();
     }
-    final name = nameController.text.trim();
-    final pattern = wordPatternController.text;
-    final hasChanges = name != selectedRule!.name || pattern != (selectedRule!.wordPattern ?? '');
+    final ruleName = selectedRule.name;
+    final name = _nameController.text.trim();
+    final pattern = _wordPatternController.text;
+    final hasChanges = name != selectedRule.name || pattern != (selectedRule.wordPattern ?? '');
 
     return Column(
       children: [
@@ -94,7 +130,10 @@ class RuleDetailsColumn extends StatelessWidget {
               children: [
                 const Center(child: LPhHeader(header: 'RULE NAME')),
                 const DBorder(data: '|'),
-                TTextField(controller: nameController, onChanged: (_) => onChanged()),
+                TTextField(
+                  controller: _nameController,
+                  onChanged: (_) => setState(() {}),
+                ),
               ],
             ),
             const TableRow(
@@ -108,7 +147,11 @@ class RuleDetailsColumn extends StatelessWidget {
               children: [
                 const Center(child: LPhHeader(header: 'WORD PATTERN')),
                 const DBorder(data: '|'),
-                TTextField(enabled: false, controller: wordPatternController, onChanged: (_) => onChanged()),
+                TTextField(
+                  enabled: false,
+                  controller: _wordPatternController,
+                  onChanged: (_) => setState(() {}),
+                ),
               ],
             ),
             TableRow(
@@ -126,12 +169,12 @@ class RuleDetailsColumn extends StatelessWidget {
           child: LPhHeader(header: ' FOR GRAMMATICAL CATEGORIES:'),
         ),
         RuleGCValuesConnections(
-          languageId: languageId,
-          posId: posId,
-          selectedDeclensionGcIds: selectedDeclensionGcIds,
+          languageId: widget.languageId,
+          posId: widget.posId,
+          selectedDeclensionGcIds: widget.selectedDeclensionGcIds,
           selectedRule: selectedRule,
-          isEditMode: isConnectionsEditMode,
-          onEditRequested: onConnectionsEditRequested,
+          isEditMode: widget.isConnectionsEditMode,
+          onEditRequested: widget.onConnectionsEditRequested,
         ),
         Table(
           columnWidths: {
@@ -152,7 +195,7 @@ class RuleDetailsColumn extends StatelessWidget {
                   color: LPColor.greenColor,
                   hover: LPColor.greenBrightColor,
                   disabled: !hasChanges || name.isEmpty,
-                  onPressed: onSave,
+                  onPressed: () => widget.onSave(name, pattern),
                 ),
                 const DBorder(data: ' ]-[ '),
                 TButton(
@@ -160,7 +203,7 @@ class RuleDetailsColumn extends StatelessWidget {
                   color: LPColor.redColor,
                   hover: LPColor.redBrightColor,
                   disabled: !hasChanges,
-                  onPressed: onCancel,
+                  onPressed: widget.onCancel,
                 ),
                 const DBorder(data: ' ]-'),
               ],

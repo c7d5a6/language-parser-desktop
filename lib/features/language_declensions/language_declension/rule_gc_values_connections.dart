@@ -144,9 +144,11 @@ class _RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> imple
           .where((v) => v.id != 0)
           .map((v) => v.name)
           .toList(growable: false);
+      var textForCategories = ' ${selectedNames.join(', ')}';
+      textForCategories = textForCategories.trim().isEmpty ? ' any' : textForCategories;
       return Row(
         children: [
-          Text(' ${selectedNames.join(', ')}', style: LPFont.defaultTextStyle),
+          Text(textForCategories, style: LPFont.defaultTextStyle),
           TButton(
             text: ' [edit categories] ',
             color: LPColor.greyColor,
@@ -184,7 +186,7 @@ class _RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> imple
                   TDropdownField<int?>(
                     value: _selectedValueByGc[gc.id],
                     items: [
-                      DropdownMenuItem<int?>(value: null, child: Text('all values', style: LPFont.defaultTextStyle)),
+                      DropdownMenuItem<int?>(value: null, child: Text('- any value -', style: LPFont.defaultTextStyle)),
                       ...values.map(
                         (v) => DropdownMenuItem<int?>(
                           value: v.id,
