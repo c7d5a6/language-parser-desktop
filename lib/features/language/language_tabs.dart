@@ -60,7 +60,7 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
   }
 
   void selectLanguage(int? id) {
-    final s = id == null ? null : _languages.firstWhere((lang) => lang.id == id, orElse: () => null);
+    final s = id == null ? null : _languages.firstWhere((lang) => lang.id == id, orElse: null);
     if (id != _selectedLanguage?.id) {
       setState(() {
         _selectedLanguage = s;
@@ -103,51 +103,53 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      final cWSize = TextMeasureProvider.of(context)!.characterWidth;
-      double maxLanguageWidth = cWSize * 8 +
-          cWSize * _languages.map((language) => language.displayName.length).fold(0, (a, b) => a > b ? a : b);
-      maxLanguageWidth = math.max(maxLanguageWidth, cWSize * 9);
-      List<Widget> tabs = [];
-      for (final (index, lang) in _languages.indexed) {
-        if (lang.id != _selectedLanguage?.id && !lang.displayName.toLowerCase().contains(search.toLowerCase())) {
-          continue;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cWSize = TextMeasureProvider.of(context)!.characterWidth;
+        double maxLanguageWidth =
+            cWSize * 8 +
+            cWSize * _languages.map((language) => language.displayName.length).fold(0, (a, b) => a > b ? a : b);
+        maxLanguageWidth = math.max(maxLanguageWidth, cWSize * 9);
+        List<Widget> tabs = [];
+        for (final (index, lang) in _languages.indexed) {
+          if (lang.id != _selectedLanguage?.id && !lang.displayName.toLowerCase().contains(search.toLowerCase())) {
+            continue;
+          }
+          tabs.add(
+            LanguageTab(
+              langName: lang.displayName,
+              selected: _selectedLanguage?.id == lang.id,
+              prevSelected: index < _languages.length - 1 && _languages[index + 1].id == _selectedLanguage?.id,
+              onSelect: selectLanguage,
+              id: lang.id,
+              cWSize: cWSize,
+            ),
+          );
         }
-        tabs.add(LanguageTab(
-          langName: lang.displayName,
-          selected: _selectedLanguage?.id == lang.id,
-          prevSelected: index < _languages.length - 1 && _languages[index + 1].id == _selectedLanguage?.id,
-          onSelect: selectLanguage,
-          id: lang.id,
-          cWSize: cWSize,
-        ));
-      }
-      return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(
-          width: maxLanguageWidth,
-          child: Column(
-            children: [
-              LanguageNewButton(
-                cWSize: cWSize,
-                onPressed: _createLanguage,
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: maxLanguageWidth,
+              child: Column(
+                children: [
+                  LanguageNewButton(cWSize: cWSize, onPressed: _createLanguage),
+                  LanguageSearch(
+                    cWSize: cWSize,
+                    onChanged: (s) => {
+                      setState(() {
+                        search = s;
+                      }),
+                    },
+                  ),
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: tabs),
+                ],
               ),
-              LanguageSearch(
-                cWSize: cWSize,
-                onChanged: (s) => {
-                  setState(() {
-                    search = s;
-                  })
-                },
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: tabs,
-              ),
-            ],
-          ),
-        ),
-        if (creating) LanguageCreating(createLanguage: _saveLanguage),
-      ]);
-    });
+            ),
+            if (creating) LanguageCreating(createLanguage: _saveLanguage),
+          ],
+        );
+      },
+    );
   }
 }
