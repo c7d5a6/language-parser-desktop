@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 class Letters extends StatelessWidget {
+  const Letters({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Column(

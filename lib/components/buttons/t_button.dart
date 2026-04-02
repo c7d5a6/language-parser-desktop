@@ -14,8 +14,8 @@ class TButton extends StatefulWidget {
       : _text = text,
         _onPressed = onPressed,
         _color = color,
-        _hover = hover == null ? color : hover,
-        _background = background == null ? Colors.transparent : background;
+        _hover = hover ?? color,
+        _background = background ?? Colors.transparent;
 
   @override
   State<StatefulWidget> createState() => _TButton();
@@ -33,12 +33,6 @@ class _TButton extends State<TButton> {
         child: GestureDetector(
           onPanDown: widget._onPressed == null ? null : (_) => widget._onPressed!(),
           child: TextButton(
-            child: Text(
-              widget._text,
-              style: LPFont.defaultTextStyle,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
-            ),
             onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(
                 foregroundColor: hover ? widget._hover : widget._color,
@@ -48,6 +42,12 @@ class _TButton extends State<TButton> {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 enableFeedback: false,
                 animationDuration: Duration()),
+            child: Text(
+              widget._text,
+              style: LPFont.defaultTextStyle,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+            ),
           ),
         ),
       );

@@ -17,7 +17,7 @@ import '../../util/constants.dart';
 class LanguageDescription extends StatefulWidget {
   final int languageId;
 
-  LanguageDescription(this.languageId);
+  const LanguageDescription(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageDescription();

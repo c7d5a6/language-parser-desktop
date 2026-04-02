@@ -15,7 +15,7 @@ class VDash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      return Container(
+      return SizedBox(
         width: TextMeasureProvider.of(context)!.characterWidth,
         child: DBorder(
           data: calculateDashes(constraints, context),

@@ -14,7 +14,7 @@ class PhonemeLexer extends Lexer<PhonemeToken, PhonemeTokenType> {
     if (isDiacritics(curChar)) {
       return getTokenByType(PhonemeTokenType.Diacritic);
     }
-    if (curChar == '\0') {
+    if (curChar == '0') {
       return getTokenByType(PhonemeTokenType.End);
     }
     return getTokenByType(PhonemeTokenType.Phoneme);

@@ -22,7 +22,7 @@ import '../language_phonetics/language_phonetics_header.dart';
 class LanguageDeclensions extends StatefulWidget {
   final int languageId;
 
-  const LanguageDeclensions(this.languageId);
+  const LanguageDeclensions(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageDeclensions();
@@ -282,7 +282,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         onPressed: () => select(id));
   }
 
-  createDeclensionCell(int i) {
+  Widget createDeclensionCell(int i) {
     var declension = i >= 2 && _declensions.length > i - 2 ? _declensions[i - 2] : null;
     return (i == 0)
         ? Center(child: LPhHeader(header: 'ENABLED DECLENSIONS'))

@@ -19,9 +19,7 @@ class Phoneme {
   Phoneme._phoneme(this._original, this.features);
 
   String get sound {
-    if (_original == null) {
-      _original = findOriginal();
-    }
+    _original ??= findOriginal();
     return _original!;
   }
 
@@ -140,8 +138,12 @@ class PhonemicFeatures {
 
   PhonemicFeatures apply(PhonemicFeatures changes) {
     var newFeatures = PhonemicFeatures.fromSets(_plusFeatures.toSet(), _minusFeatures.toSet());
-    changes._minusFeatures.forEach((f) => newFeatures.removeFeature(f));
-    changes._plusFeatures.forEach((f) => newFeatures.addFeature(f));
+    for (var f in changes._minusFeatures) {
+      newFeatures.removeFeature(f);
+    }
+    for (var f in changes._plusFeatures) {
+      newFeatures.addFeature(f);
+    }
     return newFeatures;
   }
 }
@@ -200,11 +202,7 @@ Map<String, Phoneme> constPhonemes = {
   }),
 };
 
-Map<Pair<int, int>, Phoneme> constFeatureMasks = Map.fromIterable(
-  constPhonemes.values,
-  key: (phoneme) => phoneme.mask,
-  value: (phoneme) => phoneme,
-);
+Map<Pair<int, int>, Phoneme> constFeatureMasks = { for (var phoneme in constPhonemes.values) phoneme.mask : phoneme };
 
 Map<String, PhonemicFeatures> constDiacritics = {
   /*◌͏̪*/ "\u032A": PhonemicFeatures.fromSets({Feature.anterior, Feature.distributed}, {}),

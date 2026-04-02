@@ -7,6 +7,8 @@ import 'package:language_parser_desktop/features/grammar_word_classes/grammar_wo
 import '../../components/tabs/tabs.dart';
 
 class Grammar extends StatelessWidget {
+  const Grammar({super.key});
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -17,6 +19,7 @@ class Grammar extends StatelessWidget {
           minWidth: 1,
           maxWidth: 3000,
         ),
+        height: 1000,
         child: Tabs(
           tabsInfo: [
             TabContent(tabName: 'Word Classes', shortTabName: 'Word Classes', content: GrammarWordClasses()),
@@ -26,7 +29,6 @@ class Grammar extends StatelessWidget {
                 content: GrammarGrammaticalCategories())
           ],
         ),
-        height: 1000,
       );
     });
   }

@@ -17,12 +17,13 @@ import 'add_rule_mode.dart';
 import 'rule_details_column.dart';
 import 'rules_list.dart';
 
+//TODO: remove unused loads to child components and just invalidate
 class LanguageDeclension extends StatefulWidget {
   final int languageId;
   final int posId;
   final DeclensionRow declension;
 
-  const LanguageDeclension(this.languageId, this.posId, this.declension);
+  const LanguageDeclension(this.languageId, this.posId, this.declension, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageDeclension();

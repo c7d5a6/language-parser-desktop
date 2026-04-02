@@ -20,6 +20,8 @@ import '../../text_measure_provider.dart';
 import '../language_phonetics/language_phonetics_header.dart';
 
 class GrammarGrammaticalCategories extends StatefulWidget {
+  const GrammarGrammaticalCategories({super.key});
+
   @override
   State<StatefulWidget> createState() => _GrammarGrammaticalCategories();
 }
@@ -336,14 +338,15 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
   Widget createGCNameEditCell(int i, double cWidth) {
     switch (i) {
       case 0:
-        if (_gcSelected != null || _gcCreating)
+        if (_gcSelected != null || _gcCreating) {
           return TTextField(
               onChanged: (_) => setState(() {
                     _gcUpdated = true;
                   }),
               controller: _gcNameController);
-        else
+        } else {
           return Container();
+        }
       case 1:
         return createGCNameButtons(cWidth);
       default:
@@ -416,14 +419,15 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
   Widget createGCVNameEditCell(int i, double cWidth) {
     switch (i) {
       case 0:
-        if (_gcvSelected != null || _gcvCreating)
+        if (_gcvSelected != null || _gcvCreating) {
           return TTextField(
               onChanged: (_) => setState(() {
                     _gcvUpdated = true;
                   }),
               controller: _gcvNameController);
-        else
+        } else {
           return Container();
+        }
       case 1:
         return createGCVNameButtons(cWidth);
       default:
@@ -453,7 +457,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
     }
   }
 
-  Widget createGCCell(int i) => ((i == _gcs.length + 1 && i != 1) || (i == 0 && _gcs.length == 0))
+  Widget createGCCell(int i) => ((i == _gcs.length + 1 && i != 1) || (i == 0 && _gcs.isEmpty))
       ? TButton(text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor, onPressed: _startCreatingGC)
       : i == _gcs.length
           ? HDash()
@@ -464,7 +468,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
 
   Widget createGCVCell(int i) => _gcCreating
       ? Container()
-      : ((i == _gcvs.length + 1 && i != 1) || (i == 0 && _gcvs.length == 0))
+      : ((i == _gcvs.length + 1 && i != 1) || (i == 0 && _gcvs.isEmpty))
           ? TButton(
               text: '[ + ]', color: LPColor.greenColor, hover: LPColor.greenBrightColor, onPressed: _startCreatingGCV)
           : (i == _gcvs.length)
@@ -475,7 +479,7 @@ class _GrammarGrammaticalCategories extends State<GrammarGrammaticalCategories> 
 
   Widget createValueBtn(void Function() select, bool selected, bool used, String text) {
     return TButton(
-        text: selected ? "> ${text} <" : text,
+        text: selected ? "> $text <" : text,
         color: selected
             ? LPColor.primaryBrightColor
             : used

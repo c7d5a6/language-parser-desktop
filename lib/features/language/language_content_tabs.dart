@@ -10,7 +10,7 @@ import 'package:language_parser_desktop/features/language_word_classes/language_
 class LanguageContentTabs extends StatelessWidget {
   final int? languageId;
 
-  LanguageContentTabs({super.key, required this.languageId});
+  const LanguageContentTabs({super.key, required this.languageId});
 
   @override
   Widget build(BuildContext context) {

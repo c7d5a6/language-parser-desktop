@@ -51,6 +51,7 @@ class _LanguageCreating extends State<LanguageCreating> {
               VDash(),
               Container(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextField(
                       onChanged: (s) => {
@@ -77,7 +78,6 @@ class _LanguageCreating extends State<LanguageCreating> {
                       onPressed: () => widget.createLanguage(model),
                     )),
                   ],
-                  crossAxisAlignment: CrossAxisAlignment.start,
                 ),
               ),
               VDash(),

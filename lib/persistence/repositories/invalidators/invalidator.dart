@@ -5,7 +5,7 @@ abstract class Invalidator {
 }
 
 mixin RepositoryCache {
-  List<Invalidator> _invalidators = [];
+  final List<Invalidator> _invalidators = [];
 
   void addInvalidator(Invalidator invalidator) {
     _invalidators.add(invalidator);
@@ -24,7 +24,7 @@ mixin RepositoryCache {
         try {
           await invalidator.invalidate();
           print(
-              'Repository cache ${invalidator.runtimeType} ${this.runtimeType} invalidates for: ${DateTime.now().millisecondsSinceEpoch - st}ms');
+              'Repository cache ${invalidator.runtimeType} ${runtimeType} invalidates for: ${DateTime.now().millisecondsSinceEpoch - st}ms');
         } catch (e, stack) {
           print('Error during invalidation: $e\n$stack');
         }

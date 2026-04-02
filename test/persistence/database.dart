@@ -20,7 +20,7 @@ void main() {
         return db.select("PRAGMA index_xinfo('${idx['name']}');");
       });
       print("IDXS $tableName $idxes");
-      fkeys.forEach((fkey) {
+      for (var fkey in fkeys) {
         String? onDel = fkey['on_delete'];
         String? key = fkey['from'];
         expect(onDel, 'RESTRICT', reason: 'on table $tableName from $key');
@@ -30,7 +30,7 @@ void main() {
           return rs.length == 2 && rs.first['name'] == key;
         }).length;
         expect(fkIdxCount, 1, reason: 'Expected index on fkey $key on table $tableName');
-      });
+      }
     });
   });
 

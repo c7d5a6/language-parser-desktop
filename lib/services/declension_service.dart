@@ -87,11 +87,10 @@ class DeclensionService {
 
   List<DeclensionRow> getDeclensions(int languageId, int posId) {
     var gcIds = getGCsIdsByLangIdAndPosId(languageId, posId);
-    Map<int, List<GrammaticalCategoryValue>> values = Map.fromIterable(gcIds,
-        key: (gcId) => gcId, value: (gcId) => _grammaticalCategoryValueRepository.getByGCIdAndLangId(gcId, languageId));
+    Map<int, List<GrammaticalCategoryValue>> values = { for (var gcId in gcIds) gcId : _grammaticalCategoryValueRepository.getByGCIdAndLangId(gcId, languageId) };
     var result = calculateMatrix(values);
     var declensions = _declensionRepository.getByLangIdAndPosId(languageId, posId);
-    declensions.forEach((d) {
+    for (var d in declensions) {
       bool used = false;
       for (DeclensionRow row in result) {
         if (setEquals(d.values, row.valuesIds)) {
@@ -108,7 +107,7 @@ class DeclensionService {
         row.deprecated = true;
         result.add(row);
       }
-    });
+    }
     return result;
   }
 
@@ -117,7 +116,7 @@ class DeclensionService {
     for (int id in values.keys) {
       List<List<GrammaticalCategoryValue>> newResult = [];
       if (values[id] == null) continue;
-      if (result.length == 0) {
+      if (result.isEmpty) {
         for (GrammaticalCategoryValue value in values[id]!) {
           newResult.add([value]);
         }
@@ -148,7 +147,7 @@ class DeclensionRow {
   String get name => values.fold("", (prev, decl) => "$prev ${decl.name}").trim();
 
   void addDeclension(Declension declension) {
-    this.declensionId = declension.id;
-    this.main = declension.main;
+    declensionId = declension.id;
+    main = declension.main;
   }
 }

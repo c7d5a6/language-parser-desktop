@@ -50,13 +50,13 @@ class DeclensionRepository extends Repository {
       db.execute('COMMIT;');
     } catch (e) {
       db.execute('ROLLBACK;');
-      throw e;
+      rethrow;
     }
     invalidate();
   }
 
   void delete(int id) {
-    db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${Declension.table_name} WHERE id = ${id};', []);
+    db.execute('PRAGMA foreign_keys = ON; DELETE FROM ${Declension.table_name} WHERE id = $id;', []);
     invalidate();
   }
 

@@ -19,7 +19,7 @@ class LanguageTabs extends StatefulWidget {
   final Function(Language?) onSelect;
   final Function() onCreate;
 
-  LanguageTabs({super.key, required this.onSelect, required this.onCreate}) {}
+  LanguageTabs({super.key, required this.onSelect, required this.onCreate});
 
   @override
   State<StatefulWidget> createState() => _LanguageTabs();
@@ -60,7 +60,7 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
   }
 
   void selectLanguage(int? id) {
-    final s = id == null ? null : _languages.firstWhere((lang) => lang.id == id, orElse: null);
+    final s = id == null ? null : _languages.firstWhere((lang) => lang.id == id, orElse: () => null);
     if (id != _selectedLanguage?.id) {
       setState(() {
         _selectedLanguage = s;
@@ -123,7 +123,7 @@ class _LanguageTabs extends State<LanguageTabs> implements Invalidator {
         ));
       }
       return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
+        SizedBox(
           width: maxLanguageWidth,
           child: Column(
             children: [

@@ -36,7 +36,7 @@ void main() {
     ('qsd2', 1, 1001, 'NEW', 'Comment word 2');
     ''');
 
-    final phonetics = await languageService.getLanguagePhonemes(1);
+    final phonetics = languageService.getLanguagePhonemes(1);
 
     expect(deepEqualUnorderedStringLists(phonetics.usedMainPhonemes, ['a', 's', 'd', 'q']), true);
     expect(deepEqualUnorderedStringLists(phonetics.restUsedPhonemes, ['1', '2']), true);

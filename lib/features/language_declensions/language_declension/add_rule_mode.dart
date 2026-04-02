@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
-import 'package:language_parser_desktop/components/border/vtabledashes.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/components/input/text_field.dart';
 import 'package:language_parser_desktop/util/constants.dart';

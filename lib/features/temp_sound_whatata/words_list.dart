@@ -67,14 +67,15 @@ class _TableExample extends State<TempSoundChhh> {
         );
     // var wrds = await _wordService.getWords(25, search ?? '');
     var v = version().toDartString();
-    var d = null;
-    if (search != null)
+    var d;
+    if (search != null) {
       d = distinctive(search, lib);
-    else
+    } else {
       d = " empty";
+    }
     setState(() {
       _words = [];
-      _w = v + " " + d;
+      _w = "$v " + d;
     });
   }
 

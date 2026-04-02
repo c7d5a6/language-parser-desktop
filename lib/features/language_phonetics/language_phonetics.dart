@@ -9,7 +9,7 @@ import '../../services/service_manager.dart';
 class LanguagePhonetics extends StatefulWidget {
   final int? languageId;
 
-  LanguagePhonetics(this.languageId);
+  const LanguagePhonetics(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguagePhonetics();

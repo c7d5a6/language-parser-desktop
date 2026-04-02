@@ -119,7 +119,7 @@ enum Feature {
   constricted_glottis,
   implosive;
 
-  int get hash => 1 << this.index;
+  int get hash => 1 << index;
 }
 
 enum Notation {

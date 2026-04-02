@@ -8,11 +8,11 @@ void main() {
     var changes = PhonemicFeatures.fromSets({Feature.labial}, {Feature.coronal});
 
     Phoneme m = n.apply(changes);
-    Phoneme n_o = n.apply(PhonemicFeatures.fromSets({}, {Feature.voice}));
-    Phoneme m_o = m.apply(PhonemicFeatures.fromSets({}, {Feature.voice}));
+    Phoneme nO = n.apply(PhonemicFeatures.fromSets({}, {Feature.voice}));
+    Phoneme mO = m.apply(PhonemicFeatures.fromSets({}, {Feature.voice}));
 
     expect(m.sound, "m");
-    expect(n_o.sound, "n̥");
-    expect(m_o.sound, "m̥");
+    expect(nO.sound, "n̥");
+    expect(mO.sound, "m̥");
   });
 }

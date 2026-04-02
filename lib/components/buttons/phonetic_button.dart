@@ -95,7 +95,7 @@ class _PhoneticButton extends State<PhoneticButton> {
           Row(
               children: IpaUtils.constanantVariants
                   .where((cw) =>
-                      cw.length > 0 &&
+                      cw.isNotEmpty &&
                       (widget.languagePhonemes.usedMainPhonemes.contains('${widget.phonetic}$cw') ||
                           widget.languagePhonemes.restUsedPhonemes.contains('${widget.phonetic}$cw')))
                   .map((cv) {
@@ -113,10 +113,10 @@ class _PhoneticButton extends State<PhoneticButton> {
               DBorder(data: '('),
               TButton(
                 text: '${widget.phonetic}ː',
-                color: getColor(false, widget.phonetic + 'ː'),
-                hover: getColor(true, widget.phonetic + 'ː'),
+                color: getColor(false, '${widget.phonetic}ː'),
+                hover: getColor(true, '${widget.phonetic}ː'),
                 disabled: widget.disabled,
-                onPressed: widget.disabled ? null : () => widget.onPressed(widget.phonetic + 'ː'),
+                onPressed: widget.disabled ? null : () => widget.onPressed('${widget.phonetic}ː'),
               ),
               DBorder(data: ')'),
             ],

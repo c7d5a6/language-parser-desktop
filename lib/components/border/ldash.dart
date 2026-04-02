@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 
 import '../../text_measure_provider.dart';
-import '../../util/layout.dart';
 
 class LDash extends StatelessWidget {
   const LDash({super.key});

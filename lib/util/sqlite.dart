@@ -56,7 +56,7 @@ Future<void> migrate(Database db) async {
       .toList(growable: false)
     ..sort();
   var uversion = db.select("PRAGMA user_version;").single['user_version'];
-  log('Uversion ${uversion}');
+  log('Uversion $uversion');
   printPragma();
   setPragmas(db);
   printPragma();

@@ -21,7 +21,7 @@ void main() {
     (1, 'Language 1', 'Native name 1', 'Comment 1');
     ''');
 
-    final phoneme = await languagePhonemeRepository.save(1, 'p');
+    final phoneme = languagePhonemeRepository.save(1, 'p');
 
     expect(phoneme.id, 1);
     expect(phoneme.phoneme, 'p');
@@ -41,7 +41,7 @@ void main() {
     ''');
 
     languagePhonemeRepository.delete(1);
-    final phonemes = await languagePhonemeRepository.getAllByLang(1);
+    final phonemes = languagePhonemeRepository.getAllByLang(1);
 
     expect(phonemes.length, 1);
     final ph = phonemes[0];
@@ -62,7 +62,7 @@ void main() {
     ('p', 2);
     ''');
 
-    final phonemes = await languagePhonemeRepository.getAllByLang(1);
+    final phonemes = languagePhonemeRepository.getAllByLang(1);
 
     expect(phonemes.length, 2);
     final ph = phonemes[0];

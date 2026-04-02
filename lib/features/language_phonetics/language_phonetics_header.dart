@@ -25,7 +25,7 @@ class LPhHeader extends StatelessWidget {
               )
             : Tooltip(
                 decoration: BoxDecoration(color: LPColor.greyColor),
-                message: prompt == null ? header : prompt,
+                message: prompt ?? header,
                 textStyle: LPFont.headerFontStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
                 child: Text(
                   short == null ? header : short!,

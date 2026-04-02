@@ -33,7 +33,7 @@ void main() {
     ('Word 2', 2, 1001, 'NEW', 'Comment word 2');
     ''');
 
-    final words = await wordRepository.getAllWordByLang(1);
+    final words = wordRepository.getAllWordByLang(1);
 
     expect(words.length, 1);
     final word = words[0];

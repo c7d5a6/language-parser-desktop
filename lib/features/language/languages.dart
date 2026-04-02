@@ -45,7 +45,8 @@ class _Languages extends State<Languages> {
         onSelect: selectLanguage,
         onCreate: onCreate,
       );
-      return Container(
+      return SizedBox(
+        width: constraints.maxWidth,
         child: Center(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +68,6 @@ class _Languages extends State<Languages> {
             ],
           ),
         ),
-        width: constraints.maxWidth,
       );
     });
   }

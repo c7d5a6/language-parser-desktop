@@ -16,6 +16,8 @@ import '../../services/service_manager.dart';
 import '../../text_measure_provider.dart';
 
 class GrammarWordClasses extends StatefulWidget {
+  const GrammarWordClasses({super.key});
+
   @override
   State<StatefulWidget> createState() => _GrammarWordClasses();
 }
@@ -291,7 +293,7 @@ class _GrammarWordClasses extends State<GrammarWordClasses> implements Invalidat
     var selected = _poses[i].id == _selected;
     var text = _poses[i].name;
     return TButton(
-        text: selected ? "> ${text} <" : text,
+        text: selected ? "> $text <" : text,
         color: selected ? LPColor.primaryBrightColor : LPColor.greyBrightColor,
         hover: selected ? LPColor.primaryBrighterColor : LPColor.whiteColor,
         background: selected ? LPColor.selectedBackgroundColor : null,

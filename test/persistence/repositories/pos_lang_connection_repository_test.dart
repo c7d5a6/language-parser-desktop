@@ -36,7 +36,7 @@ void main() {
     (2,1003);
     ''');
 
-    final poses = await posLangConnectionRepository.getPosIdsByLangId(1);
+    final poses = posLangConnectionRepository.getPosIdsByLangId(1);
 
     expect(poses.length, 2);
     expect(poses.contains(1001), true);

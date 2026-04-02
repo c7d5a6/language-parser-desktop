@@ -65,16 +65,16 @@ class LanguageService {
     allSoundsWithVariantsAndLanguagePhonemes.addAll(allSoundsWithVariants);
 
     List<String> sounds = allSoundsWithVariantsAndLanguagePhonemes..sort((o1, o2) => o2.length - o1.length);
-    sounds.forEach((sound) {
-      if (languagePhonemes.contains(sound) && sound.length > 0) {
+    for (var sound in sounds) {
+      if (languagePhonemes.contains(sound) && sound.isNotEmpty) {
         usedMainPhonemes.add(sound);
         languagePhonemes = languagePhonemes.replaceAll(sound, "");
       }
-    });
+    }
     restUsedPhonemes = languagePhonemes
         .split('')
         .where((s) {
-          return s.trim().length > 0;
+          return s.trim().isNotEmpty;
         })
         .toSet()
         .toList()

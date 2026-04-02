@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';
 
-import '../../util/layout.dart';
 
 class HDash extends StatelessWidget {
   const HDash({super.key});

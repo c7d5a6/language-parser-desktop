@@ -11,6 +11,6 @@ class TextMeasureProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(TextMeasureProvider oldWidget) {
-    return this.characterWidth != oldWidget.characterWidth;
+    return characterWidth != oldWidget.characterWidth;
   }
 }

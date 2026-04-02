@@ -21,7 +21,7 @@ import '../language_phonetics/language_phonetics_header.dart';
 class LanguageGrammaticalCategories extends StatefulWidget {
   final int languageId;
 
-  const LanguageGrammaticalCategories(this.languageId);
+  const LanguageGrammaticalCategories(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageGrammaticalCategories();
@@ -211,7 +211,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
             ? HDash()
             : (_poses.length > i - 2)
                 ? Center(
-                    child: Container(
+                    child: SizedBox(
                         width: posWidth,
                         child: Row(children: [
                           DBorder(data: "["),
@@ -237,7 +237,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
             ? HDash()
             : (_gcvs.length > i - 2)
                 ? Center(
-                    child: Container(
+                    child: SizedBox(
                         width: width,
                         child: Row(children: [
                           DBorder(data: "["),
@@ -280,7 +280,7 @@ class _LanguageGrammaticalCategories extends State<LanguageGrammaticalCategories
     var withValues = _gcsWithValuesEnabled.contains(category.id);
     var text = category.name;
     return TButton(
-        text: selected ? "> ${text} <" : text,
+        text: selected ? "> $text <" : text,
         color: selected
             ? LPColor.primaryBrightColor
             : (enabled && withValues)

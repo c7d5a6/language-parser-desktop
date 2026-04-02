@@ -5,7 +5,7 @@ import 'package:language_parser_desktop/util/constants.dart';
 class LanguageOrthography extends StatefulWidget {
   final int? languageId;
 
-  LanguageOrthography(this.languageId);
+  const LanguageOrthography(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageOrthography();
@@ -20,7 +20,7 @@ class _LanguageOrthography extends State<LanguageOrthography> {
       focusNode: focusNode,
       controller: multiStyleTextEditingController,
       onSubmitted: (s) {
-        multiStyleTextEditingController.text = s.endsWith("auto") ? s + "complete" : s;
+        multiStyleTextEditingController.text = s.endsWith("auto") ? "${s}complete" : s;
         focusNode.requestFocus();
       },
     );

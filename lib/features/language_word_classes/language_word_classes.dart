@@ -19,7 +19,7 @@ import '../language_phonetics/language_phonetics_header.dart';
 class LanguageWordClasses extends StatefulWidget {
   final int languageId;
 
-  const LanguageWordClasses(this.languageId);
+  const LanguageWordClasses(this.languageId, {super.key});
 
   @override
   State<StatefulWidget> createState() => _LanguageWordClasses();
