@@ -6,6 +6,8 @@ import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/features/grammar/grammar.dart';
 import 'package:language_parser_desktop/features/temp_sound_whatata/words_list.dart';
 import 'package:language_parser_desktop/features/word/words_list.dart';
+import 'package:language_parser_desktop/service_provider.dart';
+import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/layout.dart';
 
@@ -23,11 +25,24 @@ class App extends StatefulWidget {
 
 class _App extends State<App> {
   int _tabIndex = 0;
+  ServiceManager? _serviceManagerForPhonoVersion;
+  String _phonoLibVersion = '';
 
   void setIndex(int i) {
     setState(() {
       _tabIndex = i;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final sp = ServiceProvider.of(context);
+    if (sp == null) return;
+    if (_serviceManagerForPhonoVersion != sp.serviceManager) {
+      _serviceManagerForPhonoVersion = sp.serviceManager;
+      _phonoLibVersion = sp.serviceManager.phonologicalRules.version();
+    }
   }
 
   @override
@@ -61,7 +76,19 @@ class _App extends State<App> {
       ),
       bottomNavigationBar: PreferredSize(
         preferredSize: Size(size.width, cHeight * 2),
-        child: const Text(' f o o t e r '),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            DBorder(data: ' - '),
+            // TODO: refactor libs version
+            SelectableText(
+              _phonoLibVersion.isEmpty ? ' libph … ' : ' libph $_phonoLibVersion ',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            DBorder(data: ' - '),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
