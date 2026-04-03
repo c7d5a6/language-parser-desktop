@@ -1,16 +1,10 @@
 import 'dart:developer';
-import 'dart:ffi';
-import 'package:ffi/ffi.dart';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
-import 'package:language_parser_desktop/services/word_service.dart';
+import 'package:language_parser_desktop/services/phonological_rules.dart';
 
-import '../../persistence/repositories/word_repository.dart';
 import '../../service_provider.dart';
-
-const libPath = 'assets/libph_lib.so';
 
 class TempSoundChhh extends StatefulWidget {
   const TempSoundChhh({super.key});
@@ -20,62 +14,57 @@ class TempSoundChhh extends StatefulWidget {
 }
 
 class _TableExample extends State<TempSoundChhh> {
-  List<wrd> _words = [];
-  String _w = "hello";
+  String _rule = '';
+  String _input = '';
+  String _result = '';
+  String _version = '';
+  String _featuresQuery = '';
+  String _distinctive = '';
   ServiceManager? serviceManager;
-  late WordService _wordService;
-
-  DynamicLibrary loadLib() {
-    if (Platform.isLinux) {
-      return DynamicLibrary.open(libPath);
-    }
-    throw UnsupportedError("Platform not supported");
-  }
+  late PhonologicalRules _phonologicalRules;
 
   @override
-  Future<void> didChangeDependencies() async {
+  void didChangeDependencies() {
     log("didChangeDependencies");
     super.didChangeDependencies();
     final sm = ServiceProvider.of(context)?.serviceManager;
     if (serviceManager != sm) {
       serviceManager = sm;
-      _wordService = serviceManager!.wordService;
-      await _regenerateWords(null);
+      _phonologicalRules = serviceManager!.phonologicalRules;
+      _version = _phonologicalRules.version();
+      _updateResult();
+      _updateDistinctive();
     }
   } // @override
 
-  String distinctive(String input, DynamicLibrary lib) {
-    final distinctiveFeatures = lib
-        .lookupFunction<
-          Pointer<Utf8> Function(Pointer<Utf8>),
-          Pointer<Utf8> Function(Pointer<Utf8>)
-        >("distinctiveFeatures");
-    final cStr = input.toNativeUtf8();
-    final ptr = distinctiveFeatures(cStr);
-    malloc.free(cStr);
-    final output = ptr.toDartString();
-    // destroyStr(ptr);
-    return output;
+  void _updateResult() {
+    if (_rule.trim().isEmpty || _input.trim().isEmpty) {
+      setState(() {
+        _result = '';
+      });
+      return;
+    }
+
+    final applyResult = _phonologicalRules.applyRule(_rule, _input);
+    final nextResult = applyResult.isError
+        ? (applyResult.error ?? 'Unknown error')
+        : (applyResult.value ?? '');
+
+    setState(() {
+      _result = nextResult;
+    });
   }
 
-  Future<void> _regenerateWords(String? search) async {
-    log("regenerate words");
-    var lib = loadLib();
-    final version = lib
-        .lookupFunction<Pointer<Utf8> Function(), Pointer<Utf8> Function()>(
-          "version",
-        );
-    // var wrds = await _wordService.getWords(25, search ?? '');
-    var v = version().toDartString();
-    var d;
-    if (search != null) {
-      d = distinctive(search, lib);
-    } else {
-      d = " empty";
+  void _updateDistinctive() {
+    if (_featuresQuery.trim().isEmpty) {
+      setState(() {
+        _distinctive = '';
+      });
+      return;
     }
+    final d = _phonologicalRules.distinctiveFeatures(_featuresQuery);
     setState(() {
-      _words = [];
-      _w = "$v " + d;
+      _distinctive = d;
     });
   }
 
@@ -86,9 +75,57 @@ class _TableExample extends State<TempSoundChhh> {
       children: <Widget>[
         TextFormField(
           textAlign: TextAlign.center,
-          onChanged: (word) => _regenerateWords(word),
+          decoration: const InputDecoration(
+            labelText: 'Rule',
+            hintText: 't > d / V_V',
+          ),
+          onChanged: (rule) {
+            _rule = rule;
+            _updateResult();
+          },
         ),
-        Text(_w),
+        TextFormField(
+          textAlign: TextAlign.center,
+          decoration: const InputDecoration(
+            labelText: 'Input',
+            hintText: 'ata',
+          ),
+          onChanged: (input) {
+            _input = input;
+            _updateResult();
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(_result),
+          ),
+        ),
+        const Divider(height: 32),
+        SelectableText(
+          _version.isEmpty ? 'Version: …' : 'Version: $_version',
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          textAlign: TextAlign.center,
+          decoration: const InputDecoration(
+            labelText: 'Distinctive features',
+            hintText: 'IPA or segment',
+          ),
+          onChanged: (q) {
+            _featuresQuery = q;
+            _updateDistinctive();
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: SelectableText(
+            _featuresQuery.trim().isEmpty ? '' : _distinctive,
+            textAlign: TextAlign.center,
+          ),
+        ),
       ],
     );
   }
