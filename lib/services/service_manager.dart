@@ -15,33 +15,35 @@ class ServiceManager {
   late final PosService _posService;
   late final WordService _wordService;
 
-  ServiceManager(this.repositoryManager)
-      : _declensionService = DeclensionService(
-          repositoryManager.declensionCategoryPosLangConnectionRepository,
-          repositoryManager.declensionRepository,
-          repositoryManager.declensionRuleRepository,
-          repositoryManager.declensionRuleGCConnectionRepository,
-          repositoryManager.declensionRuleSoundChangeRepository,
-          repositoryManager.grammaticalCategoryValueRepository,
-        ),
-        _gcService = GCService(
-          repositoryManager.grammaticalCategoryRepository,
-          repositoryManager.grammaticalCategoryValueRepository,
-          repositoryManager.gcvLangConnectionRepository,
-          repositoryManager.posGCLangConnectionRepository,
-        ),
-        _languageService = LanguageService(
-          repositoryManager.languageRepository,
-          repositoryManager.languagePhonemeRepository,
-          repositoryManager.wordRepository,
-        ),
-        _phonologicalRules = PhonologicalRules(),
-        _posService = PosService(
-          repositoryManager.posRepository,
-          repositoryManager.posLangConnectionRepository,
-          repositoryManager.posGCLangConnectionRepository,
-        ),
-        _wordService = WordService(repositoryManager.wordRepository);
+  ServiceManager(this.repositoryManager) {
+    _phonologicalRules = PhonologicalRules();
+    _declensionService = DeclensionService(
+      repositoryManager.declensionCategoryPosLangConnectionRepository,
+      repositoryManager.declensionRepository,
+      repositoryManager.declensionRuleRepository,
+      repositoryManager.declensionRuleGCConnectionRepository,
+      repositoryManager.declensionRuleSoundChangeRepository,
+      repositoryManager.grammaticalCategoryValueRepository,
+      _phonologicalRules,
+    );
+    _gcService = GCService(
+      repositoryManager.grammaticalCategoryRepository,
+      repositoryManager.grammaticalCategoryValueRepository,
+      repositoryManager.gcvLangConnectionRepository,
+      repositoryManager.posGCLangConnectionRepository,
+    );
+    _languageService = LanguageService(
+      repositoryManager.languageRepository,
+      repositoryManager.languagePhonemeRepository,
+      repositoryManager.wordRepository,
+    );
+    _posService = PosService(
+      repositoryManager.posRepository,
+      repositoryManager.posLangConnectionRepository,
+      repositoryManager.posGCLangConnectionRepository,
+    );
+    _wordService = WordService(repositoryManager.wordRepository);
+  }
 
   DeclensionService get declensionService => _declensionService;
 

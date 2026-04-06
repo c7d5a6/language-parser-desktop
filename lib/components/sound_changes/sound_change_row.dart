@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer';
 import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/components/input/text_field.dart';
@@ -31,6 +32,7 @@ class SoundChangeRow extends StatefulWidget {
 
 class _SoundChangeRowState extends State<SoundChangeRow> {
   bool _isRowEditMode = false;
+  bool _isHovered = false;
   late TextEditingController _controller;
 
   @override
@@ -61,112 +63,129 @@ class _SoundChangeRowState extends State<SoundChangeRow> {
   @override
   Widget build(BuildContext context) {
     final cWidth = TextMeasureProvider.of(context)!.characterWidth;
+    final rowBackgroundColor = _isHovered
+        ? LPColor.selectedBackgroundColor
+        : (widget.isAlternateRow ? LPColor.stripedRowBackgroundColor : Colors.transparent);
     if (_isRowEditMode) {
-      return Table(
-        columnWidths: {
-          0: const FlexColumnWidth(1),
-          1: FixedColumnWidth(cWidth),
-          2: FixedColumnWidth(cWidth * 1.5),
-          3: FixedColumnWidth(cWidth),
-          4: FixedColumnWidth(cWidth * 1.5),
-        },
-        children: [
-          TableRow(
-            decoration: BoxDecoration(
-              color: widget.isAlternateRow ? LPColor.stripedRowBackgroundColor : Colors.transparent,
+      return MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: Table(
+          columnWidths: {
+            0: const FlexColumnWidth(1),
+            1: FixedColumnWidth(cWidth),
+            2: FixedColumnWidth(cWidth * 1.5),
+            3: FixedColumnWidth(cWidth),
+            4: FixedColumnWidth(cWidth * 1.5),
+          },
+          children: [
+            TableRow(
+              decoration: BoxDecoration(color: rowBackgroundColor),
+              children: [
+                TTextField(controller: _controller, onChanged: (_) => setState(() {})),
+                const Center(child: DBorder(data: '|')),
+                Center(
+                  child: TButton(
+                    text: 's',
+                    color: LPColor.greenColor,
+                    hover: LPColor.greenBrightColor,
+                    onPressed: () {
+                      final newValue = _controller.text.trim();
+                      if (newValue.isEmpty) {
+                        return;
+                      }
+                      widget.soundChange.soundChange = newValue;
+                      widget.onSave?.call(widget.soundChange);
+                      setState(() {
+                        _isRowEditMode = false;
+                      });
+                    },
+                  ),
+                ),
+                const Center(child: DBorder(data: '|')),
+                Center(
+                  child: TButton(
+                    text: 'x',
+                    color: LPColor.redColor,
+                    hover: LPColor.redBrightColor,
+                    onPressed: () {
+                      setState(() {
+                        _controller.text = widget.soundChange.soundChange;
+                        _isRowEditMode = false;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
-            children: [
-              TTextField(controller: _controller, onChanged: (_) => setState(() {})),
-              const Center(child: DBorder(data: '|')),
-              Center(
-                child: TButton(
-                  text: 's',
-                  color: LPColor.greenColor,
-                  hover: LPColor.greenBrightColor,
-                  onPressed: () {
-                    final newValue = _controller.text.trim();
-                    if (newValue.isEmpty) {
-                      return;
-                    }
-                    widget.soundChange.soundChange = newValue;
-                    widget.onSave?.call(widget.soundChange);
-                    setState(() {
-                      _isRowEditMode = false;
-                    });
-                  },
-                ),
-              ),
-              const Center(child: DBorder(data: '|')),
-              Center(
-                child: TButton(
-                  text: 'x',
-                  color: LPColor.redColor,
-                  hover: LPColor.redBrightColor,
-                  onPressed: () {
-                    setState(() {
-                      _controller.text = widget.soundChange.soundChange;
-                      _isRowEditMode = false;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       );
     }
 
     final parsed = widget.soundChange;
-    return Table(
-      columnWidths: widget.columnWidths,
-      children: [
-        TableRow(
-          decoration: BoxDecoration(
-            color: widget.isAlternateRow ? LPColor.stripedRowBackgroundColor : Colors.transparent,
+    final hasContext = parsed.left.isNotEmpty || parsed.right.isNotEmpty;
+    final textStyle = parsed.isCorrect
+        ? LPFont.defaultTextStyle
+        : LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.redBrightColor));
+    final symbolStyle = LPFont.defaultTextStyle.merge(TextStyle(color: LPColor.greyColor));
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: Table(
+        columnWidths: widget.columnWidths,
+        children: [
+          TableRow(
+            decoration: BoxDecoration(color: rowBackgroundColor),
+            children: [
+              Center(child: Text(parsed.from, style: textStyle)),
+              Center(child: SelectableText('>', style: symbolStyle)),
+              Center(child: Text(parsed.to, style: textStyle)),
+              Center(child: SelectableText(hasContext ? '/' : '', style: symbolStyle)),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(parsed.left, style: textStyle),
+              ),
+              Center(child: SelectableText(hasContext ? '_' : '', style: symbolStyle)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(parsed.right, style: textStyle),
+              ),
+              const Center(child: DBorder(data: '|')),
+              widget.isTableEditMode
+                  ? Center(
+                      child: TButton(
+                        text: 'e',
+                        color: LPColor.yellowColor,
+                        hover: LPColor.yellowBrightColor,
+                        onPressed: () {
+                          setState(() {
+                            _isRowEditMode = true;
+                          });
+                        },
+                      ),
+                    )
+                  : const Center(child: DBorder(data: ' ')),
+              const Center(child: DBorder(data: '|')),
+              widget.isTableEditMode
+                  ? Center(
+                      child: TButton(
+                        text: 'x',
+                        color: LPColor.redColor,
+                        hover: LPColor.redBrightColor,
+                        onPressed: widget.onDelete == null
+                            ? null
+                            : () {
+                                log('SoundChangeRow.deletePressed: id=${widget.soundChange.id}');
+                                widget.onDelete!(widget.soundChange.id);
+                              },
+                      ),
+                    )
+                  : const Center(child: DBorder(data: ' ')),
+            ],
           ),
-          children: [
-            Center(child: Text(parsed.from, style: LPFont.defaultTextStyle)),
-            const Center(child: DBorder(data: '>')),
-            Center(child: Text(parsed.to, style: LPFont.defaultTextStyle)),
-            const Center(child: DBorder(data: '/')),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(parsed.left, style: LPFont.defaultTextStyle),
-            ),
-            const Center(child: DBorder(data: '_')),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(parsed.right, style: LPFont.defaultTextStyle),
-            ),
-            const Center(child: DBorder(data: '|')),
-            widget.isTableEditMode
-                ? Center(
-                    child: TButton(
-                      text: 'e',
-                      color: LPColor.yellowColor,
-                      hover: LPColor.yellowBrightColor,
-                      onPressed: () {
-                        setState(() {
-                          _isRowEditMode = true;
-                        });
-                      },
-                    ),
-                  )
-                : const Center(child: DBorder(data: ' ')),
-            const Center(child: DBorder(data: '|')),
-            widget.isTableEditMode
-                ? Center(
-                    child: TButton(
-                      text: 'x',
-                      color: LPColor.redColor,
-                      hover: LPColor.redBrightColor,
-                      onPressed: widget.onDelete == null ? null : () => widget.onDelete!(widget.soundChange.id),
-                    ),
-                  )
-                : const Center(child: DBorder(data: ' ')),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

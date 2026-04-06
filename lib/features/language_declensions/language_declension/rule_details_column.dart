@@ -3,12 +3,12 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/components/input/text_field.dart';
-import 'package:language_parser_desktop/components/sound_changes/sound_changes.dart';
 import 'package:language_parser_desktop/persistence/entities/declension_rule_entity.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../../text_measure_provider.dart';
 import '../../language_phonetics/language_phonetics_header.dart';
+import 'declension_rule_sound_changes.dart';
 import 'rule_gc_values_connections.dart';
 
 class RuleDetailsColumn extends StatefulWidget {
@@ -211,13 +211,7 @@ class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
             ),
           ],
         ),
-        SoundChangesTable(
-          soundChanges: const [
-            SoundChangeSqlRow(id: 1, soundChange: '[+voice -syllabic][-voice]>[-voice][]'),
-            SoundChangeSqlRow(id: 2, soundChange: '[+dorsal -voice]>[+voice]/_[+voice]_'),
-            SoundChangeSqlRow(id: 2, soundChange: 'b>p/[-voice]_'),
-          ],
-        )
+        DeclensionRuleSoundChanges(ruleId: selectedRule.id),
       ],
     );
   }

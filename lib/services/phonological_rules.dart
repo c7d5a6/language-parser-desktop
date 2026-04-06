@@ -131,6 +131,27 @@ class PhonologicalRules {
       }
     }
   }
+
+  bool validateRule(String rule) {
+    final cRule = rule.toNativeUtf8();
+    late final Pointer<ResultRuleNative> ruleResult;
+    var hasRuleResult = false;
+    try {
+      ruleResult = _createRuleFn(cRule);
+      hasRuleResult = true;
+      if (ruleResult.ref.isError != 0) {
+        return false;
+      }
+      return ruleResult.ref.rule != nullptr;
+    } catch (_) {
+      return false;
+    } finally {
+      malloc.free(cRule);
+      if (hasRuleResult) {
+        _destroyRuleFn(ruleResult);
+      }
+    }
+  }
 }
 
 class PhonologicalRulesApplyResult {

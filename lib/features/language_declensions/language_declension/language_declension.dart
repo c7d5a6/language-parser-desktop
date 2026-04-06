@@ -85,6 +85,9 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
   @override
   Future<void> invalidate() async {
     _reloadRules();
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -240,9 +243,11 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
       return;
     }
 
-    _declensionService.saveRule(declensionId, name, '');
+    final createdRule = _declensionService.saveRule(declensionId, name, '');
+    _reloadRules();
     setState(() {
       _createRuleMode = false;
+      _selectedRuleId = createdRule.id;
       _newRuleNameController.clear();
       _ruleBodyController.clear();
     });

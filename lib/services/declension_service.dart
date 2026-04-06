@@ -1,7 +1,9 @@
 import 'dart:core';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:language_parser_desktop/persistence/entities/declension_rule_entity.dart';
+import 'package:language_parser_desktop/persistence/entities/declension_rule_sound_change_entity.dart';
 import 'package:language_parser_desktop/persistence/entities/grammatical_category_value_entity.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_category_pos_lang_connection_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_rule_gc_connection_repository.dart';
@@ -9,6 +11,7 @@ import 'package:language_parser_desktop/persistence/repositories/declension_rule
 import 'package:language_parser_desktop/persistence/repositories/declension_rule_sound_change_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/declension_repository.dart';
 import 'package:language_parser_desktop/persistence/repositories/gcv_repository.dart';
+import 'package:language_parser_desktop/services/phonological_rules.dart';
 
 import '../persistence/entities/declension.dart';
 
@@ -19,6 +22,7 @@ class DeclensionService {
   final DeclensionRuleGCConnectionRepository _declensionRuleGCConnectionRepository;
   final DeclensionRuleSoundChangeRepository _declensionRuleSoundChangeRepository;
   final GrammaticalCategoryValueRepository _grammaticalCategoryValueRepository;
+  final PhonologicalRules _phonologicalRules;
 
   DeclensionService(
     this._declensionCategoryPosLangConnectionRepository,
@@ -27,6 +31,7 @@ class DeclensionService {
     this._declensionRuleGCConnectionRepository,
     this._declensionRuleSoundChangeRepository,
     this._grammaticalCategoryValueRepository,
+    this._phonologicalRules,
   );
 
   Set<int> getGCsIdsByLangIdAndPosId(int langId, int posId) {
@@ -81,8 +86,40 @@ class DeclensionService {
     _declensionRuleGCConnectionRepository.delete(declensionRuleId, gcvId);
   }
 
-  void saveRuleSoundChange(int declensionRuleId, String change) {
-    _declensionRuleSoundChangeRepository.save(declensionRuleId, change);
+  List<DeclensionRuleSoundChange> getRuleSoundChanges(int declensionRuleId) {
+    return _declensionRuleSoundChangeRepository
+        .getByDeclensionRuleId(declensionRuleId)
+        .map(
+          (soundChange) => DeclensionRuleSoundChange(
+            soundChange.id,
+            soundChange.declensionRuleId,
+            soundChange.change,
+            isCorrect: _phonologicalRules.validateRule(soundChange.change),
+          ),
+        )
+        .toList(growable: false);
+  }
+
+  DeclensionRuleSoundChange saveRuleSoundChange(int declensionRuleId, String change) {
+    return _declensionRuleSoundChangeRepository.save(declensionRuleId, change);
+  }
+
+  void updateRuleSoundChange(int id, String change) {
+    _declensionRuleSoundChangeRepository.update(id, change);
+  }
+
+  void deleteRuleSoundChange(int id) {
+    log('DeclensionService.deleteRuleSoundChange: id=$id');
+    _declensionRuleSoundChangeRepository.delete(id);
+  }
+
+  void replaceRuleSoundChangesFromEditor(int declensionRuleId, String content) {
+    final lines = content
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList(growable: false);
+    _declensionRuleSoundChangeRepository.replaceAllByDeclensionRuleId(declensionRuleId, lines);
   }
 
   List<DeclensionRow> getDeclensions(int languageId, int posId) {
