@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/persistence/entities/word_list.dart';
 import 'package:language_parser_desktop/persistence/repositories/invalidators/invalidator.dart';
@@ -11,24 +12,8 @@ import 'package:language_parser_desktop/services/word_service.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
+import 'word_table_paginator.dart';
 import 'word_table_row.dart';
-
-class XDash extends StatelessWidget {
-  const XDash({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SelectionContainer.disabled(
-      child: Text(
-        '+',
-        style: TextStyle(fontSize: 16, height: 0.0),
-        maxLines: 1,
-        softWrap: false,
-        overflow: TextOverflow.fade,
-      ),
-    );
-  }
-}
 
 class WordsTable extends StatefulWidget {
   const WordsTable({super.key});
@@ -38,7 +23,11 @@ class WordsTable extends StatefulWidget {
 }
 
 class _WordsTableState extends State<WordsTable> implements Invalidator {
-  List<WordList> _words = [];
+  static const int _pageSize = 20;
+
+  List<WordListItem> _words = [];
+  int _currentPage = 1;
+  int _totalCount = 0;
   ServiceManager? _serviceManager;
   late WordService _wordService;
   String _search = '';
@@ -54,7 +43,7 @@ class _WordsTableState extends State<WordsTable> implements Invalidator {
       _serviceManager = sm;
       _serviceManager!.repositoryManager.addWordInvalidator(this);
       _wordService = _serviceManager!.wordService;
-      _regenerateWords(_search);
+      _loadWordsPage();
     }
   }
 
@@ -67,7 +56,12 @@ class _WordsTableState extends State<WordsTable> implements Invalidator {
   @override
   Future<void> invalidate() async {
     if (!mounted) return;
-    _regenerateWords(_search);
+    _loadWordsPage();
+  }
+
+  int get _totalPages {
+    if (_totalCount <= 0) return 1;
+    return (_totalCount + _pageSize - 1) ~/ _pageSize;
   }
 
   void _regenerateWords(String search) {
@@ -75,12 +69,36 @@ class _WordsTableState extends State<WordsTable> implements Invalidator {
     if (!mounted) return;
     setState(() {
       _search = search;
-      _words = _wordService.getWords(250, search);
+      _currentPage = 1;
+    });
+    _loadWordsPage();
+  }
+
+  void _loadWordsPage() {
+    if (!mounted) return;
+    var page = _currentPage;
+    var result = _wordService.getWordsPage(_pageSize, page - 1, _search);
+    final totalPages = result.totalCount <= 0 ? 1 : (result.totalCount + _pageSize - 1) ~/ _pageSize;
+    if (page > totalPages) {
+      page = totalPages;
+      result = _wordService.getWordsPage(_pageSize, page - 1, _search);
+    }
+    if (!mounted) return;
+    setState(() {
+      _currentPage = page;
+      _totalCount = result.totalCount;
+      _words = result.words;
     });
   }
 
+  void _goToPage(int page) {
+    if (!mounted) return;
+    _currentPage = page;
+    _loadWordsPage();
+  }
+
   /// Column content string lengths (for monospace `characterWidth` sizing).
-  void _accumulateWordColumnMaxLengths(WordList w, _WordColumnMaxLens acc) {
+  void _accumulateWordColumnMaxLengths(WordListItem w, _WordColumnMaxLens acc) {
     acc.written = math.max(acc.written, w.writtenForm.length);
     acc.ipa = math.max(acc.ipa, w.phonetic.length + 4);
     acc.category = math.max(acc.category, w.categoryLabel.length + 2);
@@ -134,7 +152,13 @@ class _WordsTableState extends State<WordsTable> implements Invalidator {
           border: TableBorder.all(style: BorderStyle.none),
           columnWidths: borderWidths,
           children: const [
-            TableRow(children: [XDash(), HDash(), XDash()]),
+            TableRow(
+              children: [
+                DBorder(data: '+'),
+                HDash(),
+                DBorder(data: '+'),
+              ],
+            ),
           ],
         ),
         Table(
@@ -147,7 +171,33 @@ class _WordsTableState extends State<WordsTable> implements Invalidator {
           border: TableBorder.all(style: BorderStyle.none),
           columnWidths: borderWidths,
           children: const [
-            TableRow(children: [XDash(), HDash(), XDash()]),
+            TableRow(
+              children: [
+                DBorder(data: '+'),
+                HDash(),
+                DBorder(data: '+'),
+              ],
+            ),
+          ],
+        ),
+        WordTablePaginator(
+          currentPage: _currentPage,
+          totalPages: _totalPages,
+          wordsOnThisPage: _words.length,
+          pageSize: _pageSize,
+          onPageSelected: _goToPage,
+        ),
+        Table(
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: borderWidths,
+          children: const [
+            TableRow(
+              children: [
+                DBorder(data: '+'),
+                HDash(),
+                DBorder(data: '+'),
+              ],
+            ),
           ],
         ),
       ],

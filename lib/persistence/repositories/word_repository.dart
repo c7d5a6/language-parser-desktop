@@ -5,9 +5,16 @@ import 'package:language_parser_desktop/persistence/repositories/language_reposi
 import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart' as pos;
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
 
+class WordPageResult {
+  final List<WordListItem> words;
+  final int totalCount;
+
+  WordPageResult(this.words, this.totalCount);
+}
+
 class WordRepository extends Repository {
-  static const select = '''
-  SELECT
+  /// Shared projection for [Word] + language + pos (same aliases as before).
+  static const _wordListColumns = '''
     language_tbl.id as language_id,
     language_tbl.display_name as language_display_name,
     language_tbl.native_name as language_native_name,
@@ -20,37 +27,149 @@ class WordRepository extends Repository {
     word_tbl.comment as word_comment,
     word_tbl.forgotten_yn as word_forgotten_yn,
     word_tbl.source_type as word_source_type
+''';
+
+  static const selectWithLangAndPos = '''
+SELECT
+$_wordListColumns
   FROM word_tbl
   JOIN language_tbl ON word_tbl.language = language_tbl.id
   JOIN pos_tbl ON word_tbl.pos = pos_tbl.id
   ''';
 
+  /// FTS5 path: [rank] is FTS5’s hidden relevance column (default = bm25; lower is better).
+  /// It only exists when the virtual table is in the FROM clause with MATCH — not inside `IN (SELECT rowid…)`.
+  static const _selectWithLangAndPosFts = '''
+SELECT
+$_wordListColumns
+  FROM fts5_word
+  JOIN word_tbl ON word_tbl.id = fts5_word.rowid
+  JOIN language_tbl ON word_tbl.language = language_tbl.id
+  JOIN pos_tbl ON word_tbl.pos = pos_tbl.id
+  WHERE fts5_word MATCH ?
+  ORDER BY length(word_tbl.word), rank, word_tbl.word ASC
+  ''';
+
   WordRepository(super.db);
 
-  List<WordList> getWords(int size, String string) {
+  /// Match legacy behavior: short queries use `GLOB` on `word`; longer queries use FTS5.
+  static const int _ftsMinQueryLength = 3;
+
+  static const _countSelect = '''
+  SELECT COUNT(*) as cnt
+  FROM word_tbl
+  JOIN language_tbl ON word_tbl.language = language_tbl.id
+  JOIN pos_tbl ON word_tbl.pos = pos_tbl.id
+  ''';
+
+  /// Glob pattern `*query*` with `*`, `?`, `[` escaped for SQLite GLOB.
+  static String globPattern(String raw) {
+    final escaped = raw.replaceAll('[', '[[]').replaceAll('*', '[*]').replaceAll('?', '[?]');
+    return '*$escaped*';
+  }
+
+  /// Basic escaping for double quotes inside FTS5 MATCH string literals.
+  static String ftsMatchToken(String raw) {
+    return raw.replaceAll('"', '""');
+  }
+
+  int countWords(String string) {
+    final query = string.trim();
+    if (query.isEmpty) {
+      final r = db.select(_countSelect, []);
+      return r.first['cnt'] as int;
+    }
+    if (query.length < _ftsMinQueryLength) {
+      final r = db.select(
+        '''
+$_countSelect
+WHERE ${Word.table_name}.word GLOB ?
+''',
+        [globPattern(query)],
+      );
+      return r.first['cnt'] as int;
+    }
+    final r = db.select(
+      '''
+$_countSelect
+WHERE ${Word.table_name}.id IN (
+  SELECT rowid FROM fts5_word WHERE fts5_word MATCH ?
+)
+''',
+      [ftsMatchToken(query)],
+    );
+    return r.first['cnt'] as int;
+  }
+
+  WordPageResult getWordsPage(int limit, int offset, String string) {
+    final query = string.trim();
+    final totalCount = countWords(string);
+    final resultSet = query.isEmpty
+        ? db.select(
+            '''
+$selectWithLangAndPos
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ? OFFSET ?
+''',
+            [limit, offset],
+          )
+        : query.length < _ftsMinQueryLength
+            ? db.select(
+                '''
+$selectWithLangAndPos
+WHERE ${Word.table_name}.word GLOB ?
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ? OFFSET ?
+''',
+                [globPattern(query), limit, offset],
+              )
+            : db.select(
+                '''
+$_selectWithLangAndPosFts
+LIMIT ? OFFSET ?
+''',
+                [ftsMatchToken(query), limit, offset],
+              );
+
+    final words = resultSet.map((row) => WordListItem(convertFullEntity(row))).toList(growable: false);
+    return WordPageResult(words, totalCount);
+  }
+
+  List<WordListItem> getWords(int size, String string) {
     final query = string.trim();
     final resultSet = query.isEmpty
-        ? db.select('''
-    $select
-    ORDER BY ${Word.table_name}.word ASC
-    LIMIT ?
-    ''', [size])
-        : db.select('''
-    $select
-    WHERE ${Word.table_name}.word LIKE ?
-       OR pos_tbl.name LIKE ?
-       OR ifnull(${Word.table_name}.comment, '') LIKE ?
-       OR language_tbl.display_name LIKE ?
-    ORDER BY ${Word.table_name}.word ASC
-    LIMIT ?
-    ''', ['%$query%', '%$query%', '%$query%', '%$query%', size]);
+        ? db.select(
+            '''
+$selectWithLangAndPos
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ?
+''',
+            [size],
+          )
+        : query.length < _ftsMinQueryLength
+            ? db.select(
+                '''
+$selectWithLangAndPos
+WHERE ${Word.table_name}.word GLOB ?
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ?
+''',
+                [globPattern(query), size],
+              )
+            : db.select(
+                '''
+$_selectWithLangAndPosFts
+LIMIT ?
+''',
+                [ftsMatchToken(query), size],
+              );
 
-    return resultSet.map((row) => WordList(convertFullEntity(row))).toList(growable: false);
+    return resultSet.map((row) => WordListItem(convertFullEntity(row))).toList(growable: false);
   }
 
   List<Word> getAllWordByLang(int langId) {
     final resultSet = db.select('''
-    $select
+    $selectWithLangAndPos
     WHERE ${Language.table_name}.id = $langId
     ORDER BY ${Word.table_name}.id
     ''', []);
@@ -63,12 +182,15 @@ class WordRepository extends Repository {
   }
 
   Word save(WordCreatingModel model) {
-    db.execute(
-      'INSERT INTO ${Word.table_name} (word, language, pos, comment, source_type) VALUES (?,?,?,?,?);',
-      [model.word, model.languageId, model.posId, model.comment, model.sourceType.dbValue],
-    );
+    db.execute('INSERT INTO ${Word.table_name} (word, language, pos, comment, source_type) VALUES (?,?,?,?,?);', [
+      model.word,
+      model.languageId,
+      model.posId,
+      model.comment,
+      model.sourceType.dbValue,
+    ]);
     final resultSet = db.select('''
-    $select
+    $selectWithLangAndPos
     WHERE ${Word.table_name}.id = last_insert_rowid()
     ''', []);
     invalidate();
@@ -88,11 +210,12 @@ class WordCreatingModel {
 
 Word convertFullEntity(row) {
   return Word(
-      row['word_id'] as int,
-      row['word_word'] as String,
-      lang.convertNamedEntity(row),
-      pos.convertNamedEntity(row),
-      row['word_comment'] as String?,
-      row['word_forgotten_yn'] == 0 ? false : true,
-      WordSource.fromDb(row['word_source_type'] as String));
+    row['word_id'] as int,
+    row['word_word'] as String,
+    lang.convertNamedEntity(row),
+    pos.convertNamedEntity(row),
+    row['word_comment'] as String?,
+    row['word_forgotten_yn'] == 0 ? false : true,
+    WordSource.fromDb(row['word_source_type'] as String),
+  );
 }

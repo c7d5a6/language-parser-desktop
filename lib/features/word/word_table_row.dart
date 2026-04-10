@@ -4,7 +4,7 @@ import 'package:language_parser_desktop/components/border/vdash.dart';
 import 'package:language_parser_desktop/persistence/entities/word_list.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 
-TableRow buildWordTableRow(WordList row) {
+TableRow buildWordTableRow(WordListItem row) {
   final comment = row.word.comment ?? '';
   final fromLang = 'from ${row.word.language.displayName}';
   final fromWithComment = comment.trim().isEmpty ? ' $fromLang ' : ' $fromLang. $comment ';

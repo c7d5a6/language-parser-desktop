@@ -15,7 +15,11 @@ class WordService {
     return _wordRepository.save(model);
   }
 
-  List<WordList> getWords(int size, String string) {
+  List<WordListItem> getWords(int size, String string) {
     return _wordRepository.getWords(size, string);
+  }
+
+  WordPageResult getWordsPage(int pageSize, int pageIndex, String string) {
+    return _wordRepository.getWordsPage(pageSize, pageIndex * pageSize, string);
   }
 }

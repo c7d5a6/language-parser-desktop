@@ -1,10 +1,10 @@
 import 'word_entity.dart';
 
 /// List row: full [Word] (IPA, comment) with embedded [Word.language] and [Word.pos] (category).
-class WordList {
+class WordListItem {
   final Word word;
 
-  WordList(this.word);
+  WordListItem(this.word);
 
   /// Surface form; same as [Word.word] until a dedicated written column exists.
   String get writtenForm => word.word;
