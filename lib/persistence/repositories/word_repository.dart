@@ -1,17 +1,9 @@
 import 'package:language_parser_desktop/persistence/entities/language_entity.dart';
 import 'package:language_parser_desktop/persistence/entities/word_entity.dart';
+import 'package:language_parser_desktop/persistence/entities/word_list.dart';
 import 'package:language_parser_desktop/persistence/repositories/language_repository.dart' as lang;
 import 'package:language_parser_desktop/persistence/repositories/pos_repository.dart' as pos;
 import 'package:language_parser_desktop/persistence/repositories/repository.dart';
-
-class wrd {
-  String word;
-  String written;
-  String pos;
-  String comment;
-
-  wrd(this.word, this.written, this.pos, this.comment);
-}
 
 class WordRepository extends Repository {
   static const select = '''
@@ -35,27 +27,27 @@ class WordRepository extends Repository {
 
   WordRepository(super.db);
 
-  // Future<List<wrd>> getWords(int size, String string) async {
-  //   var time = DateTime.now().millisecondsSinceEpoch;
-  //   final ResultSet resultSet = string.length < 3
-  //       ? db.select('SELECT * FROM word_tbl WHERE word glob ? OR written_word glob ? ORDER BY word ASC LIMIT $size ', [
-  //           '*$string*',
-  //           '*$string*',
-  //         ])
-  //       : db.select('SELECT rowid,* FROM fts5_word(?) ORDER BY length(word), rank, word ASC LIMIT ? ', [string, size]);
-  //   log('Result time: ${DateTime.now().millisecondsSinceEpoch - time}');
-  //   var res = (resultSet)
-  //       .rows
-  //       .map((row) => wrd(
-  //             '${row[1]}',
-  //             '${row[2]}',
-  //             'n.',
-  //             'Language',
-  //           ))
-  //       .toList(growable: false);
-  //   log('Response time: ${DateTime.now().millisecondsSinceEpoch - time}');
-  //   return res;
-  // }
+  List<WordList> getWords(int size, String string) {
+    final query = string.trim();
+    final resultSet = query.isEmpty
+        ? db.select('''
+    $select
+    ORDER BY ${Word.table_name}.word ASC
+    LIMIT ?
+    ''', [size])
+        : db.select('''
+    $select
+    WHERE ${Word.table_name}.word LIKE ?
+       OR pos_tbl.name LIKE ?
+       OR ifnull(${Word.table_name}.comment, '') LIKE ?
+       OR language_tbl.display_name LIKE ?
+    ORDER BY ${Word.table_name}.word ASC
+    LIMIT ?
+    ''', ['%$query%', '%$query%', '%$query%', '%$query%', size]);
+
+    return resultSet.map((row) => WordList(convertFullEntity(row))).toList(growable: false);
+  }
+
   List<Word> getAllWordByLang(int langId) {
     final resultSet = db.select('''
     $select
@@ -69,6 +61,29 @@ class WordRepository extends Repository {
     final result = db.select("SELECT pos FROM ${Word.table_name} WHERE language = $langId GROUP BY pos");
     return (result).map((row) => row['pos'] as int).toSet();
   }
+
+  Word save(WordCreatingModel model) {
+    db.execute(
+      'INSERT INTO ${Word.table_name} (word, language, pos, comment, source_type) VALUES (?,?,?,?,?);',
+      [model.word, model.languageId, model.posId, model.comment, model.sourceType.dbValue],
+    );
+    final resultSet = db.select('''
+    $select
+    WHERE ${Word.table_name}.id = last_insert_rowid()
+    ''', []);
+    invalidate();
+    return convertFullEntity(resultSet.single);
+  }
+}
+
+class WordCreatingModel {
+  final String word;
+  final int languageId;
+  final int posId;
+  final String? comment;
+  final WordSource sourceType;
+
+  WordCreatingModel(this.word, this.languageId, this.posId, this.comment, this.sourceType);
 }
 
 Word convertFullEntity(row) {
@@ -79,5 +94,5 @@ Word convertFullEntity(row) {
       pos.convertNamedEntity(row),
       row['word_comment'] as String?,
       row['word_forgotten_yn'] == 0 ? false : true,
-      row['word_source_type'] as String);
+      WordSource.fromDb(row['word_source_type'] as String));
 }

@@ -1,3 +1,5 @@
+import 'package:language_parser_desktop/persistence/entities/word_entity.dart';
+import 'package:language_parser_desktop/persistence/entities/word_list.dart';
 import 'package:language_parser_desktop/persistence/repositories/word_repository.dart';
 
 class WordService {
@@ -5,11 +7,15 @@ class WordService {
 
   WordService(this._wordRepository);
 
-// Future<List<wrd>> getWords(int size, String string) async {
-// return _wordRepository.getWords(size, string);
-// return
-// }
   Set<int> getAllPosIDsByLang(int langId) {
     return _wordRepository.getAllPosIDsByLang(langId);
+  }
+
+  Word saveWord(WordCreatingModel model) {
+    return _wordRepository.save(model);
+  }
+
+  List<WordList> getWords(int size, String string) {
+    return _wordRepository.getWords(size, string);
   }
 }

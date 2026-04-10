@@ -5,7 +5,7 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/buttons/t_button.dart';
 import 'package:language_parser_desktop/features/grammar/grammar.dart';
 import 'package:language_parser_desktop/features/temp_sound_whatata/words_list.dart';
-import 'package:language_parser_desktop/features/word/words_list.dart';
+import 'package:language_parser_desktop/features/word/words.dart';
 import 'package:language_parser_desktop/service_provider.dart';
 import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';

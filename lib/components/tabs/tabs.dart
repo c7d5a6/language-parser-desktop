@@ -119,7 +119,8 @@ class _TabsState extends State<Tabs> {
             decoration: BoxDecoration(color: LPColor.greyColor),
             message: widget.tabsInfo[i].tabName,
             textStyle: LPFont.headerFontStyle.merge(TextStyle(color: LPColor.greyBrightColor)),
-            waitDuration: Duration(milliseconds: 500),
+            waitDuration: const Duration(milliseconds: 500),
+            triggerMode: TooltipTriggerMode.longPress,
             child: TButton(
               onPressed: () => _onTabSelected(i),
               text: widget.tabsInfo[i].shortTabName,
