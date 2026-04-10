@@ -39,16 +39,53 @@ $_wordListColumns
 
   /// FTS5 path: [rank] is FTS5’s hidden relevance column (default = bm25; lower is better).
   /// It only exists when the virtual table is in the FROM clause with MATCH — not inside `IN (SELECT rowid…)`.
-  static const _selectWithLangAndPosFts = '''
+  static const _ftsOrderBy = 'ORDER BY length(word_tbl.word), rank, word_tbl.word ASC';
+
+  static String _selectWithLangAndPosFts(String matchTail) => '''
 SELECT
 $_wordListColumns
   FROM fts5_word
   JOIN word_tbl ON word_tbl.id = fts5_word.rowid
   JOIN language_tbl ON word_tbl.language = language_tbl.id
   JOIN pos_tbl ON word_tbl.pos = pos_tbl.id
-  WHERE fts5_word MATCH ?
-  ORDER BY length(word_tbl.word), rank, word_tbl.word ASC
+  WHERE fts5_word MATCH ?$matchTail
+  $_ftsOrderBy
   ''';
+
+  /// SQL `AND word_tbl.language = ?` / `AND word_tbl.pos = ?` for FTS `WHERE` (after `MATCH ?`).
+  static String _wordTableFilterSuffix(int? languageId, int? posId) {
+    final b = StringBuffer();
+    if (languageId != null) {
+      b.write(' AND ${Word.table_name}.language = ?');
+    }
+    if (posId != null) {
+      b.write(' AND ${Word.table_name}.pos = ?');
+    }
+    return b.toString();
+  }
+
+  /// `word_tbl.language = ?` [AND `word_tbl.pos = ?`] for standalone `WHERE` / `AND` clauses.
+  static String _wordTableFilterConditions(int? languageId, int? posId) {
+    final parts = <String>[];
+    if (languageId != null) {
+      parts.add('${Word.table_name}.language = ?');
+    }
+    if (posId != null) {
+      parts.add('${Word.table_name}.pos = ?');
+    }
+    return parts.join(' AND ');
+  }
+
+  static List<Object> _wordTableFilterArgs(int? languageId, int? posId) {
+    final a = <Object>[];
+    if (languageId != null) {
+      a.add(languageId);
+    }
+    if (posId != null) {
+      a.add(posId);
+    }
+    return a;
+  }
 
   WordRepository(super.db);
 
@@ -73,95 +110,152 @@ $_wordListColumns
     return raw.replaceAll('"', '""');
   }
 
-  int countWords(String string) {
+  int countWords(String string, {int? languageId, int? posId}) {
     final query = string.trim();
+    final filt = _wordTableFilterConditions(languageId, posId);
+    final filtArgs = _wordTableFilterArgs(languageId, posId);
     if (query.isEmpty) {
-      final r = db.select(_countSelect, []);
+      final r = filt.isEmpty
+          ? db.select(_countSelect, [])
+          : db.select(
+              '$_countSelect WHERE $filt',
+              filtArgs,
+            );
       return r.first['cnt'] as int;
     }
     if (query.length < _ftsMinQueryLength) {
+      final tail = filt.isEmpty ? '' : ' AND $filt';
       final r = db.select(
         '''
 $_countSelect
-WHERE ${Word.table_name}.word GLOB ?
+WHERE ${Word.table_name}.word GLOB ?$tail
 ''',
-        [globPattern(query)],
+        [globPattern(query), ...filtArgs],
       );
       return r.first['cnt'] as int;
     }
+    final tail = filt.isEmpty ? '' : ' AND $filt';
     final r = db.select(
       '''
 $_countSelect
 WHERE ${Word.table_name}.id IN (
   SELECT rowid FROM fts5_word WHERE fts5_word MATCH ?
-)
+)$tail
 ''',
-      [ftsMatchToken(query)],
+      [ftsMatchToken(query), ...filtArgs],
     );
     return r.first['cnt'] as int;
   }
 
-  WordPageResult getWordsPage(int limit, int offset, String string) {
+  WordPageResult getWordsPage(int limit, int offset, String string, {int? languageId, int? posId}) {
     final query = string.trim();
-    final totalCount = countWords(string);
+    final totalCount = countWords(string, languageId: languageId, posId: posId);
+    final filt = _wordTableFilterConditions(languageId, posId);
+    final filtArgs = _wordTableFilterArgs(languageId, posId);
+    final ftsTail = _wordTableFilterSuffix(languageId, posId);
+
     final resultSet = query.isEmpty
-        ? db.select(
-            '''
+        ? filt.isEmpty
+            ? db.select(
+                '''
 $selectWithLangAndPos
 ORDER BY ${Word.table_name}.word ASC
 LIMIT ? OFFSET ?
 ''',
-            [limit, offset],
-          )
-        : query.length < _ftsMinQueryLength
-            ? db.select(
+                [limit, offset],
+              )
+            : db.select(
                 '''
+$selectWithLangAndPos
+WHERE $filt
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ? OFFSET ?
+''',
+                [...filtArgs, limit, offset],
+              )
+        : query.length < _ftsMinQueryLength
+            ? filt.isEmpty
+                ? db.select(
+                    '''
 $selectWithLangAndPos
 WHERE ${Word.table_name}.word GLOB ?
 ORDER BY ${Word.table_name}.word ASC
 LIMIT ? OFFSET ?
 ''',
-                [globPattern(query), limit, offset],
-              )
-            : db.select(
-                '''
-$_selectWithLangAndPosFts
+                    [globPattern(query), limit, offset],
+                  )
+                : db.select(
+                    '''
+$selectWithLangAndPos
+WHERE ${Word.table_name}.word GLOB ? AND $filt
+ORDER BY ${Word.table_name}.word ASC
 LIMIT ? OFFSET ?
 ''',
-                [ftsMatchToken(query), limit, offset],
+                    [globPattern(query), ...filtArgs, limit, offset],
+                  )
+            : db.select(
+                '''
+${_selectWithLangAndPosFts(ftsTail)}
+LIMIT ? OFFSET ?
+''',
+                [ftsMatchToken(query), ...filtArgs, limit, offset],
               );
 
     final words = resultSet.map((row) => WordListItem(convertFullEntity(row))).toList(growable: false);
     return WordPageResult(words, totalCount);
   }
 
-  List<WordListItem> getWords(int size, String string) {
+  List<WordListItem> getWords(int size, String string, {int? languageId, int? posId}) {
     final query = string.trim();
+    final filt = _wordTableFilterConditions(languageId, posId);
+    final filtArgs = _wordTableFilterArgs(languageId, posId);
+    final ftsTail = _wordTableFilterSuffix(languageId, posId);
+
     final resultSet = query.isEmpty
-        ? db.select(
-            '''
+        ? filt.isEmpty
+            ? db.select(
+                '''
 $selectWithLangAndPos
 ORDER BY ${Word.table_name}.word ASC
 LIMIT ?
 ''',
-            [size],
-          )
-        : query.length < _ftsMinQueryLength
-            ? db.select(
+                [size],
+              )
+            : db.select(
                 '''
+$selectWithLangAndPos
+WHERE $filt
+ORDER BY ${Word.table_name}.word ASC
+LIMIT ?
+''',
+                [...filtArgs, size],
+              )
+        : query.length < _ftsMinQueryLength
+            ? filt.isEmpty
+                ? db.select(
+                    '''
 $selectWithLangAndPos
 WHERE ${Word.table_name}.word GLOB ?
 ORDER BY ${Word.table_name}.word ASC
 LIMIT ?
 ''',
-                [globPattern(query), size],
-              )
-            : db.select(
-                '''
-$_selectWithLangAndPosFts
+                    [globPattern(query), size],
+                  )
+                : db.select(
+                    '''
+$selectWithLangAndPos
+WHERE ${Word.table_name}.word GLOB ? AND $filt
+ORDER BY ${Word.table_name}.word ASC
 LIMIT ?
 ''',
-                [ftsMatchToken(query), size],
+                    [globPattern(query), ...filtArgs, size],
+                  )
+            : db.select(
+                '''
+${_selectWithLangAndPosFts(ftsTail)}
+LIMIT ?
+''',
+                [ftsMatchToken(query), ...filtArgs, size],
               );
 
     return resultSet.map((row) => WordListItem(convertFullEntity(row))).toList(growable: false);

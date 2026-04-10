@@ -71,6 +71,30 @@ void main() {
     expect(long.map((w) => w.word.word).toSet(), {'alpha', 'alphabet'});
   });
 
+  test('Filters by language and pos across search modes', () {
+    db.execute('''
+    INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES
+    ('alpha', 1, 1001, 'NEW', null),
+    ('beta', 1, 1002, 'NEW', null),
+    ('gamma', 2, 1001, 'NEW', null);
+    ''');
+
+    expect(wordRepository.countWords('', languageId: 1), 2);
+    expect(wordRepository.countWords('', languageId: 2), 1);
+    expect(wordRepository.countWords('', languageId: 1, posId: 1002), 1);
+
+    final page = wordRepository.getWordsPage(10, 0, '', languageId: 1, posId: 1002);
+    expect(page.totalCount, 1);
+    expect(page.words.single.word.word, 'beta');
+
+    final glob = wordRepository.getWords(10, 'be', languageId: 1);
+    expect(glob.map((w) => w.word.word).toSet(), {'beta'});
+
+    final fts = wordRepository.getWords(10, 'alp', languageId: 2);
+    expect(fts, isEmpty);
+    expect(wordRepository.getWords(10, 'alp', languageId: 1).single.word.word, 'alpha');
+  });
+
   test('Get all poses', () {
     db.execute('''
     INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES
