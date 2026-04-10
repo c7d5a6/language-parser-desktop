@@ -17,7 +17,7 @@ void main() {
     final fileVersion = getUserVersion(fileDb);
     final version = getUserVersion(db);
     expect(fileVersion, 0);
-    expect(version, 11);
+    expect(version, 13);
   });
 }
 
