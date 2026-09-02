@@ -131,8 +131,10 @@ class DeclensionService {
       bool used = false;
       for (DeclensionRow row in result) {
         if (setEquals(d.values, row.valuesIds)) {
-          row.addDeclension(d);
-          used = true;
+          if (!row.used) {
+            row.addDeclension(d);
+            used = true;
+          }
           break;
         }
       }
