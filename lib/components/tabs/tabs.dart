@@ -28,6 +28,17 @@ class Tabs extends StatefulWidget {
 class _TabsState extends State<Tabs> {
   int _activeTabIndex = 0;
 
+  @override
+  void didUpdateWidget(covariant Tabs oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final last = widget.tabsInfo.length - 1;
+    if (last < 0) {
+      _activeTabIndex = 0;
+    } else if (_activeTabIndex > last) {
+      _activeTabIndex = last;
+    }
+  }
+
   void _onTabSelected(int index) {
     setState(() {
       _activeTabIndex = index;
