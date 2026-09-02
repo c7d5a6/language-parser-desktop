@@ -264,7 +264,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     }
   }
 
-  void _saveSelectedRuleChanges(String newName, String newPattern) {
+  void _saveSelectedRuleChanges(String newName, String newPattern, Set<int> gcvIds) {
     final selectedRule = _selectedRule();
     if (selectedRule == null) {
       return;
@@ -272,6 +272,7 @@ class _LanguageDeclension extends State<LanguageDeclension> implements Invalidat
     if (newName.isEmpty) {
       return;
     }
+    _declensionService.syncRuleGCVIds(selectedRule.id, gcvIds);
     _declensionService.updateRule(selectedRule.id, newName, newPattern, selectedRule.enabled);
     _ruleConnectionsEditMode = false;
     _reloadRules();

@@ -20,7 +20,7 @@ class RuleDetailsColumn extends StatefulWidget {
   final VoidCallback onConnectionsEditRequested;
   final Set<int> selectedDeclensionGcIds;
   final DeclensionRule? selectedRule;
-  final void Function(String name, String pattern) onSave;
+  final void Function(String name, String pattern, Set<int> gcvIds) onSave;
   final VoidCallback onCancel;
 
   const RuleDetailsColumn({
@@ -42,6 +42,7 @@ class RuleDetailsColumn extends StatefulWidget {
 class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
   late TextEditingController _nameController;
   late TextEditingController _wordPatternController;
+  final GlobalKey<RuleGCValuesConnectionsState> _gcConnectionsKey = GlobalKey<RuleGCValuesConnectionsState>();
 
   @override
   void initState() {
@@ -87,7 +88,9 @@ class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
     final ruleName = selectedRule.name;
     final name = _nameController.text.trim();
     final pattern = _wordPatternController.text;
-    final hasChanges = name != selectedRule.name || pattern != (selectedRule.wordPattern ?? '');
+    final hasChanges = name != selectedRule.name ||
+        pattern != (selectedRule.wordPattern ?? '') ||
+        (_gcConnectionsKey.currentState?.hasGcvChanges ?? false);
 
     return Column(
       children: [
@@ -170,12 +173,14 @@ class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
           child: LPhHeader(header: ' FOR GRAMMATICAL CATEGORIES:'),
         ),
         RuleGCValuesConnections(
+          key: _gcConnectionsKey,
           languageId: widget.languageId,
           posId: widget.posId,
           selectedDeclensionGcIds: widget.selectedDeclensionGcIds,
           selectedRule: selectedRule,
           isEditMode: widget.isConnectionsEditMode,
           onEditRequested: widget.onConnectionsEditRequested,
+          onEdited: () => setState(() {}),
         ),
         Table(
           columnWidths: {
@@ -196,7 +201,11 @@ class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
                   color: LPColor.greenColor,
                   hover: LPColor.greenBrightColor,
                   disabled: !hasChanges || name.isEmpty,
-                  onPressed: () => widget.onSave(name, pattern),
+                  onPressed: () => widget.onSave(
+                    name,
+                    pattern,
+                    _gcConnectionsKey.currentState?.desiredGcvIds() ?? {},
+                  ),
                 ),
                 const DBorder(data: ' ]-[ '),
                 TButton(

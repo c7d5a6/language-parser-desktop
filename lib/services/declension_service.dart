@@ -86,6 +86,16 @@ class DeclensionService {
     _declensionRuleGCConnectionRepository.delete(declensionRuleId, gcvId);
   }
 
+  void syncRuleGCVIds(int declensionRuleId, Set<int> desired) {
+    final stored = getRuleGCVIds(declensionRuleId);
+    for (final id in desired.difference(stored)) {
+      saveRuleGCConnection(declensionRuleId, id);
+    }
+    for (final id in stored.difference(desired)) {
+      deleteRuleGCConnection(declensionRuleId, id);
+    }
+  }
+
   List<DeclensionRuleSoundChange> getRuleSoundChanges(int declensionRuleId) {
     return _declensionRuleSoundChangeRepository
         .getByDeclensionRuleId(declensionRuleId)

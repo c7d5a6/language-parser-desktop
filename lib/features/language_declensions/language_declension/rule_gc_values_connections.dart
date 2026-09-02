@@ -19,6 +19,7 @@ class RuleGCValuesConnections extends StatefulWidget {
   final DeclensionRule? selectedRule;
   final bool isEditMode;
   final VoidCallback onEditRequested;
+  final VoidCallback? onEdited;
 
   const RuleGCValuesConnections({
     super.key,
@@ -28,13 +29,14 @@ class RuleGCValuesConnections extends StatefulWidget {
     required this.selectedRule,
     required this.isEditMode,
     required this.onEditRequested,
+    this.onEdited,
   });
 
   @override
-  State<RuleGCValuesConnections> createState() => _RuleGCValuesConnectionsState();
+  State<RuleGCValuesConnections> createState() => RuleGCValuesConnectionsState();
 }
 
-class _RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> implements Invalidator {
+class RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> implements Invalidator {
   ServiceManager? _serviceManager;
   late DeclensionService _declensionService;
   late GCService _gcService;
@@ -42,6 +44,44 @@ class _RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> imple
   final Map<int, List<GrammaticalCategoryValue>> _valuesByGc = {};
   final Map<int, int?> _selectedValueByGc = {};
   final Map<int, int?> _initialSelectedValueByGc = {};
+
+  bool get hasGcvChanges {
+    for (final gc in _categories) {
+      if (widget.selectedDeclensionGcIds.contains(gc.id)) {
+        continue;
+      }
+      if (_selectedValueByGc[gc.id] != _initialSelectedValueByGc[gc.id]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Set<int> desiredGcvIds() {
+    final rule = widget.selectedRule;
+    if (rule == null) {
+      return {};
+    }
+    final stored = _declensionService.getRuleGCVIds(rule.id);
+    final editableValueIds = <int>{};
+    for (final gc in _categories) {
+      if (widget.selectedDeclensionGcIds.contains(gc.id)) {
+        continue;
+      }
+      editableValueIds.addAll((_valuesByGc[gc.id] ?? const <GrammaticalCategoryValue>[]).map((v) => v.id));
+    }
+    final desired = stored.where((id) => !editableValueIds.contains(id)).toSet();
+    for (final gc in _categories) {
+      if (widget.selectedDeclensionGcIds.contains(gc.id)) {
+        continue;
+      }
+      final id = _selectedValueByGc[gc.id];
+      if (id != null) {
+        desired.add(id);
+      }
+    }
+    return desired;
+  }
 
   @override
   void didChangeDependencies() {
@@ -198,6 +238,7 @@ class _RuleGCValuesConnectionsState extends State<RuleGCValuesConnections> imple
                       setState(() {
                         _selectedValueByGc[gc.id] = newValue;
                       });
+                      widget.onEdited?.call();
                     },
                   ),
                 ],
