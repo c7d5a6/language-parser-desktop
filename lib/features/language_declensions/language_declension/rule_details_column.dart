@@ -57,6 +57,8 @@ class _RuleDetailsColumnState extends State<RuleDetailsColumn> {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedRule?.id != oldWidget.selectedRule?.id) {
       _syncFromSelectedRule();
+    } else if (oldWidget.isConnectionsEditMode && !widget.isConnectionsEditMode) {
+      _syncFromSelectedRule();
     }
   }
 
