@@ -119,11 +119,7 @@ Future<void> migrate(Database db) async {
 }
 
 void setPragmas(Database db) {
-  db.execute('BEGIN TRANSACTION;');
-  db.execute('''
-      PRAGMA foreign_keys = ON;
-      ''');
-  db.execute('COMMIT;');
+  db.execute('PRAGMA foreign_keys = ON;');
 }
 
 void checkData() {
