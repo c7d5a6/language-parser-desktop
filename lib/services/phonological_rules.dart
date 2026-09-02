@@ -3,8 +3,9 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/services.dart';
 
-const _libPath = 'assets/libph_lib.so';
+const _libAssetPath = 'assets/libph_lib.so';
 
 final class ResultRuleNative extends Struct {
   @Uint8()
@@ -21,6 +22,8 @@ final class ResultNative extends Struct {
 }
 
 class PhonologicalRules {
+  static DynamicLibrary? _openedLib;
+
   final DynamicLibrary _lib;
 
   late final Pointer<Utf8> Function() _versionFn;
@@ -31,7 +34,7 @@ class PhonologicalRules {
   late final Pointer<ResultNative> Function(Pointer<Utf8>, Pointer<Opaque>) _applyRuleFn;
   late final void Function(Pointer<ResultNative>) _destroyRuleResultFn;
 
-  PhonologicalRules() : _lib = _loadLib() {
+  PhonologicalRules._(this._lib) {
     log('PhonologicalRules: initializing and binding native functions');
     _versionFn = _lib.lookupFunction<Pointer<Utf8> Function(), Pointer<Utf8> Function()>('version');
     _distinctiveFeaturesFn = _lib
@@ -60,11 +63,25 @@ class PhonologicalRules {
         );
   }
 
-  static DynamicLibrary _loadLib() {
-    if (Platform.isLinux) {
-      return DynamicLibrary.open(_libPath);
+  static Future<PhonologicalRules> create() async {
+    return PhonologicalRules._(await _loadLib());
+  }
+
+  static Future<DynamicLibrary> _loadLib() async {
+    if (!Platform.isLinux) {
+      throw UnsupportedError('Platform not supported');
     }
-    throw UnsupportedError('Platform not supported');
+    final opened = _openedLib;
+    if (opened != null) {
+      return opened;
+    }
+    final data = await rootBundle.load(_libAssetPath);
+    final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    final file = File('${Directory.systemTemp.path}/language_parser_desktop_libph_lib.so');
+    await file.writeAsBytes(bytes, flush: true);
+    final lib = DynamicLibrary.open(file.path);
+    _openedLib = lib;
+    return lib;
   }
 
   String version() => _versionFn().toDartString();

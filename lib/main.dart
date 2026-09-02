@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var filePath = await FilePicker.platform.saveFile();
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
-      _serviceManager = ServiceManager(_repositoryManager);
+      _serviceManager = await ServiceManager.create(_repositoryManager);
     } else {
       _repositoryManager.dispose();
       _serviceManager = null;
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var filePath = file?.files[0].path;
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
-      _serviceManager = ServiceManager(_repositoryManager);
+      _serviceManager = await ServiceManager.create(_repositoryManager);
     } else {
       _repositoryManager.dispose();
       _serviceManager = null;

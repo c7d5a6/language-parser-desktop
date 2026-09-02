@@ -15,8 +15,7 @@ class ServiceManager {
   late final PosService _posService;
   late final WordService _wordService;
 
-  ServiceManager(this.repositoryManager) {
-    _phonologicalRules = PhonologicalRules();
+  ServiceManager._(this.repositoryManager, this._phonologicalRules) {
     _declensionService = DeclensionService(
       repositoryManager.declensionCategoryPosLangConnectionRepository,
       repositoryManager.declensionRepository,
@@ -43,6 +42,11 @@ class ServiceManager {
       repositoryManager.posGCLangConnectionRepository,
     );
     _wordService = WordService(repositoryManager.wordRepository);
+  }
+
+  static Future<ServiceManager> create(RepositoryManager repositoryManager) async {
+    final phonologicalRules = await PhonologicalRules.create();
+    return ServiceManager._(repositoryManager, phonologicalRules);
   }
 
   DeclensionService get declensionService => _declensionService;
