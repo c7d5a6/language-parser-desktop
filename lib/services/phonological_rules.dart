@@ -25,6 +25,7 @@ class PhonologicalRules {
 
   late final Pointer<Utf8> Function() _versionFn;
   late final Pointer<Utf8> Function(Pointer<Utf8>) _distinctiveFeaturesFn;
+  late final void Function(Pointer<Utf8>) _destroyStrFn;
   late final Pointer<ResultRuleNative> Function(Pointer<Utf8>) _createRuleFn;
   late final void Function(Pointer<ResultRuleNative>) _destroyRuleFn;
   late final Pointer<ResultNative> Function(Pointer<Utf8>, Pointer<Opaque>) _applyRuleFn;
@@ -37,6 +38,8 @@ class PhonologicalRules {
         .lookupFunction<Pointer<Utf8> Function(Pointer<Utf8>), Pointer<Utf8> Function(Pointer<Utf8>)>(
           'distinctiveFeatures',
         );
+    _destroyStrFn = _lib
+        .lookupFunction<Void Function(Pointer<Utf8>), void Function(Pointer<Utf8>)>('destroyStr');
     _createRuleFn = _lib
         .lookupFunction<
           Pointer<ResultRuleNative> Function(Pointer<Utf8>),
@@ -69,14 +72,21 @@ class PhonologicalRules {
   String distinctiveFeatures(String input) {
     log('PhonologicalRules.distinctiveFeatures: input="$input"');
     final cStr = input.toNativeUtf8();
+    Pointer<Utf8> nativeOut = nullptr;
     try {
-      final ptr = _distinctiveFeaturesFn(cStr);
-      final output = ptr.toDartString();
+      nativeOut = _distinctiveFeaturesFn(cStr);
+      if (nativeOut == nullptr) {
+        return '';
+      }
+      final output = nativeOut.toDartString();
       log('PhonologicalRules.distinctiveFeatures: success output="$output"');
       return output;
     } finally {
       malloc.free(cStr);
-      log('PhonologicalRules.distinctiveFeatures: freed input pointer');
+      if (nativeOut != nullptr) {
+        _destroyStrFn(nativeOut);
+      }
+      log('PhonologicalRules.distinctiveFeatures: freed input and native output');
     }
   }
 
