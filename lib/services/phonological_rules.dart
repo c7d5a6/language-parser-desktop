@@ -94,8 +94,11 @@ class PhonologicalRules {
     log('PhonologicalRules.applyRule: start rule="$rule" input="$input"');
 
     final cRule = rule.toNativeUtf8();
-    late final Pointer<ResultRuleNative> ruleResult;
+    Pointer<ResultRuleNative> ruleResult = nullptr;
     var hasRuleResult = false;
+    Pointer<Utf8> cInput = nullptr;
+    late final Pointer<ResultNative> applyResult;
+    var hasApplyResult = false;
     try {
       log('PhonologicalRules.applyRule: calling native createRule');
       ruleResult = _createRuleFn(cRule);
@@ -109,15 +112,7 @@ class PhonologicalRules {
         log('PhonologicalRules.applyRule: createRule nullptr');
         return const PhonologicalRulesApplyResult.error('Rule error');
       }
-    } finally {
-      malloc.free(cRule);
-      log('PhonologicalRules.applyRule: freed rule input pointer');
-    }
-
-    final cInput = input.toNativeUtf8();
-    late final Pointer<ResultNative> applyResult;
-    var hasApplyResult = false;
-    try {
+      cInput = input.toNativeUtf8();
       log('PhonologicalRules.applyRule: calling native applyRule');
       applyResult = _applyRuleFn(cInput, ruleResult.ref.rule);
       hasApplyResult = true;
@@ -133,8 +128,12 @@ class PhonologicalRules {
         _destroyRuleResultFn(applyResult);
         log('PhonologicalRules.applyRule: destroyed native apply result');
       }
-      malloc.free(cInput);
-      log('PhonologicalRules.applyRule: freed apply input pointer');
+      if (cInput != nullptr) {
+        malloc.free(cInput);
+        log('PhonologicalRules.applyRule: freed apply input pointer');
+      }
+      malloc.free(cRule);
+      log('PhonologicalRules.applyRule: freed rule input pointer');
       if (hasRuleResult) {
         _destroyRuleFn(ruleResult);
         log('PhonologicalRules.applyRule: destroyed native rule result');
