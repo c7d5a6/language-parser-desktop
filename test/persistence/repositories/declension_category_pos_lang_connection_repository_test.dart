@@ -65,6 +65,23 @@ void main() {
     expect(poses.contains(1002), true);
   });
 
+  test('Get GC ids ordered by name then gc_id', () {
+    db.execute('''
+    INSERT INTO grammatical_category_tbl (id, name) VALUES
+    (2001, 'Zeta'),
+    (2002, 'Alpha');
+    ''');
+    db.execute('''
+    INSERT INTO declension_category_pos_lang_connection_tbl (lang_id,pos_id,gc_id) VALUES
+    (1, 1001, 2001),
+    (1, 1001, 2002);
+    ''');
+
+    var ids = declensionCategoryPosLangConnectionRepository.getGCsIdsByLangIdAndPosId(1, 1001);
+
+    expect(ids.toList(), [2002, 2001]);
+  });
+
   test('Save GC', () {
     declensionCategoryPosLangConnectionRepository.save(1, 1001, 1001);
 
