@@ -31,7 +31,7 @@ class _TButton extends State<TButton> {
         onEnter: (_) => setState(() => hover = true),
         onExit: (_) => setState(() => hover = false),
         child: GestureDetector(
-          onPanDown: widget._onPressed == null ? null : (_) => widget._onPressed!(),
+          onPanDown: widget.disabled || widget._onPressed == null ? null : (_) => widget._onPressed!(),
           child: TextButton(
             onPressed: widget.disabled ? null : () => {},
             style: TextButton.styleFrom(
