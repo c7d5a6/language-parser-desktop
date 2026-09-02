@@ -94,22 +94,9 @@ void applyMigrations(Database db, LoadedMigrations loaded) {
       db.execute('COMMIT;');
       print('Migration ${script.version} successful');
     } catch (e) {
-      if (e.runtimeType == SqliteException) {
-        final se = e as SqliteException;
-        if (se.message == 'error in tokenizer constructor') {
-          db.execute('''
-          PRAGMA user_version = ${script.version};
-          ''');
-          db.execute('COMMIT;');
-          print('Migration ${script.version} successful, with warning about tokenizer');
-        } else {
-          db.execute('ROLLBACK;');
-          print('Migration ${script.version} failed with sqlite exception: ${se.message}\n$e');
-        }
-      } else {
-        db.execute('ROLLBACK;');
-        print('Migration ${script.version} failed: $e');
-      }
+      db.execute('ROLLBACK;');
+      print('Migration ${script.version} failed: $e');
+      rethrow;
     }
   }
 }
