@@ -95,6 +95,25 @@ void main() {
     expect(wordRepository.getWords(10, 'alp', languageId: 1).single.word.word, 'alpha');
   });
 
+  test('FTS MATCH quotes user text so operators are literals', () {
+    db.execute('''
+    INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES
+    ('alpha', 1, 1001, 'NEW', null),
+    ('sand', 1, 1001, 'NEW', null);
+    ''');
+
+    expect(WordRepository.ftsMatchToken('AND'), '"AND"');
+    expect(WordRepository.ftsMatchToken('say "hi"'), '"say ""hi"""');
+
+    expect(() => wordRepository.getWords(10, 'AND'), returnsNormally);
+    expect(() => wordRepository.countWords('NOT'), returnsNormally);
+    expect(() => wordRepository.getWordsPage(10, 0, 'OR'), returnsNormally);
+
+    expect(wordRepository.getWords(10, 'alp').map((w) => w.word.word).toSet(), {'alpha'});
+    expect(wordRepository.getWords(10, 'alp*'), isEmpty);
+    expect(wordRepository.getWords(10, 'AND').map((w) => w.word.word).toSet(), {'sand'});
+  });
+
   test('Get all poses', () {
     db.execute('''
     INSERT INTO word_tbl (word, language, pos, source_type, comment) VALUES

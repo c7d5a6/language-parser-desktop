@@ -105,9 +105,9 @@ $_wordListColumns
     return '*$escaped*';
   }
 
-  /// Basic escaping for double quotes inside FTS5 MATCH string literals.
+  /// FTS5 MATCH string literal. Quotes the query so operators are not parsed.
   static String ftsMatchToken(String raw) {
-    return raw.replaceAll('"', '""');
+    return '"${raw.replaceAll('"', '""')}"';
   }
 
   int countWords(String string, {int? languageId, int? posId}) {
