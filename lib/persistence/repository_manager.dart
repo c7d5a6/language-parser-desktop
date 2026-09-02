@@ -18,6 +18,9 @@ import 'package:sqlite3/sqlite3.dart';
 
 class RepositoryManager {
   Database? _database;
+  final LoadedMigrations _migrations;
+
+  RepositoryManager(this._migrations);
 
   T _createRepository<T>(T Function(Database db) factory) {
     return factory(_database!);
@@ -26,7 +29,7 @@ class RepositoryManager {
   void openDatabase(String filePath) {
     dispose();
     var db = sqlite3.open(filePath);
-    migrate(db);
+    applyMigrations(db, _migrations);
     _database = db;
     db.execute('PRAGMA foreign_keys = ON;');
     _declensionCategoryPosLangConnectionRepository = _createRepository(

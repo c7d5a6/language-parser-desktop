@@ -41,6 +41,19 @@ void main() async {
   pragmaSelect(db, 'user_version');
 }
 
+class MigrationScript {
+  final int version;
+  final String sql;
+
+  const MigrationScript(this.version, this.sql);
+}
+
+class LoadedMigrations {
+  final List<MigrationScript> scripts;
+
+  const LoadedMigrations(this.scripts);
+}
+
 Future<void> checkAssets() async {
   final assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
   for (String asset in assetManifest.listAssets()) {
@@ -48,49 +61,61 @@ Future<void> checkAssets() async {
   }
 }
 
-Future<void> migrate(Database db) async {
+Future<LoadedMigrations> loadMigrations() async {
   final assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
   final migrations = assetManifest.listAssets().where((p) => p.startsWith(migrationsPath));
   final versions = migrations
       .map((m) => int.parse(m.substring(migrationsPath.length, m.indexOf('_', migrationsPath.length))))
       .toList(growable: false)
     ..sort();
+  final scripts = <MigrationScript>[];
+  for (final version in versions) {
+    final migrationPath = migrations.firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
+    final sql = await rootBundle.loadString(migrationPath);
+    scripts.add(MigrationScript(version, sql));
+  }
+  return LoadedMigrations(scripts);
+}
+
+void applyMigrations(Database db, LoadedMigrations loaded) {
   var uversion = db.select("PRAGMA user_version;").single['user_version'];
   log('Uversion $uversion');
   printPragma();
   setPragmas(db);
   printPragma();
-  for (int version in versions) {
-    if (version <= uversion) continue;
-    var migrationPath = migrations.firstWhere((p) => p.startsWith('$migrationsPath${version}_'));
-    var migration = await rootBundle.loadString(migrationPath);
+  for (final script in loaded.scripts) {
+    if (script.version <= uversion) continue;
     db.execute('BEGIN TRANSACTION;');
     try {
-      db.execute(migration);
+      db.execute(script.sql);
       db.execute('''
-      PRAGMA user_version = $version;
+      PRAGMA user_version = ${script.version};
       ''');
       db.execute('COMMIT;');
-      print('Migration $version successful');
+      print('Migration ${script.version} successful');
     } catch (e) {
       if (e.runtimeType == SqliteException) {
         final se = e as SqliteException;
         if (se.message == 'error in tokenizer constructor') {
           db.execute('''
-          PRAGMA user_version = $version;
+          PRAGMA user_version = ${script.version};
           ''');
           db.execute('COMMIT;');
-          print('Migration $version successful, with warning about tokenizer');
+          print('Migration ${script.version} successful, with warning about tokenizer');
         } else {
           db.execute('ROLLBACK;');
-          print('Migration $version failed with sqlite exception: ${se.message}\n$e');
+          print('Migration ${script.version} failed with sqlite exception: ${se.message}\n$e');
         }
       } else {
         db.execute('ROLLBACK;');
-        print('Migration $version failed: $e');
+        print('Migration ${script.version} failed: $e');
       }
     }
   }
+}
+
+Future<void> migrate(Database db) async {
+  applyMigrations(db, await loadMigrations());
 }
 
 void setPragmas(Database db) {

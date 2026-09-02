@@ -9,13 +9,18 @@ import 'package:language_parser_desktop/services/service_manager.dart';
 import 'package:language_parser_desktop/text_measure_provider.dart';
 import 'package:language_parser_desktop/util/constants.dart';
 import 'package:language_parser_desktop/util/layout.dart';
+import 'package:language_parser_desktop/util/sqlite.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  final migrations = await loadMigrations();
+  runApp(MyApp(migrations: migrations));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final LoadedMigrations migrations;
+
+  const MyApp({super.key, required this.migrations});
 
   // This widget is the root of your application.
   @override
@@ -42,15 +47,16 @@ class MyApp extends StatelessWidget {
         ),
         brightness: Brightness.dark,
       ),
-      home: const MyHomePage(title: 'Language Parser Demo'),
+      home: MyHomePage(title: 'Language Parser Demo', migrations: migrations),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.migrations});
 
   final String title;
+  final LoadedMigrations migrations;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -66,7 +72,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    _repositoryManager = RepositoryManager();
+    _repositoryManager = RepositoryManager(widget.migrations);
   }
 
   void newFile() async {
