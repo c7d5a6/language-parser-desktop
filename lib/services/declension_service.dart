@@ -145,6 +145,12 @@ class DeclensionService {
         result.add(row);
       }
     }
+    for (final row in result) {
+      final id = row.declensionId;
+      if (id != null) {
+        row.hasRules = _declensionRuleRepository.getByDeclensionId(id).isNotEmpty;
+      }
+    }
     return result;
   }
 
@@ -173,6 +179,7 @@ class DeclensionRow {
   int? declensionId;
   bool main = false;
   bool deprecated = false;
+  bool hasRules = false;
   List<GrammaticalCategoryValue> values;
 
   DeclensionRow(this.values);

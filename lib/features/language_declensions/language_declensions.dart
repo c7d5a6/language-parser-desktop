@@ -50,6 +50,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
       if (_serviceManager != null) {
         _serviceManager!.repositoryManager.removeDeclensionCategoryPosLangConnectionInvalidator(this);
         _serviceManager!.repositoryManager.removeDeclensionInvalidator(this);
+        _serviceManager!.repositoryManager.removeDeclensionRuleInvalidator(this);
         _serviceManager!.repositoryManager.removeGCInvalidator(this);
         _serviceManager!.repositoryManager.removeGCVInvalidator(this);
         _serviceManager!.repositoryManager.removeGCVLangInvalidator(this);
@@ -60,6 +61,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
       _serviceManager = sm;
       _serviceManager!.repositoryManager.addDeclensionCategoryPosLangConnectionInvalidator(this);
       _serviceManager!.repositoryManager.addDeclensionInvalidator(this);
+      _serviceManager!.repositoryManager.addDeclensionRuleInvalidator(this);
       _serviceManager!.repositoryManager.addGCValidator(this);
       _serviceManager!.repositoryManager.addGCVValidator(this);
       _serviceManager!.repositoryManager.addGCVLangInvalidator(this);
@@ -86,6 +88,7 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
   void dispose() {
     _serviceManager!.repositoryManager.removeDeclensionCategoryPosLangConnectionInvalidator(this);
     _serviceManager!.repositoryManager.removeDeclensionInvalidator(this);
+    _serviceManager!.repositoryManager.removeDeclensionRuleInvalidator(this);
     _serviceManager!.repositoryManager.removeGCInvalidator(this);
     _serviceManager!.repositoryManager.removeGCVInvalidator(this);
     _serviceManager!.repositoryManager.removeGCVLangInvalidator(this);
@@ -299,9 +302,10 @@ class _LanguageDeclensions extends State<LanguageDeclensions> implements Invalid
         declension.used
             ? TButton(
                 text: 'o',
+                disabled: declension.hasRules,
                 color: declension.deprecated ? LPColor.redColor : LPColor.greenColor,
                 hover: declension.deprecated ? LPColor.redBrightColor : LPColor.greenBrightColor,
-                onPressed: () => _declensionService.delete(declension.declensionId!),
+                onPressed: declension.hasRules ? null : () => _declensionService.delete(declension.declensionId!),
               )
             : TButton(
                 text: 'x',
