@@ -155,6 +155,9 @@ class DeclensionService {
   }
 
   List<DeclensionRow> calculateMatrix(Map<int, List<GrammaticalCategoryValue>> values) {
+    if (values.values.any((list) => list.isEmpty)) {
+      return [];
+    }
     List<List<GrammaticalCategoryValue>> result = [];
     for (int id in values.keys) {
       List<List<GrammaticalCategoryValue>> newResult = [];
