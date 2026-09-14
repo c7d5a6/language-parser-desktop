@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_non_pulmonic_consonants.dart';
+import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_other_phonemes.dart';
 import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_plumonic_consonants.dart';
+import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_vowels.dart';
 import 'package:language_parser_desktop/persistence/entities/language_phoneme_entity.dart';
 
 import '../../service_provider.dart';
@@ -77,19 +80,18 @@ class _LanguagePhonetics extends State<LanguagePhonetics> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      LanguagePhoneticsPlumonicConsonants(phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
-      // PhoneticButton(phonetic: 'a', languagePhonemes: listOfLanguagePhonemes, vowel: true, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 'i', languagePhonemes: listOfLanguagePhonemes, vowel: true, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 's', languagePhonemes: listOfLanguagePhonemes, consonant: true, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 'd', languagePhonemes: listOfLanguagePhonemes, consonant: true, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 'f', languagePhonemes: listOfLanguagePhonemes, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 'g', languagePhonemes: listOfLanguagePhonemes, consonant: true, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: 'h', languagePhonemes: listOfLanguagePhonemes, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: '1', languagePhonemes: listOfLanguagePhonemes, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: '2', languagePhonemes: listOfLanguagePhonemes, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: '3', languagePhonemes: listOfLanguagePhonemes, disabled: widget.languageId == null),
-      // PhoneticButton(phonetic: '4', languagePhonemes: listOfLanguagePhonemes, consonant: true, disabled: widget.languageId == null),
-    ]);
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          LanguagePhoneticsPlumonicConsonants(
+              phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
+          LanguagePhoneticsVowels(phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
+          LanguagePhoneticsNonPulmonicConsonants(
+              phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
+          LanguagePhoneticsOtherPhonemes(
+              phonemes: listOfLanguagePhonemes, disabled: disabled, onPress: updatePhoneme),
+        ],
+      ),
+    );
   }
 }

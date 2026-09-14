@@ -76,7 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void newFile() async {
-    var filePath = await FilePicker.platform.saveFile();
+    final output = await FilePicker.saveFile(
+      fileName: 'language.sqlt3',
+      bytes: Uint8List(0),
+    );
+    final filePath = output?.toFilePath();
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
       _serviceManager = await ServiceManager.create(_repositoryManager);
@@ -90,11 +94,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void openFile() async {
-    var file = await FilePicker.platform.pickFiles();
+    final file = await FilePicker.pickFile();
     if (kDebugMode && file != null) {
-      assert(file.files.isNotEmpty);
+      assert(file.path != null);
     }
-    var filePath = file?.files[0].path;
+    final filePath = file?.path;
     if (filePath != null) {
       _repositoryManager.openDatabase(filePath);
       _serviceManager = await ServiceManager.create(_repositoryManager);

@@ -14,7 +14,7 @@ void newDb(String path) {
   var tmp = sqlite3.openInMemory();
   database = sqlite3.open(path);
   tmp.backup(database!, nPage: -1);
-  tmp.dispose();
+  tmp.close();
   migrate(database!);
 }
 
@@ -114,7 +114,7 @@ void checkData() {
   pragmaSelect(db, 'data_version');
   var dm = sqlite3.copyIntoMemory(db);
   pragmaSelect(db, 'data_version');
-  db.dispose();
+  db.close();
 
   pragmaSelect(dm, 'data_version');
   dm.execute('''
@@ -128,14 +128,14 @@ void checkData() {
   final stmt = dm.prepare('INSERT INTO word_tbl (word, written_word) VALUES (?,?)');
   stmt.execute(['abc2', 'abc']);
   stmt.execute(['abc3', 'abc']);
-  stmt.dispose();
+  stmt.close();
   pragmaSelect(dm, 'data_version');
   var db2 = sqlite3.open('./temp.sqlt3');
   dm.backup(db2, nPage: -1).drain();
   pragmaSelect(dm, 'data_version');
   pragmaSelect(db2, 'data_version');
-  dm.dispose();
-  db2.dispose();
+  dm.close();
+  db2.close();
 }
 
 void printPragma() {
@@ -147,7 +147,7 @@ void printPragma() {
   // pragmaSelect(db, 'optimize');
   pragmaSelect(db, 'user_version');
   pragmaSelect(db, 'foreign_keys');
-  db.dispose();
+  db.close();
 }
 
 void pragmaSelect(Database db, String variable) {

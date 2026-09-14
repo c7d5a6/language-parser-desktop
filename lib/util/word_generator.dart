@@ -163,10 +163,10 @@ Future<void> generateSQL(Database database) async {
   log('statements executed');
 
   // Dispose a statement when you don't need it anymore to clean up resources.
-  stmt.dispose();
+  stmt.close();
 
   // Use the database
   // var backUp = sqlite3.open('temp.sqlt3');
   await db.backup(database, nPage: -1).drain();
-  db.dispose();
+  db.close();
 }

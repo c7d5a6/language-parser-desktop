@@ -5,6 +5,7 @@ import 'package:language_parser_desktop/components/border/border.dart';
 import 'package:language_parser_desktop/components/border/hdash.dart';
 import 'package:language_parser_desktop/components/buttons/phonetic_button.dart';
 import 'package:language_parser_desktop/features/language_phonetics/language_phonetics_header.dart';
+import 'package:language_parser_desktop/util/constants.dart';
 
 import '../../services/language_service.dart';
 import '../../text_measure_provider.dart';
@@ -29,6 +30,17 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
     ["Lateral tap/flap", "LTF"]
   ];
 
+  /// Row-header width used by pulmonic / co-articulated / vowels for alignment.
+  /// Never shorter than the longest full label when there is room.
+  static double sharedRowHeaderWidth(double maxWidth, double cWidth, {int extraChars = 0}) {
+    final rowHeaderCharacters =
+        math.max(extraChars, rowHeaders.fold(0, (p, s) => math.max(p, s[0].length)));
+    final delta = maxWidth % (cWidth * 12);
+    final aligned =
+        math.max(0, rowHeaderCharacters - (delta / cWidth).floorToDouble()) * cWidth + delta % cWidth;
+    return math.max(rowHeaderCharacters * cWidth, aligned);
+  }
+
   const LanguagePhoneticsPlumonicConsonants(
       {super.key, required this.disabled, required this.phonemes, required this.onPress});
 
@@ -36,37 +48,26 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       final cWidth = TextMeasureProvider.of(context)!.characterWidth;
-      final rowHeaderCharacters = rowHeaders.fold(0, (p, s) => math.max(p, s[0].length));
-      var delta = ((constraints.maxWidth) % (cWidth * 12));
-      final rowHeaderLength =
-          math.max(0, rowHeaderCharacters - 0 - (delta / cWidth).floorToDouble()) * cWidth + delta % cWidth;
+      final rowHeaderLength = sharedRowHeaderWidth(constraints.maxWidth, cWidth);
 
       return Column(
         children: [
-          Table(
-            columnWidths: {
-              0: FixedColumnWidth(cWidth),
-              1: FlexColumnWidth(),
-              2: FixedColumnWidth(cWidth),
-            },
+          // Header: no left | — matches Angular colspan + right |
+          Row(
             children: [
-              TableRow(children: [
-                DBorder(data: '|'),
-                Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---')),
-                DBorder(data: '|')
-              ])
+              Expanded(child: Center(child: LPhHeader(header: '--- PLUMONIC CONSONANTS ---'))),
+              SizedBox(width: cWidth, child: DBorder(data: '|')),
             ],
           ),
           Table(
             columnWidths: {
-              0: FixedColumnWidth(cWidth),
-              1: FixedColumnWidth(rowHeaderLength),
-              2: FixedColumnWidth(cWidth),
-              3: FlexColumnWidth(),
-              4: FixedColumnWidth(cWidth)
+              0: FixedColumnWidth(rowHeaderLength),
+              1: FixedColumnWidth(cWidth),
+              2: FlexColumnWidth(),
+              3: FixedColumnWidth(cWidth)
             },
             children: [
-              TableRow(children: [DBorder(data: '+'), HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')])
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')])
             ],
           ),
           Table(
@@ -393,7 +394,7 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
                 CPhoneticButton(phonetic: 'ɟ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'k', phonemes: phonemes, disabled: disabled, onPressed: onPress),
-                CPhoneticButton(phonetic: 'g', phonemes: phonemes, disabled: disabled, onPressed: onPress),
+                CPhoneticButton(phonetic: 'ɡ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 DBorder(data: '|'),
                 CPhoneticButton(phonetic: 'q', phonemes: phonemes, disabled: disabled, onPressed: onPress),
                 CPhoneticButton(phonetic: 'ɢ', phonemes: phonemes, disabled: disabled, onPressed: onPress),
@@ -1363,6 +1364,114 @@ class LanguagePhoneticsPlumonicConsonants extends StatelessWidget {
               3: FixedColumnWidth(cWidth),
             },
             children: [
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: Center(child: LPhHeader(header: '--- CO-ARTICULATED CONSONANTS ---'))),
+              SizedBox(width: cWidth, child: DBorder(data: '|')),
+            ],
+          ),
+          Table(
+            columnWidths: {
+              0: FixedColumnWidth(rowHeaderLength),
+              1: FixedColumnWidth(cWidth),
+              2: FlexColumnWidth(),
+              3: FixedColumnWidth(cWidth),
+            },
+            children: [
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+              TableRow(children: [
+                Center(child: CLPhHeader(header: 'Nasal', short: 'Nas')),
+                DBorder(data: '|'),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Labial–alveolar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'n͡m', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      Text(', Labial–velar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'ŋ͡m', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                    ],
+                  ),
+                ),
+                DBorder(data: '|'),
+              ]),
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+              TableRow(children: [
+                Center(child: CLPhHeader(header: 'Plosive', short: 'Pl')),
+                DBorder(data: '|'),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Labial–alveolar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 't͡p', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      PhoneticButton(
+                          phonetic: 'd͡b', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      Text(', Labial–velar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'k͡p', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      PhoneticButton(
+                          phonetic: 'ɡ͡b', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      Text(', Uvular–epiglottal ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'q͡ʡ', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                    ],
+                  ),
+                ),
+                DBorder(data: '|'),
+              ]),
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+              TableRow(children: [
+                Center(child: CLPhHeader(header: 'Fricative/appr.', short: 'F/A')),
+                DBorder(data: '|'),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Labial–palatal ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'ɥ̊', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      PhoneticButton(
+                          phonetic: 'ɥ', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      Text(', Labial–velar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'ʍ', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      PhoneticButton(
+                          phonetic: 'w', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                      Text(', Sj-sound ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'ɧ', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                    ],
+                  ),
+                ),
+                DBorder(data: '|'),
+              ]),
+              TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
+              TableRow(children: [
+                Center(child: CLPhHeader(header: 'Lateral appr.', short: 'LAp')),
+                DBorder(data: '|'),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Velarized alveolar ', style: LPFont.headerFontStyle),
+                      PhoneticButton(
+                          phonetic: 'ɫ', languagePhonemes: phonemes, disabled: disabled, onPressed: onPress),
+                    ],
+                  ),
+                ),
+                DBorder(data: '|'),
+              ]),
               TableRow(children: [HDash(), DBorder(data: '+'), HDash(), DBorder(data: '+')]),
             ],
           ),

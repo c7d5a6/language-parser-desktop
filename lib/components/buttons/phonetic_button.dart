@@ -82,6 +82,7 @@ class _PhoneticButton extends State<PhoneticButton> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TButton(
@@ -93,6 +94,7 @@ class _PhoneticButton extends State<PhoneticButton> {
         ),
         if (widget.consonant)
           Row(
+              mainAxisSize: MainAxisSize.min,
               children: IpaUtils.constanantVariants
                   .where((cw) =>
                       cw.isNotEmpty &&
@@ -109,6 +111,7 @@ class _PhoneticButton extends State<PhoneticButton> {
           }).toList(growable: false)),
         if (widget.vowel)
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               DBorder(data: '('),
               TButton(
@@ -142,6 +145,27 @@ class CPhoneticButton extends StatelessWidget {
       languagePhonemes: phonemes,
       disabled: disabled,
       consonant: true,
+      onPressed: onPressed,
+    );
+  }
+}
+
+class VPhoneticButton extends StatelessWidget {
+  final String phonetic;
+  final bool disabled;
+  final Function(String) onPressed;
+  final ListOfLanguagePhonemes phonemes;
+
+  const VPhoneticButton(
+      {super.key, required this.phonetic, required this.disabled, required this.phonemes, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return PhoneticButton(
+      phonetic: phonetic,
+      languagePhonemes: phonemes,
+      disabled: disabled,
+      vowel: true,
       onPressed: onPressed,
     );
   }

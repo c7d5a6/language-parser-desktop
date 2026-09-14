@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.11.1
+  sdk: ^3.13.3
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,10 +30,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sqlite3: 3.2.0
+  sqlite3: 3.5.2
   ffi: 2.2.0
 #  sqlite3_async: 1.0.8
-  file_picker: 10.3.10
+  file_picker: 12.3.0
   collection: 1.19.1
 
 dev_dependencies:
@@ -41,7 +41,7 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
-  test: ^1.30.0
+  test: 1.31.1
   flutter_lints: 6.0.0
   test_descriptor: ^2.0.1
 
